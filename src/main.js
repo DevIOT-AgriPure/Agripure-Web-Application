@@ -1,4 +1,6 @@
 import './assets/main.css'
+import router from './router/index.js'
+import PrimeVue from 'primevue/config';
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -12,6 +14,8 @@ import Button from 'primevue/button';
 
 const app = createApp(App)
 
+app.use(PrimeVue);
+app.use(router)
 app.component("pv-button",Button)
 
 app.mount('#app')

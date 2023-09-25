@@ -4,7 +4,7 @@ import TheWelcome from './components/TheWelcome.vue'
 </script>
 
 <template>
-  <h1>Agripure Base App</h1>
+  <RouterView />
 </template>
 
 <style scoped>
