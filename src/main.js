@@ -13,6 +13,7 @@ import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
 import AutoComplete from 'primevue/autocomplete';
 import Card from 'primevue/card';
+import InputText from 'primevue/inputtext';
 
 const app = createApp(App)
 
@@ -22,5 +23,6 @@ app.component("pv-button",Button)
 app.component("pv-avatar",Avatar)
 app.component("pv-autoComplete",AutoComplete)
 app.component("pv-card",Card)
+app.component("pv-input",InputText)
 
 app.mount('#app')
