@@ -13,6 +13,17 @@ const router = createRouter({
             path: '/specialist',
             name: 'about',
             component: () => import('../agripure/Home_specialist.vue')
+        },
+        {
+            path: '/farmer/cropDetail',
+            name: 'cropdetail',
+            component: () => import('../agripure/farmer/crop_details.vue')
+        }
+        ,
+        {
+            path: '/farmer/cropInventory',
+            name: 'cropInventory',
+            component: () => import('../agripure/farmer/crop_inventory.vue')
         }
     ]
 })

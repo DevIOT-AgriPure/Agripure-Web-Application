@@ -5,11 +5,11 @@
         </div>
 
         <div class="menu">
-            <router-link to="/home" class="button" style="margin-bottom: 1rem">
+            <router-link to="/farmer/cropInventory" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-home" style="font-size: 1rem; margin-right: 0.9rem;color: white" ></i>
                 <p class="text" style="font-size: 1.2rem;color: white">Home</p>
             </router-link>
-            <router-link to="/" class="button" style="margin-bottom: 1rem">
+            <router-link to="/farmer/cropDetail" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-user" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Specialist</span>
             </router-link>
