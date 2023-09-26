@@ -53,7 +53,6 @@ const ToggleMenu = () => {
 aside {
     display: flex;
     flex-direction: column;
-    font-family: monse;
 
     background-color: var(--dark);
     color: var(--light);

@@ -5,9 +5,8 @@ const http = axios.create({
 })
 export class CropServices{
     getCropsByFarmerId(id){        
-        data= http.get(baseURL+"?farmerId="+id);
-        console.log(data)
-        return data
+        return http.get("?farmerId="+id);
+        
     }
  
 }
