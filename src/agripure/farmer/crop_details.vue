@@ -1,4 +1,5 @@
 <template>
+  <div class="background">
     <div class="tomato-details">
         <div class="title">
           <h1 class="title-text">Tomato Details</h1>
@@ -24,6 +25,7 @@
           <p class="detail-text">Weather conditions: {{ cropWeather }}</p>
         </div>
     </div>
+  </div>  
 </template>
 <script>
 export default {
@@ -39,15 +41,22 @@ export default {
 };
 </script>
 <style scoped>
+.background {
+    background-color: #242424;
+    color: white; /* Cambiar el color del texto si es necesario */
+    margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
+    border-radius: 15px; /* Agregar bordes redondeados */
+    width: 100%;
+}
     .tomato-details {
-  background-color: #1c1c1c;
+
   color: white;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* Alinea los elementos a la izquierda */
   text-align: left; /* Alinea el texto a la izquierda */
-  width: 100vw;
+  
 }
 .title {
   margin-right: 20px; /* Espacio entre el título y el borde derecho */
@@ -59,6 +68,7 @@ export default {
 
 .detail {
   margin-right: 20px; /* Espacio entre los detalles y el borde derecho */
+  margin-top: 15px;
 }
 
 .detail-text {
@@ -66,6 +76,7 @@ export default {
 }
 .image-container {
   text-align: center; /* Centrar la imagen horizontalmente */
+  margin-top: 15px;
 }
 
 .centered-image {
@@ -78,6 +89,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
+  margin-top: 15px;
+  
 }
 
 .divider {
@@ -85,5 +98,6 @@ export default {
   height: 1px;
   background-color: rgba(255, 255, 255, 0.5); /* Color de línea divisoria */
   margin: 10px 0;
+  margin-top: 15px;
   }
 </style>
