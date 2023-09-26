@@ -1,4 +1,3 @@
-import './assets/main.css'
 import router from './router/index.js'
 import PrimeVue from 'primevue/config';
 
@@ -11,11 +10,13 @@ import "primevue/resources/primevue.min.css"                //core css
 import "primeicons/primeicons.css"
 
 import Button from 'primevue/button';
+import Avatar from 'primevue/avatar';
 
 const app = createApp(App)
 
 app.use(PrimeVue);
 app.use(router)
 app.component("pv-button",Button)
+app.component("pv-avatar",Avatar)
 
 app.mount('#app')
