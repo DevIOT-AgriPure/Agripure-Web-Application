@@ -1,18 +1,41 @@
 <template>
   <div class="background" >
-    <div class="header">
-        <h1>Good morning {{username}}!</h1>
-        <div class="card p-fluid">
-            <pv-autoComplete
-                    v-model="value"
-                    :suggestions="items"
-                    @complete="search"
-                    placeholder="Search for plants"
-                    style="margin-left: 5rem"
-                    class="searchBar"/>
-        </div>
+      <div class="header">
+          <h1 style="margin-right: 3rem">Good morning {{ username }}!</h1>
+          <div class="search-container">
+              <div class="searchBar-container">
+                  <pv-autoComplete
+                          v-model="value"
+                          :suggestions="items"
+                          @complete="search"
+                          placeholder="Search for plants"
+                          class="searchBar"
+                  />
+              </div>
+          </div>
+      </div>
+      <div class="inventory">
+          <h2>Your plants: </h2>
+          <div class="cards" style="margin-top: 2rem">
+              <pv-card style="width: 17em; border-radius: 15px;"> <!-- Agregamos el estilo border-radius -->
+                  <template #header>
+                      <img
+                          alt="user header"
+                          src="https://watchandlearn.scholastic.com/content/dam/classroom-magazines/watchandlearn/videos/animals-and-plants/plants/what-are-plants-/What-Are-Plants.jpg"
+                          style="margin: 1em; width: 15em; height: 150px;border-radius: 15px;"
+                      />
+                  </template>
+                  <template #title>Advanced Card</template>
+                  <template #footer>
+                      <div style="display: flex; justify-content: center">
+                          <pv-button label="Detail" severity="warning"  />
+                      </div>
+                  </template>
+              </pv-card>
+          </div>
+      </div>
 
-    </div>
+
   </div>
 </template>
 
@@ -47,13 +70,29 @@ export default {
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
 }
-.header{
-    margin: 2rem;
-    margin-left: 3rem;
+.header {
+    margin: 3rem;
     display: flex;
+    align-items: center; /* Centra verticalmente los elementos */
 }
-.searchBar{
 
+.search-container {
+    display: flex; /* Hace que los elementos dentro se muestren en línea */
+    align-items: center; /* Centra verticalmente los elementos */
 }
+
+.searchBar-container {
+    width: 200px; /* Establece un ancho fijo para el contenedor del pv-autoComplete */
+    margin-left: 10px; /* Ajusta el margen izquierdo según sea necesario */
+}
+
+.searchBar {
+    width: 100%; /* Establece el ancho del pv-autoComplete al 100% del contenedor */
+}
+
+.inventory{
+    margin: 0 5rem 0 5rem;
+}
+
 </style>
 
