@@ -7,4 +7,7 @@ export class PlantServices{
     getPlantInfoByCropId(id){   
         return http.get(""+id);
     }
+    getAllPlants(){
+        return http.get("");
+    }
 }

@@ -43,6 +43,47 @@
               </pv-card>
 
           </div>
+          <pv-dialog v-model:visible="visible" maximizable modal header="Add a plant" :style="{ width: '80vw' }">
+              <div class="addplantbackground" >
+                  <div style="margin: 3rem">
+                      <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
+                          <pv-autoComplete v-model="value"
+                                           :suggestions="items"
+                                           @complete="search"
+                                           placeholder="Search for a new plant"
+                                           class="searchBar" />
+                      </div>
+                  </div>
+
+                  <div class="inventory">
+                      <h2 style="margin-left: 2rem">Results:</h2>
+                      <div class="cards" style="margin-top: 2rem">
+                          <div v-for="crop in resultsPlants" :key="crop.id">
+                              <pv-card style="width: 17em; border-radius: 15px;">
+                                  <template #header>
+                                      <img
+                                          alt="user header"
+                                          :src="crop.imageUrl"
+                                          style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"
+                                      />
+                                  </template>
+                                  <template #title>{{ crop.name }}</template>
+                                  <template #footer>
+                                      <div style="display: flex; justify-content: center">
+                                          <pv-button label="Detail" severity="warning" />
+                                      </div>
+                                  </template>
+                              </pv-card>
+                          </div>
+
+                      </div>
+
+                  </div>
+
+
+
+              </div>
+          </pv-dialog>
 
       </div>
 
@@ -64,7 +105,9 @@ export default {
             value : ref(""),
             items : ref([]),
             showDropdown: false,
-            displayableCrops:[]
+            displayableCrops:[],
+            resultsPlants:[],
+            visible :false
 
         }
     },
@@ -86,8 +129,15 @@ export default {
                 })
             }
         },
+        getAllPlants(){
+            new PlantServices().getAllPlants().then(response=>{
+                this.resultsPlants=response.data
+            })
+        },
         addPlant(){
-            this.$router.push("/farmer/createCrop")
+            //this.$router.push("/farmer/createCrop")
+            this.visible=!this.visible
+            this.getAllPlants()
         }
     }
 }
@@ -95,11 +145,6 @@ export default {
 </script>
 
 <style scoped>
-pv-card:hover div {
-    background-color: lightcoral;
-    cursor: pointer;
-}
-
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(17em, 1fr)); /* 3 columnas y tamaño mínimo de 17em */
@@ -115,6 +160,14 @@ pv-card:hover div {
     margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
+    padding-bottom: 3rem;
+}
+.addplantbackground {
+    background-color: #242424;
+    color: white; /* Cambiar el color del texto si es necesario */
+    border-radius: 15px; /* Agregar bordes redondeados */
+    width: 100%;
+    padding-top: 3rem;
     padding-bottom: 3rem;
 }
 .header {
