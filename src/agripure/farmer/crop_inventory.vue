@@ -29,7 +29,7 @@
                       <template #title>{{ crop.name }}</template>
                       <template #footer>
                           <div style="display: flex; justify-content: center">
-                              <pv-button label="Detail" severity="warning" />
+                              <pv-button label="Detail" severity="warning" @click="showCropDetails(crop)" />
                           </div>
                       </template>
                   </pv-card>
@@ -45,12 +45,13 @@
           </div>
           <pv-dialog v-model:visible="visible" maximizable modal header="Add a plant" :style="{ width: '80vw' }">
               <div class="addplantbackground" >
-                  <div style="margin: 3rem">
+                  <div style="margin: 0 3rem 3rem 3rem">
+                      <h1 style="margin-bottom: 2rem">Search for a new plant</h1>
                       <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
                           <pv-autoComplete v-model="value"
                                            :suggestions="items"
                                            @complete="search"
-                                           placeholder="Search for a new plant"
+                                           placeholder="What are you looking for?"
                                            class="searchBar" />
                       </div>
                   </div>
@@ -84,6 +85,46 @@
 
               </div>
           </pv-dialog>
+          <pv-dialog v-model:visible="cropDetailsVisible" maximizable modal header="Crop Detail" :style="{ width: '80vw' }">
+              <div class="addplantbackground">
+                  <div class="crop-details">
+                      <div class="title">
+                          <h1 class="title-text">{{ currentCrop.name }} Details</h1>
+                      </div>
+                      <div class="detail">
+                          <p class="detail-text">Scientific name: {{ currentCrop.scientificName }}</p>
+                      </div>
+                      <div class="detail">
+                          <p class="detail-text">Variety: {{ currentCrop.variety }}</p>
+                      </div>
+                      <div class="image-container">
+                          <img :src="currentCrop.imageUrl" alt="crop Image" class="centered-image">
+                      </div>
+                      <div class="detail-row">
+                          <p class="detail-text">Land type: {{ currentCrop.landType }}</p>
+                      </div>
+                      <div class="divider"></div>
+                      <div class="detail-row">
+                          <p class="detail-text">Distance between plants: {{ currentCrop.distanceBetweenPlants }}</p>
+                      </div>
+                      <div class="divider"></div>
+                      <div class="detail-row">
+                          <p class="detail-text">Weather conditions: {{ currentCrop.weatherConditions }}</p>
+                      </div>
+                      <div style="display: flex; width: 100%;justify-content: end">
+                          <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
+                              <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
+                          </pv-button>
+                          <pv-button severity="danger" style="width: 15rem; color: white; font-weight: bold;" @click="deleteCrop">
+                              <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
+                          </pv-button>
+
+
+                      </div>
+
+                  </div>
+              </div>
+          </pv-dialog>
 
       </div>
 
@@ -106,8 +147,10 @@ export default {
             items : ref([]),
             showDropdown: false,
             displayableCrops:[],
+            currentCrop:{},
             resultsPlants:[],
-            visible :false
+            visible :false,
+            cropDetailsVisible :false
 
         }
     },
@@ -129,10 +172,20 @@ export default {
                 })
             }
         },
+        deleteCrop(){
+            this.cropDetailsVisible=!this.cropDetailsVisible
+        },
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
                 this.resultsPlants=response.data
             })
+        },
+        showCropDetails(crop) {
+            this.cropDetailsVisible=!this.cropDetailsVisible
+            this.currentCrop= crop;
+        },
+        findIndexById(id) {
+            //return this.rooms.findIndex((room) => room.id === id);
         },
         addPlant(){
             //this.$router.push("/farmer/createCrop")
@@ -192,6 +245,59 @@ export default {
 
 .inventory{
     margin: 0 5rem 0 5rem;
+}
+
+.crop-details {
+    color: white;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea los elementos a la izquierda */
+    text-align: left; /* Alinea el texto a la izquierda */
+
+}
+.title {
+    margin-right: 20px; /* Espacio entre el título y el borde derecho */
+}
+
+.title-text {
+    font-weight: bold;
+}
+
+.detail {
+    margin-right: 20px; /* Espacio entre los detalles y el borde derecho */
+    margin-top: 15px;
+}
+
+.detail-text {
+    font-weight: bold;
+}
+.image-container {
+    text-align: center; /* Centrar la imagen horizontalmente */
+    margin-top: 15px;
+
+}
+
+.centered-image {
+    max-width: 100%; /* Asegura que la imagen no sea más ancha que su contenedor */
+    max-height: 300px; /* Límite de altura máximo */
+    height: auto; /* Mantiene la proporción de aspecto de la imagen */
+    border-radius: 15px;
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.5); /* Color de línea divisoria */
+    margin: 10px 0;
+    margin-top: 15px;
 }
 
 </style>
