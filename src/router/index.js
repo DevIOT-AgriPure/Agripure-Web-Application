@@ -24,6 +24,11 @@ const router = createRouter({
             path: '/farmer/cropInventory',
             name: 'cropInventory',
             component: () => import('../agripure/farmer/crop_inventory.vue')
+        },
+        {
+            path:'/farmer/createCrop',
+            name:'createcrop',
+            component:()=>import('../agripure/farmer/create_crop.vue')
         }
     ]
 })
