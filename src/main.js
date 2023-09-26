@@ -14,6 +14,7 @@ import Avatar from 'primevue/avatar';
 import AutoComplete from 'primevue/autocomplete';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
 
 const app = createApp(App)
 
@@ -24,5 +25,6 @@ app.component("pv-avatar",Avatar)
 app.component("pv-autoComplete",AutoComplete)
 app.component("pv-card",Card)
 app.component("pv-input",InputText)
+app.component("pv-dropdown",Dropdown)
 
 app.mount('#app')

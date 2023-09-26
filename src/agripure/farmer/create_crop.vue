@@ -2,18 +2,14 @@
   <div class="background">
     <div class="crop-registration">
       <div class="left-section">
-        <img src="ruta_de_la_imagen.jpg" alt="Imagen del cultivo" />
+        <img :src="selectedPlantImage" alt="Imagen del cultivo" style="width: 500px; height: 500px;" />
       </div>
       <div class="right-section">
         <h2><b>Register a Crop</b></h2>
         <div class="form-row">
           <label for="plant">Plant:  </label>
-          <select id="plant" v-model="selectedPlant">
-            <option value="plant1">Planta 1</option>
-            <option value="plant2">Planta 2</option>
-            <option value="plant3">Planta 3</option>
-            <!-- Puedes cargar dinámicamente las opciones desde tu base de datos -->
-          </select>
+          <pv-dropdown v-model="selectedPlant" :options="plants" option-label="label" option-value="value" @change="updateSelectedPlantImage" placeholder="Select a plant"></pv-dropdown>
+         
         </div>
         <div class="form-row">
         <label style="color: white;">Land type:  </label>
@@ -41,9 +37,22 @@
       return {
         selectedPlant: null,
         landType:'',
-        spacePlants:''
+        spacePlants:'',
+        plants: [
+        { label: 'TOMATE', value: 'plant1', imageUrl: 'https://s1.eestatic.com/2021/07/12/actualidad/595952167_195030066_1706x960.jpg' },
+        { label: 'PEPINO', value: 'plant2', imageUrl: 'https://www.finedininglovers.com/es/sites/g/files/xknfdk1706/files/styles/article_1200_800_fallback/public/2022-06/Type%20of%20cucumber.jpg?itok=WEuXomjV' },
+        { label: 'CEBOLLA', value: 'plant3', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJgyeKFSDUEuff1j_znrU6KQfal0dutg4sYkqlS009n_HH4ey9RkblwMvhjX17TFd4FL8&usqp=CAU' }
+        // Agrega más plantas con sus respectivas imágenes y valores
+      ]
       };
     },
+    computed: {
+    selectedPlantImage() {
+      // Busca la URL de la imagen de la planta seleccionada
+      const selectedPlantData = this.plants.find(plant => plant.value === this.selectedPlant);
+      return selectedPlantData ? selectedPlantData.imageUrl : '';
+    }
+  },
     methods: {
       submitForm() {
         // Aquí puedes enviar los datos del cultivo al servidor o realizar otras acciones.
@@ -73,7 +82,9 @@
   
   .left-section {
     flex: 1;
-    padding: 20px;
+  display: flex;
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center; /* Centrar verticalmente */
   }
   
   .right-section {

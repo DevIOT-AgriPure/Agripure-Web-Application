@@ -41,6 +41,7 @@
 
 <script>
 import { ref } from "vue";
+import { CropServices } from "../../services/crop-service";
 export default {
     name: "crop_inventory",
     data(){
