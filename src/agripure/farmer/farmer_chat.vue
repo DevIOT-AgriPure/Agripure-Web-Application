@@ -7,18 +7,22 @@
             </div>
         </div>
         <div style="margin: 0 2rem 0 2rem">
-            <div class="chat-card" @click="irAChat">
-                <div class="profile-image">
-                    <img src="https://static.albertafarmexpress.ca/wp-content/uploads/2022/11/10152211/on-farm-trials-boychyn-supplied.jpeg" alt="Foto de perfil">
-                </div>
-                <div class="chat-content">
-                    <div class="chat-header">
-                        <h3 style="margin-bottom: 0.5rem">Cesar Paredes</h3>
-                        <span>00:08</span>
+            <div v-for="contact in displayableContacts"
+                 :key="contact.id">
+                <div class="chat-card" @click="irAChat(contact.id)">
+                    <div class="profile-image">
+                        <img :src="contact.imageUrl" alt="Foto de perfil">
                     </div>
-                    <p>Último mensaje del usuario...</p>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <h3 style="margin-bottom: 0.5rem">{{ contact.name }}</h3>
+                            <span>00:08</span>
+                        </div>
+                        <p>Último mensaje del usuario...</p>
+                    </div>
                 </div>
             </div>
+
         </div>
 
     </div>
@@ -27,6 +31,8 @@
 
 <script>
 import {ref} from "vue";
+import {ContactServices} from "../../services/contacts-service"
+import {UserServices} from "../../services/user-service"
 
 export default {
     name: "farmer_chat",
@@ -35,15 +41,28 @@ export default {
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
             items : ref([]),
+            displayableContacts:[]
 
         }
+    },
+    created() {
+        new ContactServices().getContactsForFarmer(1).then(response=>{
+            this.getDisplayableContacts(response.data)
+        })
     },
     methods:{
         search(event){
             items.value = [...Array(10).keys()].map((item) => event.query + '-' + item);
         },
-        irAChat() {
-
+        irAChat(id) {
+            this.$router.push("/chat/" + id)
+        },
+        getDisplayableContacts(rawContacts){
+            for (let i = 0; i < rawContacts.length; i++) {
+                new UserServices().getUserById(rawContacts[i].specialistId).then(response=>{
+                    this.displayableContacts.push(response.data)
+                })
+            }
         }
     }
 }

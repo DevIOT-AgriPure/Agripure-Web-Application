@@ -67,7 +67,7 @@ export default {
         })
     },
     contactSpecialist() {
-      // Aquí puedes agregar la lógica para contactar al especialista
+        this.$router.push("/chat/" + this.id)
     },
   },
 };
