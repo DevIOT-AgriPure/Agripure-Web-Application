@@ -18,7 +18,7 @@
                             <h3 style="margin-bottom: 0.5rem">{{ contact.name }}</h3>
                             <span>00:08</span>
                         </div>
-                        <p>Último mensaje del usuario...</p>
+                        <p>Envia un mensaje !</p>
                     </div>
                 </div>
             </div>
