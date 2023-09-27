@@ -2,6 +2,7 @@
     <aside :class="`${is_expanded ? 'is-expanded' : ''}`" >
         <div class="logo" style="display: flex;justify-content: center;margin-top: 1rem;margin-bottom: 5rem">
             <img :src="logoURL" alt="Vue"   style="width: 70px;"/>
+            <h3 style="color: white;">Agripure</h3>
         </div>
 
         <div class="menu">
@@ -77,11 +78,17 @@ aside {
     }
 
     .logo {
-        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centra horizontalmente */
+        margin-top: 1rem;
+        margin-bottom: 5rem;
+        color: white;
+    }
 
-        img {
-            width: 2rem;
-        }
+    .logo img {
+        width: 70px;
+        margin-bottom: 0.5rem; /* Espacio entre la imagen y el texto */
     }
 
     .menu-toggle-wrap {
