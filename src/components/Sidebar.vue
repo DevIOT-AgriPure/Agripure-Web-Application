@@ -9,13 +9,21 @@
                 <i class="pi pi-home" style="font-size: 1rem; margin-right: 0.9rem;color: white" ></i>
                 <p class="text" style="font-size: 1.2rem;color: white">Home</p>
             </router-link>
-            <router-link to="/farmer/cropDetail" class="button" style="margin-bottom: 1rem">
+            <router-link to="/specialist" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-user" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Specialist</span>
             </router-link>
             <router-link to="/" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-tablet" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Devices</span>
+            </router-link>
+            <router-link to="/farmer/chat" class="button" style="margin-bottom: 1rem">
+                <i class="pi pi-comments" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
+                <span class="text" style="font-size: 1.2rem;color: white">Chat</span>
+            </router-link>
+            <router-link to="/" class="button" style="margin-bottom: 1rem">
+                <i class="pi pi-calendar" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
+                <span class="text" style="font-size: 1.2rem;color: white">Projects</span>
             </router-link>
             <router-link to="/" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-bell" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>

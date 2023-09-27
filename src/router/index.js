@@ -29,7 +29,23 @@ const router = createRouter({
             path:'/farmer/createCrop',
             name:'createcrop',
             component:()=>import('../agripure/farmer/create_crop.vue')
-        }
+        },
+        {
+            path: '/specialist',
+            name: 'about',
+            component: () => import('../agripure/farmer/Home_specialist1.vue')
+        },
+        {
+            path: '/info/:id',
+            name: 'info',
+            component: () => import('../agripure/farmer/Home_specialist2.vue'),
+            props: true,
+        },
+        {
+            path: '/farmer/chat',
+            name: 'farmerChat',
+            component: () => import('../agripure/farmer/farmer_chat.vue')
+        },
     ]
 })
 export default router
