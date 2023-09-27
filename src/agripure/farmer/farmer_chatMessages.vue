@@ -2,6 +2,7 @@
     <div class="background">
         <div class="chat-space" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
             <div class="info-card">
+                <i class="pi pi-angle-left" style="margin-right: 1rem; cursor: pointer;" @click="goback"></i>
                 <div class="profile-image">
                     <img :src="displayableContactInfo.imageUrl" alt="Foto de perfil">
                 </div>
@@ -42,6 +43,11 @@ export default {
             this.displayableContactInfo=response.data
             console.log(this.displayableContactInfo)
         })
+    },
+    methods:{
+      goback(){
+          this.$router.push("/farmer/chat")
+      }
     }
 }
 </script>
@@ -61,7 +67,6 @@ export default {
     padding: 1.2rem;
     background-color: #1c1c1c; /* Color de fondo negro */
     color: white; /* Color de texto blanco */
-    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
     margin-bottom: 10px; /* Espaciado entre tarjetas */
 }
 

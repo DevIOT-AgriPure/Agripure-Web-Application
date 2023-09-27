@@ -52,6 +52,11 @@ const router = createRouter({
             name: 'farmerChat',
             component: () => import('../agripure/farmer/farmer_chat.vue')
         },
+        {
+            path: '/farmer/projects',
+            name: 'farmerProject',
+            component: () => import('../agripure/farmer/farmer_projects.vue')
+        },
     ]
 })
 export default router
