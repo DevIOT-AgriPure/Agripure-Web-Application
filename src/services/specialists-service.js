@@ -6,7 +6,6 @@ const http = axios.create({
 export class SpecialistServices{
     getSpecialistInformationByUserId(id){
         return http.get("?userId="+id);
-
     }
 
 }

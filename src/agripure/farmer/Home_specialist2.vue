@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import {SpecialistServices} from "../../services/specialists-service"
+import {UserServices} from "@/services/user-service";
 export default {
   props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
   data() {
@@ -53,28 +55,16 @@ export default {
   },
   methods: {
     loadSpecialistDetails(id) {
-      if (id === '1') {
-        this.specialistName = 'Cesar Paredes';
-        this.expertise = 'Especialista en crecimiento de plantas';
-        this.image = "https://static.albertafarmexpress.ca/wp-content/uploads/2022/11/10152211/on-farm-trials-boychyn-supplied.jpeg";
-        this.location = 'Lima, Perú';
-        this.contactEmail = 'susanapuesto@example.com';
-        this.areasOfFocus = 'Gestión de cultivos, Salud del suelo, Control de plagas';
-      } else if (id === '2') {
-        this.specialistName = 'Susana Suarez';
-        this.expertise = 'Agricultora experta en verduras';
-        this.image = "https://as2.ftcdn.net/v2/jpg/05/12/12/07/1000_F_512120707_OjneMPioROqdKGXiHJbQy9xVKKXdDX6b.jpg";
-        this.location = 'Cusco, Perú';
-        this.contactEmail = 'cesarparedesquispe@example.com';
-        this.areasOfFocus = 'Manejo de cultivos, Agricultura sostenible, Riego';
-      } else if (id === '3') {
-        this.specialistName = 'Adriano Vilca';
-        this.expertise = 'Cultivos Organicos';
-        this.image = "https://static.albertafarmexpress.ca/wp-content/uploads/2022/07/19174144/Baarda-Lewis.jpeg";
-        this.location = 'Arequipa, Perú';
-        this.contactEmail = 'adrian156@example.com';
-        this.areasOfFocus = 'Agricultura orgánica, Investigación agrícola, Producción de alimentos';
-      }
+        new UserServices().getUserById(id).then(response=>{
+            this.specialistName=response.data.name
+            this.image=response.data.imageUrl
+            this.location =response.data.location
+            new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
+                this.expertise=response.data[0].expertise
+                this.contactEmail = response.data[0].contactEmail
+                this.areasOfFocus= response.data[0].areasOfFocus
+            })
+        })
     },
     contactSpecialist() {
       // Aquí puedes agregar la lógica para contactar al especialista
@@ -91,6 +81,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   margin: 0 auto;
+    width: 100%;
 }
 
 .agriculture-specialist-details {

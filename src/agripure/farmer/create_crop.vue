@@ -9,7 +9,7 @@
         <div class="form-row">
           <label for="plant">Plant:  </label>
           <pv-dropdown v-model="selectedPlant" :options="plants" option-label="label" option-value="value" @change="updateSelectedPlantImage" placeholder="Select a plant"></pv-dropdown>
-         
+
         </div>
         <div class="form-row">
         <label style="color: white;">Land type:  </label>
@@ -24,7 +24,7 @@
           style="border: 1px solid #4CAF50; background-color: transparent; color: white;"/>
         </div>
         <div class="center-button"><pv-button @click="submitForm" style="background-color: #1c1c1c; color: white;">Registrar Cultivo</pv-button></div>
-        
+
 
       </div>
     </div>
@@ -67,12 +67,13 @@
   
   <style scoped>
   .background {
-    background-color: #242424;
-    color: white; /* Cambiar el color del texto si es necesario */
-    margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
-    border-radius: 15px; /* Agregar bordes redondeados */
-    width: 100%;
-}
+      background-color: #242424;
+      color: white; /* Cambiar el color del texto si es necesario */
+      margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
+      border-radius: 15px; /* Agregar bordes redondeados */
+      width: 100%;
+      padding-bottom: 3rem;
+  }
   .crop-registration {
     padding-top: 10px;
     display: flex;

@@ -6,7 +6,6 @@ const http = axios.create({
 export class UserServices{
     getUserById(id){
         return http.get(""+id);
-
     }
 
 }
