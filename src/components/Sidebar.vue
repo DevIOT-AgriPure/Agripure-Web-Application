@@ -2,16 +2,25 @@
     <aside :class="`${is_expanded ? 'is-expanded' : ''}`" >
         <div class="logo" style="display: flex;justify-content: center;margin-top: 1rem;margin-bottom: 5rem">
             <img :src="logoURL" alt="Vue"   style="width: 70px;"/>
+            <h3 style="color: white;">Agripure</h3>
         </div>
 
         <div class="menu">
-            <router-link to="/home" class="button" style="margin-bottom: 1rem">
+            <router-link to="/farmer/cropInventory" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-home" style="font-size: 1rem; margin-right: 0.9rem;color: white" ></i>
                 <p class="text" style="font-size: 1.2rem;color: white">Home</p>
             </router-link>
-            <router-link to="/" class="button" style="margin-bottom: 1rem">
+            <router-link to="/specialist" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-user" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Specialist</span>
+            </router-link>
+            <router-link to="/farmer/chat" class="button" style="margin-bottom: 1rem">
+                <i class="pi pi-comments" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
+                <span class="text" style="font-size: 1.2rem;color: white">Chat</span>
+            </router-link>
+            <router-link to="/farmer/projects" class="button" style="margin-bottom: 1rem">
+                <i class="pi pi-calendar" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
+                <span class="text" style="font-size: 1.2rem;color: white">Projects</span>
             </router-link>
             <router-link to="/" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-tablet" style="font-size: 1rem; margin-right: 0.9rem;color: white"></i>
@@ -53,7 +62,6 @@ const ToggleMenu = () => {
 aside {
     display: flex;
     flex-direction: column;
-    font-family: monse;
 
     background-color: var(--dark);
     color: var(--light);
@@ -70,11 +78,17 @@ aside {
     }
 
     .logo {
-        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centra horizontalmente */
+        margin-top: 1rem;
+        margin-bottom: 5rem;
+        color: white;
+    }
 
-        img {
-            width: 2rem;
-        }
+    .logo img {
+        width: 70px;
+        margin-bottom: 0.5rem; /* Espacio entre la imagen y el texto */
     }
 
     .menu-toggle-wrap {
