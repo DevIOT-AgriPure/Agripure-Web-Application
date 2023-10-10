@@ -7,9 +7,12 @@
               <div class="card p-fluid" style="width: 80%">
                   <pv-autoComplete v-model="searchInventorValue"
                                    :suggestions="searchInventorItems"
-                                   @complete="inventoSearch"
+                                   @complete="inventorySearch"
+                                   @itemSelect="inventorySearchSelected"
                                    placeholder="Search your plant"
-                                   class="searchBar" />              </div>
+                                   class="searchBar"
+                                   />
+              </div>
           </div>
       </div>
       <div class="inventory">
@@ -82,9 +85,10 @@
                       <div style="margin: 0 3rem 3rem 3rem">
                           <h1 style="margin-bottom: 2rem;">Search for a new plant</h1>
                           <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
-                              <pv-autoComplete v-model="value"
-                                               :suggestions="items"
-                                               @complete="search"
+                              <pv-autoComplete v-model="searchNewPlantValue"
+                                               :suggestions="searchNewPlantItems"
+                                               @complete="newPlantSearch"
+                                               @itemSelect="newPlantSearchSelected"
                                                placeholder="What are you looking for?"
                                                class="searchBar" />
                           </div>
@@ -92,7 +96,7 @@
                       <div class="inventory">
                           <h2 style="margin-left: 2rem">Results:</h2>
                           <div class="cards" style="margin-top: 2rem">
-                              <div v-for="crop in resultsPlants" :key="crop.id">
+                              <div v-for="crop in currentResultsPlants" :key="crop.id">
                                   <pv-card style="width: 17em; border-radius: 15px;">
                                       <template #header>
                                           <img
@@ -173,16 +177,19 @@ export default {
             username:"Huell",
             searchInventorValue: ref(""),
             searchInventorItems: ref([]),
-            value: ref(""),
-            items: ref([]),
+            searchNewPlantValue: ref(""),
+            searchNewPlantItems: ref([]),
+            newPlantsSearchOptions:[],
             showDropdown: false,
             displayableCrops:[],
             currentCrop:{},
             currentPlantInSearch:{},
-            resultsPlants:[],
+            defaultResultsPlants:[],
             visible :false,
             cropDetailsVisible :false,
-            showDetailsForSearch:false
+            showDetailsForSearch:false,
+            currentResultsPlants:[]
+
 
         }
     },
@@ -193,11 +200,38 @@ export default {
 
     },
     methods:{
-        inventoSearch(event) {
-            this.searchInventorItems = [...Array(10).keys()].map((item) => this.searchInventorValue + "-" + item);
+        inventorySearchSelected(){
+
         },
-        search(event) {
-            this.items = [...Array(10).keys()].map((item) => this.value + "-" + item);
+        newPlantSearchSelected() {
+            this.currentResultsPlants=this.newPlantsSearchOptions
+        },
+        inventorySearch(event) {
+
+        },
+        newPlantSearch(event){
+            console.log("Busque: "+this.searchNewPlantValue)
+            new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
+                this.newPlantsSearchOptions=response.data
+                let options=[]
+                for (let i = 0; i < response.data.length; i++) {
+                    options.push(response.data[i].name)
+                }
+                this.searchNewPlantItems=options
+            })
+            const previousValue = this.searchNewPlantValue;
+
+            // Espera un momento para asegurarte de que el modelo se haya actualizado
+            setTimeout(() => {
+                const newValue = this.searchInventorValue;
+                if (previousValue !== newValue) {
+                    // El valor ha cambiado, lo que indica que se seleccionó una sugerencia
+                    console.log("Se hizo clic en una sugerencia:", newValue);
+                } else {
+                    // No se hizo clic en una sugerencia, se ingresó manualmente
+                    console.log("Valor ingresado manualmente:", newValue);
+                }
+            }, 3000); // Ajusta el tiempo de espera según sea necesario
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
@@ -212,6 +246,7 @@ export default {
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
                 this.resultsPlants=response.data
+                this.currentResultsPlants=this.resultsPlants
             })
         },
         showCropDetails(crop) {

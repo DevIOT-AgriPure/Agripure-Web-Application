@@ -10,4 +10,7 @@ export class PlantServices{
     getAllPlants(){
         return http.get("");
     }
+    getResultsByPlantName(plantName){
+        return http.get("?name_like="+plantName);
+    }
 }
