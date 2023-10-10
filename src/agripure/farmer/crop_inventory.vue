@@ -204,7 +204,13 @@ export default {
 
         },
         newPlantSearchSelected() {
-            this.currentResultsPlants=this.newPlantsSearchOptions
+            for (let i = 0; i < this.currentResultsPlants.length; i++) {
+                if(this.currentResultsPlants[i].name===this.searchNewPlantValue){
+                    let temp=this.currentResultsPlants[i]
+                    this.currentResultsPlants=[]
+                    this.currentResultsPlants.push(temp)
+                }
+            }
         },
         inventorySearch(event) {
 
@@ -214,24 +220,17 @@ export default {
             new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
                 this.newPlantsSearchOptions=response.data
                 let options=[]
-                for (let i = 0; i < response.data.length; i++) {
-                    options.push(response.data[i].name)
+                if(response.data.length===0){
+                    this.currentResultsPlants=this.resultsPlants
+                }else {
+                    for (let i = 0; i < response.data.length; i++) {
+                        options.push(response.data[i].name)
+                    }
+                    this.searchNewPlantItems=options
+                    this.currentResultsPlants=this.newPlantsSearchOptions
                 }
-                this.searchNewPlantItems=options
-            })
-            const previousValue = this.searchNewPlantValue;
 
-            // Espera un momento para asegurarte de que el modelo se haya actualizado
-            setTimeout(() => {
-                const newValue = this.searchInventorValue;
-                if (previousValue !== newValue) {
-                    // El valor ha cambiado, lo que indica que se seleccionó una sugerencia
-                    console.log("Se hizo clic en una sugerencia:", newValue);
-                } else {
-                    // No se hizo clic en una sugerencia, se ingresó manualmente
-                    console.log("Valor ingresado manualmente:", newValue);
-                }
-            }, 3000); // Ajusta el tiempo de espera según sea necesario
+            })
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
@@ -262,6 +261,7 @@ export default {
         },
         addPlant(){
             //this.$router.push("/farmer/createCrop")
+            this.searchNewPlantValue=""
             this.visible=!this.visible
             this.showDetailsForSearch=false
             this.getAllPlants()
