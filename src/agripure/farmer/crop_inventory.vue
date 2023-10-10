@@ -157,8 +157,6 @@
                           <pv-button severity="danger" style="width: 15rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
                           </pv-button>
-
-
                       </div>
                   </div>
               </div>

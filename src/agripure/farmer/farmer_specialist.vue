@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="inventory" style="margin-bottom: 20px;">
-        <h2 style="margin: 2rem 0 2rem 0">Contactos:</h2>
+        <h2 style="margin: 2rem 0 2rem 0">Contacts:</h2>
         <div class="cards">
           <div v-for="contact in displayableContacts" :key="contact.id">
             <pv-card style="width: 17em; border-radius: 15px;">
@@ -38,7 +38,7 @@
           </div>
           <pv-card style="width: 17em; border-radius: 15px;">
             <template #content>
-              <pv-button text @click="addPlant" style="border-radius: 15px; width: 100%; height: 17rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <pv-button text @click="addSpecialist" style="border-radius: 15px; width: 100%; height: 17rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <h3 style="margin: 0;">SEARCH MORE SPECIALIST</h3>
               </pv-button>
             </template>
@@ -81,6 +81,82 @@
           </div>
         </div>
       </pv-dialog>
+      <pv-dialog v-model:visible="addSpecialistVisible" maximizable modal header="Contact a plant" :style="{ width: '80vw' }">
+        <div class="addplantbackground" >
+          <div class="detail" v-if="showDetailsForSearch">
+            <div class="crop-details">
+              <div class="title">
+                <h1 class="title-text">{{ currentPlantInSearch.name }} Details</h1>
+              </div>
+              <div class="detail">
+                <p class="detail-text">Scientific name: {{ currentPlantInSearch.scientificName }}</p>
+              </div>
+              <div class="detail">
+                <p class="detail-text">Variety: {{ currentPlantInSearch.variety }}</p>
+              </div>
+              <div class="image-container">
+                <img :src="currentPlantInSearch.imageUrl" alt="crop Image" class="centered-image">
+              </div>
+              <div class="detail-row">
+                <p class="detail-text">Land type: {{ currentPlantInSearch.landType }}</p>
+              </div>
+              <div class="divider"></div>
+              <div class="detail-row">
+                <p class="detail-text">Distance between plants: {{ currentPlantInSearch.distanceBetweenPlants }}</p>
+              </div>
+              <div class="divider"></div>
+              <div class="detail-row">
+                <p class="detail-text">Weather conditions: {{ currentPlantInSearch.weatherConditions }}</p>
+              </div>
+              <div style="display: flex; width: 100%;justify-content: end">
+                <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="showDetailsForSearch=!showDetailsForSearch">
+                  <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
+                </pv-button>
+                <pv-button style="width: 15rem; color: white; font-weight: bold;" @click="addPlantToCrop">
+                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Add plant</div>
+                </pv-button>
+              </div>
+            </div>
+          </div>
+          <div class="results" v-if="!showDetailsForSearch">
+            <div style="margin: 0 3rem 3rem 3rem">
+              <h1 style="margin-bottom: 2rem;">Search for a new specialist</h1>
+              <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
+                <pv-autoComplete v-model="searchNewPlantValue"
+                                 :suggestions="searchNewPlantItems"
+                                 @complete="newPlantSearch"
+                                 @itemSelect="newPlantSearchSelected"
+                                 placeholder="What are you looking for?"
+                                 class="searchBar" />
+              </div>
+            </div>
+            <div class="inventory">
+              <h2 style="margin-left: 2rem">Results:</h2>
+              <p v-if="currentResultsPlants !== defaultResultsPlants" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
+              <div class="cards" style="margin-top: 2rem">
+                <div v-for="crop in currentResultsPlants" :key="crop.id">
+                  <pv-card style="width: 17em; border-radius: 15px;">
+                    <template #header>
+                      <img
+                          alt="user header"
+                          :src="crop.imageUrl"
+                          style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"
+                      />
+                    </template>
+                    <template #title>{{ crop.name }}</template>
+                    <template #footer>
+                      <div style="display: flex; justify-content: center">
+                        <pv-button label="Detail" severity="warning" @click="showDetailsForPlantInSearch(crop)" />
+                      </div>
+                    </template>
+                  </pv-card>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </pv-dialog>
 
     </div>
   </div>
@@ -91,6 +167,7 @@ import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {SpecialistServices} from "@/services/specialists-service";
+import {PlantServices} from "@/services/plant-service";
 
 export default {
   name: "Farmer_specialist",
@@ -103,7 +180,9 @@ export default {
       showDropdown: false,
       displayableContacts:[],
       contactDetailsVisible: false,
-      currentContact:{}
+      addSpecialistVisible: false,
+      currentContact:{},
+      showDetailsForSearch:false
     };
   },
   created() {
@@ -138,6 +217,19 @@ export default {
     },
     contactSpecialist() {
       this.$router.push("/chat/" + this.currentContact.id)
+    },
+    addSpecialist(){
+      //this.$router.push("/farmer/createCrop")
+      this.searchNewPlantValue=""
+      this.addSpecialistVisible=!this.addSpecialistVisible
+      this.showDetailsForSearch=false
+      this.getAllSpecialist()
+    },
+    getAllSpecialist(){
+      /*new SpecialistServices().getAllPlants().then(response=>{
+        this.defaultResultsPlants=response.data
+        this.currentResultsPlants=this.defaultResultsPlants
+      })*/
     },
   },
 };
@@ -209,7 +301,61 @@ export default {
 }
 
 .green-button {
+  margin-top: 1.5rem;
+  color: white;
+}
+
+.agriculture-specialist-details {
+  text-align: left;
+  padding: 20px;
+}
+
+.title-text {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.detail-text {
+  font-size: 18px;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.image-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.centered-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.divider {
+  height: 1px;
+  background-color: #ccc;
+  margin: 20px 0;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+}
+
+.green-button {
   background-color: green;
   color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.green-button:hover {
+  background-color: darkgreen;
 }
 </style>
