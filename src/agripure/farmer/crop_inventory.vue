@@ -16,9 +16,12 @@
           </div>
       </div>
       <div class="inventory">
-  <h2>Your plants:</h2>
+  <div>
+      <h2>Your plants:</h2>
+      <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+  </div>
           <div class="cards" style="margin-top: 2rem">
-              <div v-for="crop in displayableCrops" :key="crop.id">
+              <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
                       <template #header>
                           <img
@@ -95,6 +98,7 @@
                       </div>
                       <div class="inventory">
                           <h2 style="margin-left: 2rem">Results:</h2>
+                          <p v-if="currentResultsPlants !== defaultResultsPlants" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
                           <div class="cards" style="margin-top: 2rem">
                               <div v-for="crop in currentResultsPlants" :key="crop.id">
                                   <pv-card style="width: 17em; border-radius: 15px;">
@@ -120,7 +124,6 @@
 
               </div>
           </pv-dialog>
-
           <pv-dialog v-model:visible="cropDetailsVisible" maximizable modal header="Crop Detail" :style="{ width: '80vw' }">
               <div class="addplantbackground">
                   <div class="crop-details">
@@ -188,7 +191,8 @@ export default {
             visible :false,
             cropDetailsVisible :false,
             showDetailsForSearch:false,
-            currentResultsPlants:[]
+            currentResultsPlants:[],
+            currentInventoryResultsPlants:[]
 
 
         }
@@ -200,8 +204,20 @@ export default {
 
     },
     methods:{
+        resetInventory(){
+          this.currentInventoryResultsPlants=this.displayableCrops
+        },
+        resetAddPlant(){
+            this.currentResultsPlants = this.defaultResultsPlants
+        },
         inventorySearchSelected(){
-
+            for (let i = 0; i < this.currentInventoryResultsPlants.length; i++) {
+                if(this.currentInventoryResultsPlants[i].name===this.searchInventorValue){
+                    let temp=this.currentInventoryResultsPlants[i]
+                    this.currentInventoryResultsPlants=[]
+                    this.currentInventoryResultsPlants.push(temp)
+                }
+            }
         },
         newPlantSearchSelected() {
             for (let i = 0; i < this.currentResultsPlants.length; i++) {
@@ -213,6 +229,18 @@ export default {
             }
         },
         inventorySearch(event) {
+            console.log("Busque: "+this.searchInventorValue.toString())
+            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+            const matchingCrops = this.displayableCrops.filter(crop =>
+                crop.name.toLowerCase().includes(this.searchInventorValue.toString().toLowerCase())
+            );
+            if(matchingCrops.length===0){
+                this.currentInventoryResultsPlants=this.displayableCrops
+            }else {
+                this.searchInventorItems = matchingCrops.map(crop => crop.name);
+                this.currentInventoryResultsPlants=matchingCrops
+            }
+
 
         },
         newPlantSearch(event){
@@ -237,6 +265,7 @@ export default {
                 new PlantServices().getPlantInfoByCropId(rawCrop[i].id).then(response=>{
                     this.displayableCrops.push(response.data)
                 })
+                this.currentInventoryResultsPlants=this.displayableCrops
             }
         },
         deleteCrop(){
@@ -244,8 +273,8 @@ export default {
         },
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
-                this.resultsPlants=response.data
-                this.currentResultsPlants=this.resultsPlants
+                this.defaultResultsPlants=response.data
+                this.currentResultsPlants=this.defaultResultsPlants
             })
         },
         showCropDetails(crop) {
