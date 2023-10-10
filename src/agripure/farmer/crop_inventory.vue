@@ -296,7 +296,7 @@ export default {
             //this.$router.push("/farmer/createCrop")
             this.visible=!this.visible
             this.showDetailsForSearch=false
-            this.getAllPlants()
+            //this.getAllPlants()
         }
     }
 }

@@ -84,36 +84,40 @@
       <pv-dialog v-model:visible="addSpecialistVisible" maximizable modal header="Contact a plant" :style="{ width: '80vw' }">
         <div class="addplantbackground" >
           <div class="detail" v-if="showDetailsForSearch">
-            <div class="crop-details">
+            <div class="agriculture-specialist-details">
               <div class="title">
-                <h1 class="title-text">{{ currentPlantInSearch.name }} Details</h1>
+                <h1 class="title-text">Agriculture Specialist Details</h1>
               </div>
               <div class="detail">
-                <p class="detail-text">Scientific name: {{ currentPlantInSearch.scientificName }}</p>
+                <p class="detail-text">Name: {{ currentSpecialistInSearch.name }}</p>
               </div>
               <div class="detail">
-                <p class="detail-text">Variety: {{ currentPlantInSearch.variety }}</p>
+                <p class="detail-text">Expertise: {{ currentSpecialistInSearch.expertise }}</p>
               </div>
               <div class="image-container">
-                <img :src="currentPlantInSearch.imageUrl" alt="crop Image" class="centered-image">
+                <img
+                    :src="currentSpecialistInSearch.imageUrl"
+                    alt="Specialist Image"
+                    class="centered-image"
+                />
               </div>
               <div class="detail-row">
-                <p class="detail-text">Land type: {{ currentPlantInSearch.landType }}</p>
+                <p class="detail-text">Location: {{ currentSpecialistInSearch.location }}</p>
               </div>
               <div class="divider"></div>
               <div class="detail-row">
-                <p class="detail-text">Distance between plants: {{ currentPlantInSearch.distanceBetweenPlants }}</p>
+                <p class="detail-text">Contact Email: {{ currentSpecialistInSearch.contactEmail }}</p>
               </div>
               <div class="divider"></div>
               <div class="detail-row">
-                <p class="detail-text">Weather conditions: {{ currentPlantInSearch.weatherConditions }}</p>
+                <p class="detail-text">Areas of Focus: {{ currentSpecialistInSearch.areasOfFocus }}</p>
               </div>
-              <div style="display: flex; width: 100%;justify-content: end">
+              <div class="button-row">
                 <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="showDetailsForSearch=!showDetailsForSearch">
                   <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
                 </pv-button>
-                <pv-button style="width: 15rem; color: white; font-weight: bold;" @click="addPlantToCrop">
-                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Add plant</div>
+                <pv-button style="width: 15rem; color: white; font-weight: bold;" @click="sendRequestToSpecialist">
+                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Send request</div>
                 </pv-button>
               </div>
             </div>
@@ -237,6 +241,11 @@ export default {
     showDetailsForSpecialistInSearch(specialist){
       this.showDetailsForSearch=!this.showDetailsForSearch
       this.currentSpecialistInSearch=specialist;
+    },
+    sendRequestToSpecialist(){
+      //this.$router.push("/farmer/createCrop")
+      this.addSpecialistVisible=!this.addSpecialistVisible
+      this.showDetailsForSearch=false
     }
   },
 };
