@@ -1,25 +1,26 @@
 <template>
   <div class="background">
     <div class="container">
-      <div class="header">
-        <h1>Good Morning {{ username }}</h1>
-        <div class="search-container">
-          <div class="searchBar-container">
-            <pv-autoComplete
-                v-model="value"
-                :suggestions="items"
-                @complete="search"
-                placeholder="Buscar"
-                class="searchBar"
+      <div class="header" style="display: flex;justify-content: left;">
+        <h1>Good morning {{ username }}!</h1>
+        <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
+          <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
+          <div class="card p-fluid" style="width: 80%">
+            <pv-autoComplete v-model="searchContactValue"
+                             :suggestions="searchContactItems"
+                             @complete="contactSearch"
+                             @itemSelect="contactSearchSelected"
+                             placeholder="Search a contact"
+                             class="searchBar"
             />
           </div>
-          <i class="pi pi-search"></i>
         </div>
       </div>
       <div class="inventory" style="margin-bottom: 20px;">
         <h2 style="margin: 2rem 0 2rem 0">Contacts:</h2>
+        <p v-if="currentContactResultsSpecialists !== displayableContacts" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
         <div class="cards">
-          <div v-for="contact in displayableContacts" :key="contact.id">
+          <div v-for="contact in currentContactResultsSpecialists" :key="contact.id">
             <pv-card style="width: 17em; border-radius: 15px;">
               <template #header>
                 <img
@@ -161,7 +162,6 @@
           </div>
         </div>
       </pv-dialog>
-
     </div>
   </div>
 </template>
@@ -179,8 +179,8 @@ export default {
     return {
       token: sessionStorage.getItem("jwt"),
       username: "Huell",
-      value: ref(""),
-      items: ref([]),
+      searchContactValue: ref(""),
+      searchContactItems: ref([]),
       showDropdown: false,
       displayableContacts:[],
       contactDetailsVisible: false,
@@ -190,6 +190,7 @@ export default {
       defaultResultsSpecialists:[],
       currentResultsSpecialists:[],
       currentSpecialistInSearch:{},
+      currentContactResultsSpecialists:[]
     };
   },
   created() {
@@ -198,28 +199,59 @@ export default {
     })
   },
   methods: {
-    search(event) {
-      console.log("hola");
-      this.items = [...Array(10).keys()].map((item) => this.value + "-" + item);
+    resetContacts(){
+      this.currentContactResultsSpecialists=this.displayableContacts
+    },
+    contactSearchSelected(){
+      console.log("Click en: "+this.searchContactValue)
+      for (let i = 0; i < this.currentContactResultsSpecialists.length; i++) {
+        if(this.currentContactResultsSpecialists[i].name===this.searchContactValue){
+            console.log("Encontre a en: "+this.currentContactResultsSpecialists[i].name)
+          let temp=this.currentContactResultsSpecialists[i]
+          this.currentContactResultsSpecialists=[]
+          this.currentContactResultsSpecialists.push(temp)
+        }
+      }
+    },
+    contactSearch(event) {
+      console.log("Busque: "+this.searchContactValue.toString())
+      // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+      const matchingContacts = this.displayableContacts.filter(contact =>
+          contact.name.toLowerCase().includes(this.searchContactValue.toString().toLowerCase())
+      );
+      if(matchingContacts.length===0){
+        this.currentContactResultsSpecialists=this.displayableContacts
+      }else {
+        this.searchContactItems = matchingContacts.map(contact => contact.name);
+        this.currentContactResultsSpecialists=matchingContacts
+      }
     },
     getDisplayableContacts(rawContacts){
       for (let i = 0; i < rawContacts.length; i++) {
         new UserServices().getUserById(rawContacts[i].specialistId).then(response=>{
           this.displayableContacts.push(response.data)
         })
+        this.currentContactResultsSpecialists=this.displayableContacts
       }
     },
     showSpecialistDetails(contact) {
       console.log(contact)
-      this.loadSpecialistDetails(contact.id)
+      this.loadContactDetails(contact.id)
       this.contactDetailsVisible=!this.contactDetailsVisible
       this.currentContact= contact;
     },
-    loadSpecialistDetails(id) {
+    loadContactDetails(id) {
       new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
         this.currentContact.expertise=response.data[0].expertise
         this.currentContact.contactEmail = response.data[0].contactEmail
         this.currentContact.areasOfFocus= response.data[0].areasOfFocus
+      })
+    },
+    loadSpecialistDetails(id) {
+      new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
+        this.currentSpecialistInSearch.expertise=response.data[0].expertise
+        this.currentSpecialistInSearch.contactEmail = response.data[0].contactEmail
+        this.currentSpecialistInSearch.areasOfFocus= response.data[0].areasOfFocus
       })
     },
     contactSpecialist() {
@@ -239,11 +271,11 @@ export default {
       })
     },
     showDetailsForSpecialistInSearch(specialist){
+      this.loadSpecialistDetails(specialist.id)
       this.showDetailsForSearch=!this.showDetailsForSearch
       this.currentSpecialistInSearch=specialist;
     },
     sendRequestToSpecialist(){
-      //this.$router.push("/farmer/createCrop")
       this.addSpecialistVisible=!this.addSpecialistVisible
       this.showDetailsForSearch=false
     }
