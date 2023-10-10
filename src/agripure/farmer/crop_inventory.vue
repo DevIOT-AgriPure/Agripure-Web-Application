@@ -1,23 +1,27 @@
 <template>
   <div class="background" >
-      <div class="header">
-          <h1 style="margin-right: 3rem">Good morning {{ username }}!</h1>
-          <div class="search-container">
-              <div class="searchBar-container">
-                  <pv-autoComplete
-                          v-model="value"
-                          :suggestions="items"
-                          @complete="search"
-                          placeholder="Search for plants"
-                          class="searchBar"
-                  />
+      <div class="header" style="display: flex;justify-content: left;">
+          <h1>Good morning {{ username }}!</h1>
+          <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
+              <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
+              <div class="card p-fluid" style="width: 80%">
+                  <pv-autoComplete v-model="searchInventorValue"
+                                   :suggestions="searchInventorItems"
+                                   @complete="inventorySearch"
+                                   @itemSelect="inventorySearchSelected"
+                                   placeholder="Search your plant"
+                                   class="searchBar"
+                                   />
               </div>
           </div>
       </div>
       <div class="inventory">
-  <h2>Your plants:</h2>
+  <div>
+      <h2>Your plants:</h2>
+      <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+  </div>
           <div class="cards" style="margin-top: 2rem">
-              <div v-for="crop in displayableCrops" :key="crop.id">
+              <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
                       <template #header>
                           <img
@@ -84,17 +88,19 @@
                       <div style="margin: 0 3rem 3rem 3rem">
                           <h1 style="margin-bottom: 2rem;">Search for a new plant</h1>
                           <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
-                              <pv-autoComplete v-model="value"
-                                               :suggestions="items"
-                                               @complete="search"
+                              <pv-autoComplete v-model="searchNewPlantValue"
+                                               :suggestions="searchNewPlantItems"
+                                               @complete="newPlantSearch"
+                                               @itemSelect="newPlantSearchSelected"
                                                placeholder="What are you looking for?"
                                                class="searchBar" />
                           </div>
                       </div>
                       <div class="inventory">
                           <h2 style="margin-left: 2rem">Results:</h2>
+                          <p v-if="currentResultsPlants !== defaultResultsPlants" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
                           <div class="cards" style="margin-top: 2rem">
-                              <div v-for="crop in resultsPlants" :key="crop.id">
+                              <div v-for="crop in currentResultsPlants" :key="crop.id">
                                   <pv-card style="width: 17em; border-radius: 15px;">
                                       <template #header>
                                           <img
@@ -118,7 +124,6 @@
 
               </div>
           </pv-dialog>
-
           <pv-dialog v-model:visible="cropDetailsVisible" maximizable modal header="Crop Detail" :style="{ width: '80vw' }">
               <div class="addplantbackground">
                   <div class="crop-details">
@@ -160,9 +165,6 @@
           </pv-dialog>
 
       </div>
-
-
-
   </div>
 </template>
 
@@ -176,16 +178,22 @@ export default {
         return{
             token: sessionStorage.getItem("jwt"),
             username:"Huell",
-            value : ref(""),
-            items : ref([]),
+            searchInventorValue: ref(""),
+            searchInventorItems: ref([]),
+            searchNewPlantValue: ref(""),
+            searchNewPlantItems: ref([]),
+            newPlantsSearchOptions:[],
             showDropdown: false,
             displayableCrops:[],
             currentCrop:{},
             currentPlantInSearch:{},
-            resultsPlants:[],
+            defaultResultsPlants:[],
             visible :false,
             cropDetailsVisible :false,
-            showDetailsForSearch:false
+            showDetailsForSearch:false,
+            currentResultsPlants:[],
+            currentInventoryResultsPlants:[]
+
 
         }
     },
@@ -196,15 +204,68 @@ export default {
 
     },
     methods:{
-        search(event){
-            console.log("hola")
-            this.items = [...Array(10).keys()].map((item) => this.value + '-' + item);
+        resetInventory(){
+          this.currentInventoryResultsPlants=this.displayableCrops
+        },
+        resetAddPlant(){
+            this.currentResultsPlants = this.defaultResultsPlants
+        },
+        inventorySearchSelected(){
+            for (let i = 0; i < this.currentInventoryResultsPlants.length; i++) {
+                if(this.currentInventoryResultsPlants[i].name===this.searchInventorValue){
+                    let temp=this.currentInventoryResultsPlants[i]
+                    this.currentInventoryResultsPlants=[]
+                    this.currentInventoryResultsPlants.push(temp)
+                }
+            }
+        },
+        newPlantSearchSelected() {
+            for (let i = 0; i < this.currentResultsPlants.length; i++) {
+                if(this.currentResultsPlants[i].name===this.searchNewPlantValue){
+                    let temp=this.currentResultsPlants[i]
+                    this.currentResultsPlants=[]
+                    this.currentResultsPlants.push(temp)
+                }
+            }
+        },
+        inventorySearch(event) {
+            console.log("Busque: "+this.searchInventorValue.toString())
+            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+            const matchingCrops = this.displayableCrops.filter(crop =>
+                crop.name.toLowerCase().includes(this.searchInventorValue.toString().toLowerCase())
+            );
+            if(matchingCrops.length===0){
+                this.currentInventoryResultsPlants=this.displayableCrops
+            }else {
+                this.searchInventorItems = matchingCrops.map(crop => crop.name);
+                this.currentInventoryResultsPlants=matchingCrops
+            }
+
+
+        },
+        newPlantSearch(event){
+            console.log("Busque: "+this.searchNewPlantValue)
+            new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
+                this.newPlantsSearchOptions=response.data
+                let options=[]
+                if(response.data.length===0){
+                    this.currentResultsPlants=this.resultsPlants
+                }else {
+                    for (let i = 0; i < response.data.length; i++) {
+                        options.push(response.data[i].name)
+                    }
+                    this.searchNewPlantItems=options
+                    this.currentResultsPlants=this.newPlantsSearchOptions
+                }
+
+            })
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
                 new PlantServices().getPlantInfoByCropId(rawCrop[i].id).then(response=>{
                     this.displayableCrops.push(response.data)
                 })
+                this.currentInventoryResultsPlants=this.displayableCrops
             }
         },
         deleteCrop(){
@@ -212,7 +273,8 @@ export default {
         },
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
-                this.resultsPlants=response.data
+                this.defaultResultsPlants=response.data
+                this.currentResultsPlants=this.defaultResultsPlants
             })
         },
         showCropDetails(crop) {
@@ -228,6 +290,7 @@ export default {
         },
         addPlant(){
             //this.$router.push("/farmer/createCrop")
+            this.searchNewPlantValue=""
             this.visible=!this.visible
             this.showDetailsForSearch=false
             this.getAllPlants()
