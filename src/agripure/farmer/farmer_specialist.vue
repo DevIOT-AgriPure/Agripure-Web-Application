@@ -132,21 +132,21 @@
             </div>
             <div class="inventory">
               <h2 style="margin-left: 2rem">Results:</h2>
-              <p v-if="currentResultsPlants !== defaultResultsPlants" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
+              <p v-if="currentResultsSpecialists !== defaultResultsSpecialists" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
               <div class="cards" style="margin-top: 2rem">
-                <div v-for="crop in currentResultsPlants" :key="crop.id">
+                <div v-for="specialist in currentResultsSpecialists" :key="specialist.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
                     <template #header>
                       <img
                           alt="user header"
-                          :src="crop.imageUrl"
+                          :src="specialist.imageUrl"
                           style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"
                       />
                     </template>
-                    <template #title>{{ crop.name }}</template>
+                    <template #title>{{ specialist.name }}</template>
                     <template #footer>
                       <div style="display: flex; justify-content: center">
-                        <pv-button label="Detail" severity="warning" @click="showDetailsForPlantInSearch(crop)" />
+                        <pv-button label="Details" severity="warning" @click="showDetailsForSpecialistInSearch(specialist)" />
                       </div>
                     </template>
                   </pv-card>
@@ -182,7 +182,10 @@ export default {
       contactDetailsVisible: false,
       addSpecialistVisible: false,
       currentContact:{},
-      showDetailsForSearch:false
+      showDetailsForSearch:false,
+      defaultResultsSpecialists:[],
+      currentResultsSpecialists:[],
+      currentSpecialistInSearch:{},
     };
   },
   created() {
@@ -226,11 +229,15 @@ export default {
       this.getAllSpecialist()
     },
     getAllSpecialist(){
-      /*new SpecialistServices().getAllPlants().then(response=>{
-        this.defaultResultsPlants=response.data
-        this.currentResultsPlants=this.defaultResultsPlants
-      })*/
+      new UserServices().getAllUsersSpecialists().then(response=>{
+        this.defaultResultsSpecialists=response.data
+        this.currentResultsSpecialists=this.defaultResultsSpecialists
+      })
     },
+    showDetailsForSpecialistInSearch(specialist){
+      this.showDetailsForSearch=!this.showDetailsForSearch
+      this.currentSpecialistInSearch=specialist;
+    }
   },
 };
 </script>
