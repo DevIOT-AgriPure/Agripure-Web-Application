@@ -1,16 +1,11 @@
 <template>
   <div class="background" >
-      <div class="header">
-          <h1 style="margin-right: 3rem">Good morning {{ username }}!</h1>
-          <div class="search-container">
-              <div class="searchBar-container">
-                  <pv-autoComplete
-                          v-model="value"
-                          :suggestions="items"
-                          @complete="search"
-                          placeholder="Search for plants"
-                          class="searchBar"
-                  />
+      <div class="header" style="display: flex;justify-content: left;">
+          <h1>Good morning {{ username }}!</h1>
+          <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
+              <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
+              <div class="card p-fluid" style="width: 80%">
+                  <pv-autoComplete v-model="value" multiple :suggestions="items" @complete="search" placeholder="Search your plant" />
               </div>
           </div>
       </div>
