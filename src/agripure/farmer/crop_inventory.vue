@@ -5,8 +5,11 @@
           <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
               <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
               <div class="card p-fluid" style="width: 80%">
-                  <pv-autoComplete v-model="value" multiple :suggestions="items" @complete="search" placeholder="Search your plant" />
-              </div>
+                  <pv-autoComplete v-model="searchInventorValue"
+                                   :suggestions="searchInventorItems"
+                                   @complete="inventoSearch"
+                                   placeholder="Search your plant"
+                                   class="searchBar" />              </div>
           </div>
       </div>
       <div class="inventory">
@@ -155,9 +158,6 @@
           </pv-dialog>
 
       </div>
-
-
-
   </div>
 </template>
 
@@ -171,8 +171,10 @@ export default {
         return{
             token: sessionStorage.getItem("jwt"),
             username:"Huell",
-            value : ref(""),
-            items : ref([]),
+            searchInventorValue: ref(""),
+            searchInventorItems: ref([]),
+            value: ref(""),
+            items: ref([]),
             showDropdown: false,
             displayableCrops:[],
             currentCrop:{},
@@ -191,9 +193,11 @@ export default {
 
     },
     methods:{
-        search(event){
-            console.log("hola")
-            this.items = [...Array(10).keys()].map((item) => this.value + '-' + item);
+        inventoSearch(event) {
+            this.searchInventorItems = [...Array(10).keys()].map((item) => this.searchInventorValue + "-" + item);
+        },
+        search(event) {
+            this.items = [...Array(10).keys()].map((item) => this.value + "-" + item);
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
