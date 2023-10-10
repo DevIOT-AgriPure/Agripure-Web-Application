@@ -127,9 +127,9 @@
             <div style="margin: 0 3rem 3rem 3rem">
               <h1 style="margin-bottom: 2rem;">Search for a new specialist</h1>
               <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
-                <pv-autoComplete v-model="searchNewPlantValue"
-                                 :suggestions="searchNewPlantItems"
-                                 @complete="newPlantSearch"
+                <pv-autoComplete v-model="searchNewSpecialistValue"
+                                 :suggestions="searchNewSpecialistItems"
+                                 @complete="newSpecialistSearch"
                                  @itemSelect="newPlantSearchSelected"
                                  placeholder="What are you looking for?"
                                  class="searchBar" />
@@ -181,6 +181,8 @@ export default {
       username: "Huell",
       searchContactValue: ref(""),
       searchContactItems: ref([]),
+      searchNewSpecialistValue: ref(""),
+      searchNewSpecialistItems: ref([]),
       showDropdown: false,
       displayableContacts:[],
       contactDetailsVisible: false,
@@ -225,6 +227,19 @@ export default {
         this.searchContactItems = matchingContacts.map(contact => contact.name);
         this.currentContactResultsSpecialists=matchingContacts
       }
+    },
+    newSpecialistSearch(event) {
+      /*console.log("Busque: "+this.searchNewSpecialistValue.toString())
+      // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+      const matchingNewSpecialist = this.displayableContacts.filter(contact =>
+          contact.name.toLowerCase().includes(this.searchNewSpecialistValue.toString().toLowerCase())
+      );
+      if(matchingNewSpecialist.length===0){
+        this.currentContactResultsSpecialists=this.displayableContacts
+      }else {
+        this.searchContactItems = matchingNewSpecialist.map(contact => contact.name);
+        this.currentContactResultsSpecialists=matchingNewSpecialist
+      }*/
     },
     getDisplayableContacts(rawContacts){
       for (let i = 0; i < rawContacts.length; i++) {
