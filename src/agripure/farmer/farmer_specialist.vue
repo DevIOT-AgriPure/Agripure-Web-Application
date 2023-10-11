@@ -77,7 +77,7 @@
               <p class="detail-text">Areas of Focus: {{ currentContact.areasOfFocus }}</p>
             </div>
             <div class="button-row">
-              <pv-button class="green-button" @click="contactSpecialist">Contact Especialist</pv-button>
+              <pv-button class="green-button" @click="contactSpecialist">Contact</pv-button>
             </div>
           </div>
         </div>
@@ -130,14 +130,14 @@
                 <pv-autoComplete v-model="searchNewSpecialistValue"
                                  :suggestions="searchNewSpecialistItems"
                                  @complete="newSpecialistSearch"
-                                 @itemSelect="newPlantSearchSelected"
+                                 @itemSelect="newSpecialistSearchSelected"
                                  placeholder="What are you looking for?"
                                  class="searchBar" />
               </div>
             </div>
             <div class="inventory">
               <h2 style="margin-left: 2rem">Results:</h2>
-              <p v-if="currentResultsSpecialists !== defaultResultsSpecialists" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
+              <p v-if="currentResultsSpecialists !== defaultResultsSpecialists" @click="resetNewSpecialist()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
               <div class="cards" style="margin-top: 2rem">
                 <div v-for="specialist in currentResultsSpecialists" :key="specialist.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
@@ -185,7 +185,6 @@ export default {
       searchNewSpecialistItems: ref([]),
       showDropdown: false,
       displayableContacts:[],
-      displayableNewSpecialist:[],
       contactDetailsVisible: false,
       addSpecialistVisible: false,
       currentContact:{},
@@ -204,7 +203,12 @@ export default {
   methods: {
     resetContacts(){
       this.currentContactResultsSpecialists=this.displayableContacts
+        this.searchContactValue=""
     },
+      resetNewSpecialist(){
+          this.currentResultsSpecialists=this.defaultResultsSpecialists
+          this.searchNewSpecialistValue=""
+      },
     contactSearchSelected(){
       console.log("Click en: "+this.searchContactValue)
       for (let i = 0; i < this.currentContactResultsSpecialists.length; i++) {
@@ -216,6 +220,17 @@ export default {
         }
       }
     },
+      newSpecialistSearchSelected(){
+          console.log("Click en: "+this.searchNewSpecialistValue)
+          for (let i = 0; i < this.currentResultsSpecialists.length; i++) {
+              if(this.currentResultsSpecialists[i].name===this.searchNewSpecialistValue){
+                  console.log("Encontre a en: "+this.currentResultsSpecialists[i].name)
+                  let temp=this.currentResultsSpecialists[i]
+                  this.currentResultsSpecialists=[]
+                  this.currentResultsSpecialists.push(temp)
+              }
+          }
+      },
     contactSearch(event) {
       console.log("Busque: "+this.searchContactValue.toString())
       // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
@@ -223,7 +238,7 @@ export default {
           contact.name.toLowerCase().includes(this.searchContactValue.toString().toLowerCase())
       );
       if(matchingContacts.length===0){
-        this.currentContactResultsSpecialists=this.displayableContacts
+        this.currentContactResultsSpecialists=[]
       }else {
         this.searchContactItems = matchingContacts.map(contact => contact.name);
         this.currentContactResultsSpecialists=matchingContacts
@@ -235,9 +250,8 @@ export default {
       const matchingNewSpecialist = this.defaultResultsSpecialists.filter(contact =>
           contact.name.toLowerCase().includes(this.searchNewSpecialistValue.toString().toLowerCase())
       );
-      console.log("filtrado: "+this.currentResultsSpecialists)
       if(matchingNewSpecialist.length===0){
-        this.currentResultsSpecialists=this.defaultResultsSpecialists
+        this.currentResultsSpecialists=[]
       }else {
         this.searchNewSpecialistItems = matchingNewSpecialist.map(contact => contact.name);
         this.currentResultsSpecialists=matchingNewSpecialist
