@@ -77,12 +77,12 @@
               <p class="detail-text">Areas of Focus: {{ currentContact.areasOfFocus }}</p>
             </div>
             <div class="button-row">
-              <pv-button class="green-button" @click="contactSpecialist">Contactar Especialista</pv-button>
+              <pv-button class="green-button" @click="contactSpecialist">Contact Especialist</pv-button>
             </div>
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="addSpecialistVisible" maximizable modal header="Contact a plant" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="addSpecialistVisible" maximizable modal header="Contact a Specialist" :style="{ width: '80vw' }">
         <div class="addplantbackground" >
           <div class="detail" v-if="showDetailsForSearch">
             <div class="agriculture-specialist-details">
@@ -185,6 +185,7 @@ export default {
       searchNewSpecialistItems: ref([]),
       showDropdown: false,
       displayableContacts:[],
+      displayableNewSpecialist:[],
       contactDetailsVisible: false,
       addSpecialistVisible: false,
       currentContact:{},
@@ -192,7 +193,7 @@ export default {
       defaultResultsSpecialists:[],
       currentResultsSpecialists:[],
       currentSpecialistInSearch:{},
-      currentContactResultsSpecialists:[]
+      currentContactResultsSpecialists:[],
     };
   },
   created() {
@@ -229,17 +230,18 @@ export default {
       }
     },
     newSpecialistSearch(event) {
-      /*console.log("Busque: "+this.searchNewSpecialistValue.toString())
+      console.log("Busque: "+this.searchNewSpecialistValue.toString())
       // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
-      const matchingNewSpecialist = this.displayableContacts.filter(contact =>
+      const matchingNewSpecialist = this.defaultResultsSpecialists.filter(contact =>
           contact.name.toLowerCase().includes(this.searchNewSpecialistValue.toString().toLowerCase())
       );
+      console.log("filtrado: "+this.currentResultsSpecialists)
       if(matchingNewSpecialist.length===0){
-        this.currentContactResultsSpecialists=this.displayableContacts
+        this.currentResultsSpecialists=this.defaultResultsSpecialists
       }else {
-        this.searchContactItems = matchingNewSpecialist.map(contact => contact.name);
-        this.currentContactResultsSpecialists=matchingNewSpecialist
-      }*/
+        this.searchNewSpecialistItems = matchingNewSpecialist.map(contact => contact.name);
+        this.currentResultsSpecialists=matchingNewSpecialist
+      }
     },
     getDisplayableContacts(rawContacts){
       for (let i = 0; i < rawContacts.length; i++) {
@@ -248,6 +250,12 @@ export default {
         })
         this.currentContactResultsSpecialists=this.displayableContacts
       }
+    },
+    getAllSpecialist(){
+      new UserServices().getAllUsersSpecialists().then(response=>{
+        this.defaultResultsSpecialists=response.data
+        this.currentResultsSpecialists=this.defaultResultsSpecialists
+      })
     },
     showSpecialistDetails(contact) {
       console.log(contact)
@@ -279,12 +287,7 @@ export default {
       this.showDetailsForSearch=false
       this.getAllSpecialist()
     },
-    getAllSpecialist(){
-      new UserServices().getAllUsersSpecialists().then(response=>{
-        this.defaultResultsSpecialists=response.data
-        this.currentResultsSpecialists=this.defaultResultsSpecialists
-      })
-    },
+    
     showDetailsForSpecialistInSearch(specialist){
       this.loadSpecialistDetails(specialist.id)
       this.showDetailsForSearch=!this.showDetailsForSearch
