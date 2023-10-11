@@ -13,6 +13,9 @@
                 </div>
             </div>
             <div class="message-content" style="flex-grow: 1;">
+                <div>
+                    Hola compañero
+                </div>
             </div>
             <div class="message-box" style="display: flex; justify-content: space-between; align-items: center;">
                 <pv-input type="text" placeholder="Escribe tu mensaje aquí" style="width: 95%;"/>
@@ -24,8 +27,6 @@
         </div>
     </div>
 </template>
-
-
 
 <script>
 import {UserServices} from "../../services/user-service"
