@@ -7,5 +7,8 @@ export class UserServices{
     getUserById(id){
         return http.get(""+id);
     }
+    getAllUsersSpecialists(){
+        return http.get("?type=specialist");
+    }
 
 }

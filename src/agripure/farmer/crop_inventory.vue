@@ -157,13 +157,10 @@
                           <pv-button severity="danger" style="width: 15rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
                           </pv-button>
-
-
                       </div>
                   </div>
               </div>
           </pv-dialog>
-
       </div>
   </div>
 </template>
@@ -206,9 +203,11 @@ export default {
     methods:{
         resetInventory(){
           this.currentInventoryResultsPlants=this.displayableCrops
+            this.searchInventorValue=""
         },
         resetAddPlant(){
             this.currentResultsPlants = this.defaultResultsPlants
+            this.searchNewPlantValue=""
         },
         inventorySearchSelected(){
             for (let i = 0; i < this.currentInventoryResultsPlants.length; i++) {
@@ -235,7 +234,7 @@ export default {
                 crop.name.toLowerCase().includes(this.searchInventorValue.toString().toLowerCase())
             );
             if(matchingCrops.length===0){
-                this.currentInventoryResultsPlants=this.displayableCrops
+                this.currentInventoryResultsPlants=[]
             }else {
                 this.searchInventorItems = matchingCrops.map(crop => crop.name);
                 this.currentInventoryResultsPlants=matchingCrops
@@ -249,7 +248,7 @@ export default {
                 this.newPlantsSearchOptions=response.data
                 let options=[]
                 if(response.data.length===0){
-                    this.currentResultsPlants=this.resultsPlants
+                    this.currentResultsPlants=[]
                 }else {
                     for (let i = 0; i < response.data.length; i++) {
                         options.push(response.data[i].name)
