@@ -9,7 +9,7 @@
         <div style="margin: 0 2rem 0 2rem">
             <div v-for="contact in displayableContacts"
                  :key="contact.id">
-                <div class="chat-card" @click="irAChat(contact.id)">
+                <div class="chat-card" @click="irAChat(contact.contactId)">
                     <div class="profile-image">
                         <img :src="contact.imageUrl" alt="Foto de perfil">
                     </div>
@@ -60,7 +60,9 @@ export default {
         getDisplayableContacts(rawContacts){
             for (let i = 0; i < rawContacts.length; i++) {
                 new UserServices().getUserById(rawContacts[i].specialistId).then(response=>{
-                    this.displayableContacts.push(response.data)
+                    let displayableContact=response.data
+                    displayableContact.contactId=rawContacts[i].id
+                    this.displayableContacts.push(displayableContact)
                 })
             }
         }

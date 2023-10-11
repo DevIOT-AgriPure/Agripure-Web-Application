@@ -13,8 +13,14 @@
                 </div>
             </div>
             <div class="message-content" style="flex-grow: 1;">
-                <div>
-                    Hola compañero
+                <div v-for="rawMessage in rawMessages">
+                    <div v-if="rawMessage.AutorId===userId" style="display: flex;justify-content: right;">
+                        <p style="margin: 2rem 1rem">{{rawMessage.message}}</p>
+                    </div>
+                    <div v-if="rawMessage.AutorId!==userId" style="display: flex;justify-content: left;">
+                        <p style="margin: 2rem 1rem">{{rawMessage.message}}</p>
+                    </div>
+
                 </div>
             </div>
             <div class="message-box" style="display: flex; justify-content: space-between; align-items: center;">
@@ -30,20 +36,30 @@
 
 <script>
 import {UserServices} from "../../services/user-service"
+import {ChatServices} from "@/services/chat-service";
+import {ContactServices} from "@/services/contacts-service";
 export default {
     name: "farmer_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
     data() {
         return {
             token: sessionStorage.getItem("jwt"),
-            displayableContactInfo:{}
+            displayableContactInfo:{},
+            rawMessages:[],
+            userId:1
         };
     },
     created() {
-        new UserServices().getUserById(this.id).then(response=>{
-            this.displayableContactInfo=response.data
-            console.log(this.displayableContactInfo)
+        new ChatServices().getChatByContactId(this.id).then(response=>{
+            this.rawMessages=response.data
         })
+        new ContactServices().getContactById(this.id).then(response=>{
+            new UserServices().getUserById(response.data.specialistId).then(response=>{
+                this.displayableContactInfo=response.data
+                console.log(this.displayableContactInfo)
+            })
+        })
+
     },
     methods:{
       goback(){
