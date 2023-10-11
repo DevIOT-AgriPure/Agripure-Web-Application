@@ -55,7 +55,7 @@ export default {
             items.value = [...Array(10).keys()].map((item) => event.query + '-' + item);
         },
         irAChat(id) {
-            this.$router.push("/chat/" + id)
+            this.$router.push("/farmer/chat/" + id)
         },
         getDisplayableContacts(rawContacts){
             for (let i = 0; i < rawContacts.length; i++) {

@@ -156,7 +156,6 @@
                     </template>
                   </pv-card>
                 </div>
-
               </div>
             </div>
           </div>
@@ -318,7 +317,6 @@ export default {
 <style scoped>
 .background {
   background-color: #242424;
-  padding: 70px;
   margin-top: 20px;
   margin-left: 20px;
   margin-bottom: 20px;
@@ -326,24 +324,13 @@ export default {
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
+    padding: 1.5rem;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.search-container {
-  display: flex;
-  align-items: center;
-}
-
-.searchBar-container {
-  width: 200px;
-  margin-left: 10px;
 }
 
 .searchBar {
@@ -363,17 +350,6 @@ export default {
   gap: 2rem; /* Espacio entre las cartas */
   justify-items: center; /* Centra las cartas horizontalmente */
   margin-top: 2rem;
-}
-
-.button {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: center;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center;
 }
 
 .pi {
