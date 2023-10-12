@@ -3,11 +3,18 @@
         <div style="width: 100%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
             <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
             <div class="card p-fluid" style="width: 80%">
-                <pv-autoComplete v-model="value" multiple :suggestions="items" @complete="search" placeholder="Search" />
+                <pv-autoComplete v-model="value"
+                                 :suggestions="items"
+                                 @complete="search"
+                                 @itemSelect="select"
+                                 placeholder="Search on your contacts"
+                                 class="searchBar"
+                />
             </div>
         </div>
         <div style="margin: 0 2rem 0 2rem">
-            <div v-for="contact in displayableContacts"
+            <p v-if="currentContacts !== displayableContacts" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
+            <div v-for="contact in currentContacts"
                  :key="contact.id">
                 <div class="chat-card" @click="irAChat(contact.contactId)">
                     <div class="profile-image">
@@ -41,7 +48,8 @@ export default {
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
             items : ref([]),
-            displayableContacts:[]
+            displayableContacts:[],
+            currentContacts:[]
 
         }
     },
@@ -51,8 +59,31 @@ export default {
         })
     },
     methods:{
+        reset(){
+            this.currentContacts=this.displayableContacts
+            this.value=""
+        },
+        select() {
+            for (let i = 0; i < this.currentContacts.length; i++) {
+                if(this.currentContacts[i].name===this.value){
+                    let temp=this.currentContacts[i]
+                    this.currentContacts=[]
+                    this.currentContacts.push(temp)
+                }
+            }
+        },
         search(event){
-            items.value = [...Array(10).keys()].map((item) => event.query + '-' + item);
+            console.log("Busque: "+this.value.toString())
+            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+            const matchingContacts = this.displayableContacts.filter(contact =>
+                contact.name.toLowerCase().includes(this.value.toString().toLowerCase())
+            );
+            if(matchingContacts.length===0){
+                this.currentContacts=[]
+            }else {
+                this.items = matchingContacts.map(contact => contact.name);
+                this.currentContacts=matchingContacts
+            }
         },
         irAChat(id) {
             this.$router.push("/farmer/chat/" + id)
@@ -64,6 +95,7 @@ export default {
                     displayableContact.contactId=rawContacts[i].id
                     this.displayableContacts.push(displayableContact)
                 })
+                this.currentContacts=this.displayableContacts
             }
         }
     }

@@ -239,8 +239,6 @@ export default {
                 this.searchInventorItems = matchingCrops.map(crop => crop.name);
                 this.currentInventoryResultsPlants=matchingCrops
             }
-
-
         },
         newPlantSearch(event){
             console.log("Busque: "+this.searchNewPlantValue)
