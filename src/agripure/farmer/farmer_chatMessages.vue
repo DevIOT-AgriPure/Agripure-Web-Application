@@ -12,20 +12,20 @@
                     </div>
                 </div>
             </div>
-            <div class="message-content" style="flex-grow: 1;">
-                <div v-for="rawMessage in rawMessages">
-                    <div v-if="rawMessage.AutorId===userId" style="display: flex;justify-content: right;">
-                        <p style="margin: 2rem 1rem">{{rawMessage.message}}</p>
+            <div class="message-content" >
+                <div v-for="rawMessage in rawMessages"  >
+                    <div v-if="rawMessage.AutorId === userId" class="bubble-right">
+                        <p class="bubble">{{ rawMessage.message }}</p>
                     </div>
-                    <div v-if="rawMessage.AutorId!==userId" style="display: flex;justify-content: left;">
-                        <p style="margin: 2rem 1rem">{{rawMessage.message}}</p>
+                    <div v-else class="bubble-left">
+                        <p class="bubble">{{ rawMessage.message }}</p>
                     </div>
-
                 </div>
             </div>
+
             <div class="message-box" style="display: flex; justify-content: space-between; align-items: center;">
                 <pv-input type="text" placeholder="Escribe tu mensaje aquí" style="width: 95%;"/>
-                <pv-button @click="enviarMensaje" style="width: 5%; display: flex; justify-content: center; align-items: center;">
+                <pv-button @click="scrollBottom" style="width: 5%; display: flex; justify-content: center; align-items: center;">
                     <i class="pi pi-send"></i>
                 </pv-button>
 
@@ -38,6 +38,7 @@
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
 import {ContactServices} from "@/services/contacts-service";
+
 export default {
     name: "farmer_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
@@ -56,26 +57,59 @@ export default {
         new ContactServices().getContactById(this.id).then(response=>{
             new UserServices().getUserById(response.data.specialistId).then(response=>{
                 this.displayableContactInfo=response.data
-                console.log(this.displayableContactInfo)
+                this.scrollBottom()
             })
         })
-
     },
     methods:{
       goback(){
           this.$router.push("/farmer/chat")
-      }
+      },
+        enviarMensaje(){
+
+        },
+        scrollBottom(){
+            let messageContainer = document.querySelector(".message-content"); // Cambia la clase aquí
+            if (messageContainer) {
+                console.log("Ejecuté");
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+        }
     }
 }
 </script>
 
 <style scoped>
+.message-content{
+    flex-grow: 1;
+    max-height: 76vh;
+    overflow-y: scroll;
+}
 .background {
     background-color: #242424;
     color: white; /* Cambiar el color del texto si es necesario */
     margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
+}
+
+.bubble {
+    background-color: #1c1c1c;
+    color: #fff; /* Color de texto en las burbujas */
+    max-width: 100%; /* Ajusta el ancho máximo según tus preferencias */
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.bubble-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.bubble-left {
+    display: flex;
+    justify-content: flex-start;
 }
 
 .info-card {
