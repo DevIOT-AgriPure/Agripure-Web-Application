@@ -16,6 +16,11 @@ import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';   // optional
+import Row from 'primevue/row';                   // optional
+
 
 const app = createApp(App)
 
@@ -28,5 +33,9 @@ app.component("pv-card",Card)
 app.component("pv-input",InputText)
 app.component("pv-dropdown",Dropdown)
 app.component("pv-dialog",Dialog)
+app.component("pv-dataTable",DataTable)
+app.component("pv-column",Column)
+app.component("pv-columnGroup",ColumnGroup)
+app.component("pv-row",Row)
 
 app.mount('#app')
