@@ -16,10 +16,10 @@
           </div>
       </div>
       <div class="inventory">
-  <div>
-      <h2>Your plants:</h2>
-      <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
-  </div>
+          <div style="margin-left: 1rem">
+                <h2>Your plants:</h2>
+                <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+          </div>
           <div class="cards" style="margin-top: 2rem">
               <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
@@ -239,8 +239,6 @@ export default {
                 this.searchInventorItems = matchingCrops.map(crop => crop.name);
                 this.currentInventoryResultsPlants=matchingCrops
             }
-
-
         },
         newPlantSearch(event){
             console.log("Busque: "+this.searchNewPlantValue)
@@ -331,20 +329,11 @@ export default {
     padding-bottom: 3rem;
     padding-top: 1rem;
 }
+
 .header {
-    margin: 3rem;
+    margin: 3rem 3rem 1rem 3rem;
     display: flex;
     align-items: center; /* Centra verticalmente los elementos */
-}
-
-.search-container {
-    display: flex; /* Hace que los elementos dentro se muestren en línea */
-    align-items: center; /* Centra verticalmente los elementos */
-}
-
-.searchBar-container {
-    width: 200px; /* Establece un ancho fijo para el contenedor del pv-autoComplete */
-    margin-left: 10px; /* Ajusta el margen izquierdo según sea necesario */
 }
 
 .searchBar {
@@ -352,7 +341,7 @@ export default {
 }
 
 .inventory{
-    margin: 0 5rem 0 5rem;
+    padding: 1.5rem;
 }
 
 .crop-details {
@@ -362,7 +351,6 @@ export default {
     flex-direction: column;
     align-items: flex-start; /* Alinea los elementos a la izquierda */
     text-align: left; /* Alinea el texto a la izquierda */
-
 }
 .title {
     margin-right: 20px; /* Espacio entre el título y el borde derecho */
