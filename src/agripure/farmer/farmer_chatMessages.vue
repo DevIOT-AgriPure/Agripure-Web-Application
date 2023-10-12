@@ -22,7 +22,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="message-box" style="display: flex; justify-content: space-between; align-items: center;">
                 <pv-input type="text" placeholder="Escribe tu mensaje aquí" style="width: 95%;"/>
                 <pv-button @click="scrollBottom" style="width: 5%; display: flex; justify-content: center; align-items: center;">
@@ -71,7 +70,6 @@ export default {
         scrollBottom(){
             let messageContainer = document.querySelector(".message-content"); // Cambia la clase aquí
             if (messageContainer) {
-                console.log("Ejecuté");
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         }
@@ -81,6 +79,7 @@ export default {
 
 <style scoped>
 .message-content{
+    max-width: 81vw;
     flex-grow: 1;
     max-height: 76vh;
     overflow-y: scroll;
@@ -95,12 +94,16 @@ export default {
 
 .bubble {
     background-color: #1c1c1c;
-    color: #fff; /* Color de texto en las burbujas */
-    max-width: 100%; /* Ajusta el ancho máximo según tus preferencias */
+    color: #fff;
+    max-width: 50%; /* Ajusta el ancho máximo según tus preferencias */
     padding: 15px;
     border-radius: 10px;
     margin: 10px;
+    white-space: normal; /* Permite que el texto se ajuste y divida en líneas */
 }
+
+
+
 
 .bubble-right {
     display: flex;
