@@ -7,5 +7,8 @@ export class SpecialistServices{
     getSpecialistInformationByUserId(id){
         return http.get("?userId="+id);
     }
+    getSpecialistInformationById(id){
+        return http.get(""+id);
+    }
 
 }

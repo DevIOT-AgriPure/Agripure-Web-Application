@@ -170,7 +170,6 @@ import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {SpecialistServices} from "@/services/specialists-service";
-import {PlantServices} from "@/services/plant-service";
 
 export default {
   name: "Farmer_specialist",
@@ -209,10 +208,8 @@ export default {
           this.searchNewSpecialistValue=""
       },
     contactSearchSelected(){
-      console.log("Click en: "+this.searchContactValue)
       for (let i = 0; i < this.currentContactResultsSpecialists.length; i++) {
         if(this.currentContactResultsSpecialists[i].name===this.searchContactValue){
-            console.log("Encontre a en: "+this.currentContactResultsSpecialists[i].name)
           let temp=this.currentContactResultsSpecialists[i]
           this.currentContactResultsSpecialists=[]
           this.currentContactResultsSpecialists.push(temp)
@@ -220,10 +217,8 @@ export default {
       }
     },
       newSpecialistSearchSelected(){
-          console.log("Click en: "+this.searchNewSpecialistValue)
           for (let i = 0; i < this.currentResultsSpecialists.length; i++) {
               if(this.currentResultsSpecialists[i].name===this.searchNewSpecialistValue){
-                  console.log("Encontre a en: "+this.currentResultsSpecialists[i].name)
                   let temp=this.currentResultsSpecialists[i]
                   this.currentResultsSpecialists=[]
                   this.currentResultsSpecialists.push(temp)
@@ -231,7 +226,6 @@ export default {
           }
       },
     contactSearch(event) {
-      console.log("Busque: "+this.searchContactValue.toString())
       // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
       const matchingContacts = this.displayableContacts.filter(contact =>
           contact.name.toLowerCase().includes(this.searchContactValue.toString().toLowerCase())
@@ -244,7 +238,6 @@ export default {
       }
     },
     newSpecialistSearch(event) {
-      console.log("Busque: "+this.searchNewSpecialistValue.toString())
       // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
       const matchingNewSpecialist = this.defaultResultsSpecialists.filter(contact =>
           contact.name.toLowerCase().includes(this.searchNewSpecialistValue.toString().toLowerCase())
@@ -271,7 +264,6 @@ export default {
       })
     },
     showSpecialistDetails(contact) {
-      console.log(contact)
       this.loadContactDetails(contact.id)
       this.contactDetailsVisible=!this.contactDetailsVisible
       this.currentContact= contact;
@@ -281,6 +273,7 @@ export default {
         this.currentContact.expertise=response.data[0].expertise
         this.currentContact.contactEmail = response.data[0].contactEmail
         this.currentContact.areasOfFocus= response.data[0].areasOfFocus
+          this.currentContact.specialistId=response.data[0].id
       })
     },
     loadSpecialistDetails(id) {
@@ -291,7 +284,7 @@ export default {
       })
     },
     contactSpecialist() {
-      this.$router.push("/chat/" + this.currentContact.id)
+      this.$router.push("/farmer/chat/" + this.currentContact.specialistId)
     },
     addSpecialist(){
       //this.$router.push("/farmer/createCrop")

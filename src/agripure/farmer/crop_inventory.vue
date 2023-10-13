@@ -259,7 +259,7 @@ export default {
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
-                new PlantServices().getPlantInfoByCropId(rawCrop[i].id).then(response=>{
+                new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
                     this.displayableCrops.push(response.data)
                 })
                 this.currentInventoryResultsPlants=this.displayableCrops

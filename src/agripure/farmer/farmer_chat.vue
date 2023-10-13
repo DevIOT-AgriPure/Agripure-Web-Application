@@ -73,7 +73,6 @@ export default {
             }
         },
         search(event){
-            console.log("Busque: "+this.value.toString())
             // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
             const matchingContacts = this.displayableContacts.filter(contact =>
                 contact.name.toLowerCase().includes(this.value.toString().toLowerCase())

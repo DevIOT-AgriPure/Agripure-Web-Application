@@ -4,7 +4,7 @@ const http = axios.create({
     headers: { "Content-type": "application/json" },
 })
 export class PlantServices{
-    getPlantInfoByCropId(id){   
+    getPlantInfoById(id){
         return http.get(""+id);
     }
     getAllPlants(){

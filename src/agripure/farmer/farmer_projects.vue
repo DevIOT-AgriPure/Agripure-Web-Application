@@ -26,8 +26,8 @@
                     </span>
                     </div>
                 </template>
-                <template #empty> No customers found. </template>
-                <template #loading> Loading customers data. Please wait. </template>
+                <template #empty> No projects found. </template>
+                <template #loading> Loading projects data. Please wait. </template>
                 <pv-column field="name" header="Name" style="min-width: 14rem"></pv-column>
                 <pv-column field="weeks" header="Duration" style="min-width: 7rem">
                     <template #body="{ data }">
@@ -51,8 +51,8 @@
                 </pv-column >
                 <pv-column  header="" style="min-width: 1rem">
                     <template #body="{ data }">
-                        <pv-button v-if="data.isProjectStarted" label="Details" severity="success" rounded  />
-                        <pv-button v-if="!data.isProjectStarted" label="Start" severity="success" rounded  />
+                        <pv-button v-if="data.isProjectStarted" label="Details" severity="success" @click="showProjectDetail(data)"  />
+                        <pv-button v-if="!data.isProjectStarted" label="Start" severity="success"   />
                     </template>
                 </pv-column >
             </pv-dataTable>
@@ -89,6 +89,22 @@
                 </div>
             </div>
         </pv-dialog>
+        <pv-dialog v-model:visible="projectDetailsDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+            <div class="addplantbackground">
+                <div class="crop-details">
+                    <h1>{{currentProjectDetail.name}}</h1>
+                    <h4>{{currentProjectDetail.description}}</h4>
+                    <h5>Specialist: {{currentSpecialistForProject.name}}</h5>
+                    <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
+                    <h5>Crop: {{currentCropForProject.name}}</h5>
+                    <h5>Duration: {{currentProjectDetail.weeks}}</h5>
+                    <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
+                    <h5>Progress: {{ currentProjectDetail.progress }} %</h5>
+
+                </div>
+            </div>
+        </pv-dialog>
+
 
     </div>
 </div>
@@ -98,6 +114,10 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
+import {SpecialistServices} from "@/services/specialists-service";
+import {PlantServices} from "@/services/plant-service";
+import {CropServices} from "@/services/crop-service";
+import {UserServices} from "@/services/user-service";
 
 export default {
     name: "farmer_projects",
@@ -113,7 +133,11 @@ export default {
               verified: { value: null, matchMode: FilterMatchMode.EQUALS }
           },
           activitiesDialogVisible:false,
+          projectDetailsDialogVisible:false,
           currentActivities:[],
+          currentProjectDetail:{},
+          currentSpecialistForProject:{},
+          currentCropForProject:{}
       };
     },
     created(){
@@ -132,6 +156,13 @@ export default {
                     return 'danger';
             }
         },
+        showProjectDetail(project){
+            this.getSpecialistInfo(project.specialistId)
+            this.getCropInfo(project.cropId)
+            this.currentProjectDetail=project
+            this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
+
+        },
         getStatusProject(status){
             switch (status) {
                 case true:
@@ -146,6 +177,22 @@ export default {
             new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
                 this.currentActivities=response.data
             })
+        },
+        getSpecialistInfo(id){
+            new SpecialistServices().getSpecialistInformationById(id).then(response=>{
+                new UserServices().getUserById(response.data.userId).then(res=>{
+                    this.currentSpecialistForProject=res.data
+                    console.log("SPCname is: "+this.currentSpecialistForProject.name)
+                })
+            })
+        },
+        getCropInfo(cropId){
+           new CropServices().getCropInfoById(cropId).then(response=>{
+               new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
+                   this.currentCropForProject=resp.data
+                   console.log("name is: "+this.currentCropForProject.name)
+               })
+           })
         }
     }
 }
