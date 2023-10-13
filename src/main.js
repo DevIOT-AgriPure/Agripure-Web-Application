@@ -20,6 +20,12 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';   // optional
 import Row from 'primevue/row';                   // optional
+import Tag from 'primevue/tag';
+import Slider from 'primevue/slider';
+import ProgressBar from 'primevue/progressbar';
+
+
+
 
 
 const app = createApp(App)
@@ -37,5 +43,9 @@ app.component("pv-dataTable",DataTable)
 app.component("pv-column",Column)
 app.component("pv-columnGroup",ColumnGroup)
 app.component("pv-row",Row)
+app.component("pv-tag",Tag)
+app.component("pv-slider",Slider)
+app.component("pv-progressBar",ProgressBar)
+
 
 app.mount('#app')
