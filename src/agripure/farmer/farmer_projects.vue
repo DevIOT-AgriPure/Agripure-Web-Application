@@ -36,7 +36,7 @@
                 </pv-column>
                 <pv-column field="totalActivities" header="Activities" style="min-width: 7rem">
                     <template #body="{ data }">
-                        <pv-button severity="secondary" rounded size="small" @click="openActivities">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
+                        <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
                     </template>
                 </pv-column>
                 <pv-column field="progress" header="Progress" style="min-width: 14rem">
@@ -46,49 +46,45 @@
                 </pv-column>
                 <pv-column field="isProjectStarted" header="Status" style="min-width: 1rem">
                     <template #body="{ data }">
-                        <pv-tag :value="data.isProjectStarted" :severity="getSeverity(data.isProjectStarted)" />
+                        <pv-tag :value="getStatusProject(data.isProjectStarted)" :severity="getSeverity(data.isProjectStarted)" />
                     </template>
                 </pv-column >
                 <pv-column  header="" style="min-width: 1rem">
                     <template #body="{ data }">
-                        <pv-button label="Details" severity="success" rounded  />
+                        <pv-button v-if="data.isProjectStarted" label="Details" severity="success" rounded  />
+                        <pv-button v-if="!data.isProjectStarted" label="Start" severity="success" rounded  />
                     </template>
                 </pv-column >
             </pv-dataTable>
         </div>
-        <pv-dialog v-model:visible="activitiesDialogVisible" maximizable modal header="Crop Detail" :style="{ width: '80vw' }">
+        <pv-dialog v-model:visible="activitiesDialogVisible" maximizable modal header="Activities" :style="{ width: '80vw' }">
             <div class="addplantbackground">
                 <div class="crop-details">
-                    <div class="title">
-                        <h1 class="title-text">{{ currentCrop.name }} Details</h1>
-                    </div>
-                    <div class="detail">
-                        <p class="detail-text">Scientific name: {{ currentCrop.scientificName }}</p>
-                    </div>
-                    <div class="detail">
-                        <p class="detail-text">Variety: {{ currentCrop.variety }}</p>
-                    </div>
-                    <div class="image-container">
-                        <img :src="currentCrop.imageUrl" alt="crop Image" class="centered-image">
-                    </div>
-                    <div class="detail-row">
-                        <p class="detail-text">Land type: {{ currentCrop.landType }}</p>
-                    </div>
-                    <div class="divider"></div>
-                    <div class="detail-row">
-                        <p class="detail-text">Distance between plants: {{ currentCrop.distanceBetweenPlants }}</p>
-                    </div>
-                    <div class="divider"></div>
-                    <div class="detail-row">
-                        <p class="detail-text">Weather conditions: {{ currentCrop.weatherConditions }}</p>
-                    </div>
-                    <div style="display: flex; width: 100%;justify-content: end">
-                        <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
-                            <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
-                        </pv-button>
-                        <pv-button severity="danger" style="width: 15rem; color: white; font-weight: bold;" @click="deleteCrop">
-                            <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
-                        </pv-button>
+                    <div v-for="activities in currentActivities"
+                         :key="activities.id">
+                        <pv-accordion>
+                            <pv-accordionTab>
+                                <template #header>
+                                    <div style="width: 100%;display: flex;justify-content: space-between">
+                                        <span>{{ activities.title }}</span>
+                                        <pv-tag v-if="activities.completed" severity="success" >Finished</pv-tag>
+                                        <pv-tag v-if="!activities.completed" severity="danger" >Pending</pv-tag>
+                                    </div>
+                                </template>
+                                <div class="chat-card">
+                                    <div class="chat-content" >
+                                        <div class="chat-header">
+                                            <h3 style="margin-bottom: 0.5rem">{{ activities.description }}</h3>
+                                            <pv-checkbox v-model="activities.completed" :binary="true"/>
+                                        </div>
+                                        <div style="display: flex;">
+                                            <i class="pi pi-calendar" style="margin-right: 1rem"></i>
+                                            <p style="width: 50%">{{ activities.date }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </pv-accordionTab>
+                        </pv-accordion>
                     </div>
                 </div>
             </div>
@@ -101,13 +97,13 @@
 <script>
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
+import {ActivitiesService} from "@/services/activities-service";
 
 export default {
     name: "farmer_projects",
     data(){
       return{
         projects:[],
-          selectedProjects:[],
           filters: {
               global: { value: null, matchMode: FilterMatchMode.CONTAINS },
               name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -116,7 +112,8 @@ export default {
               isProjectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
               verified: { value: null, matchMode: FilterMatchMode.EQUALS }
           },
-          activitiesDialogVisible:false
+          activitiesDialogVisible:false,
+          currentActivities:[],
       };
     },
     created(){
@@ -135,9 +132,20 @@ export default {
                     return 'danger';
             }
         },
-        openActivities(){
+        getStatusProject(status){
+            switch (status) {
+                case true:
+                    return 'Started';
+
+                case false:
+                    return 'Pending';
+            }
+        },
+        openActivities(id){
             this.activitiesDialogVisible=!this.activitiesDialogVisible
-            
+            new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
+                this.currentActivities=response.data
+            })
         }
     }
 }
@@ -159,5 +167,57 @@ export default {
 }
 .projects{
     padding: 1.5rem;
+}
+
+.chat-card {
+    display: flex;
+    align-items: center;
+    background-color: #1c1c1c; /* Color de fondo negro */
+    color: white; /* Color de texto blanco */
+    border-radius: 10px; /* Bordes redondos */
+    margin-bottom: 10px; /* Espaciado entre tarjetas */
+}
+
+.profile-image {
+    width: 50px; /* Ancho de la imagen de perfil */
+    height: 50px; /* Alto de la imagen de perfil */
+    border-radius: 50%; /* Hace que la imagen sea redonda */
+    overflow: hidden; /* Oculta cualquier parte de la imagen fuera del círculo */
+    margin-right: 10px;
+}
+
+.profile-image img {
+    width: 100%; /* Ajusta la imagen de perfil al círculo */
+    height: 100%;
+    object-fit: cover; /* Mantiene la relación de aspecto de la imagen */
+}
+
+.chat-content {
+    flex-grow: 1;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.chat-header span {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+p {
+    margin: 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

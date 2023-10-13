@@ -23,6 +23,11 @@ import Row from 'primevue/row';                   // optional
 import Tag from 'primevue/tag';
 import Slider from 'primevue/slider';
 import ProgressBar from 'primevue/progressbar';
+import Checkbox from 'primevue/checkbox';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+
+
 
 
 
@@ -46,6 +51,9 @@ app.component("pv-row",Row)
 app.component("pv-tag",Tag)
 app.component("pv-slider",Slider)
 app.component("pv-progressBar",ProgressBar)
+app.component("pv-checkbox",Checkbox)
+app.component("pv-accordion",Accordion)
+app.component("pv-accordionTab",AccordionTab)
 
 
 app.mount('#app')
