@@ -19,7 +19,7 @@
                           :globalFilterFields="['name', 'isProjectStarted', 'weeks', 'description']"
                           tableStyle="min-width: 50rem">
                 <template #header>
-                    <div class="flex justify-content-end">
+                    <div style="display: flex; width: 100%; justify-content: end">
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <pv-input v-model="filters['global'].value" placeholder="Keyword Search" />

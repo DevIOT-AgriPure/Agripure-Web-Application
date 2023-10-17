@@ -26,6 +26,7 @@ import ProgressBar from 'primevue/progressbar';
 import Checkbox from 'primevue/checkbox';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import InputSwitch from 'primevue/inputswitch';
 
 
 
@@ -54,6 +55,7 @@ app.component("pv-progressBar",ProgressBar)
 app.component("pv-checkbox",Checkbox)
 app.component("pv-accordion",Accordion)
 app.component("pv-accordionTab",AccordionTab)
+app.component("pv-inputSwitch",InputSwitch)
 
 
 app.mount('#app')
