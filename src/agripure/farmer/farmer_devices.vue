@@ -38,55 +38,32 @@
           </pv-column >
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
-              <pv-button style="margin-right: 1rem" icon="pi pi-info" severity="warning" rounded aria-label="Information" />
-              <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" />
+              <pv-button style="margin-right: 1rem" icon="pi pi-info" severity="warning" rounded aria-label="Information" @click="openInfoDeviceDialog(data)"/>
+              <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
             </template>
           </pv-column >
         </pv-dataTable>
       </div>
-      <pv-dialog v-model:visible="activitiesDialogVisible" maximizable modal header="Activities" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deleteDeviceDialogVisible"  modal header="Delete device" :style="{ width: '30vw' }">
         <div class="addplantbackground">
-          <div class="crop-details">
-            <div v-for="activities in currentActivities"
-                 :key="activities.id">
-              <pv-accordion>
-                <pv-accordionTab>
-                  <template #header>
-                    <div style="width: 100%;display: flex;justify-content: space-between">
-                      <span>{{ activities.title }}</span>
-                      <pv-tag v-if="activities.completed" severity="success" >Finished</pv-tag>
-                      <pv-tag v-if="!activities.completed" severity="danger" >Pending</pv-tag>
-                    </div>
-                  </template>
-                  <div class="chat-card">
-                    <div class="chat-content" >
-                      <div class="chat-header">
-                        <h3 style="margin-bottom: 0.5rem">{{ activities.description }}</h3>
-                        <pv-checkbox v-model="activities.completed" :binary="true"/>
-                      </div>
-                      <div style="display: flex;">
-                        <i class="pi pi-calendar" style="margin-right: 1rem"></i>
-                        <p style="width: 50%">{{ activities.date }}</p>
-                      </div>
-                    </div>
-                  </div>
-                </pv-accordionTab>
-              </pv-accordion>
-            </div>
+          <h3 style="margin: 0rem 2rem 2rem 2rem">¿ Are you sure you want delete this device ?</h3>
+          <div style="display: flex;justify-content: space-around">
+            <pv-button label="Yes" severity="success" @click="deleteDevice()"/>
+            <pv-button label="No" severity="danger" @click="deleteDeviceDialogVisible=!deleteDeviceDialogVisible"/>
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="projectDetailsDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-            <h1>{{currentProjectDetail.name}}</h1>
-            <h4>{{currentProjectDetail.description}}</h4>
-            <h5>Specialist: {{currentSpecialistForProject.name}}</h5>
-            <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
-            <h5>Crop: {{currentCropForProject.name}}</h5>
-            <h5>Duration: {{currentProjectDetail.weeks}}</h5>
-            <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
-            <h5>Progress: {{ currentProjectDetail.progress }} %</h5>
+            <h1>{{currentDeviceForInfo.name}}</h1>
+            <h4>{{currentDeviceForInfo.model}}</h4>
+            <h5>Crop: {{currentDeviceForInfo.cropName}}</h5>
+            <div>
+              <h5>Status: </h5>
+              <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
+            </div>
+            <h5>Project: {{currentCropForProject.name}}</h5>
 
           </div>
         </div>
@@ -118,12 +95,14 @@ export default {
         isProjectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
-      activitiesDialogVisible:false,
-      projectDetailsDialogVisible:false,
+      deviceDialogVisible:false,
+      deleteDeviceDialogVisible:false,
       currentActivities:[],
       currentProjectDetail:{},
       currentSpecialistForProject:{},
-      currentCropForProject:{}
+      currentCropForProject:{},
+      currentDeviceForDelete:{},
+      currentDeviceForInfo:{}
     };
   },
   created(){
@@ -133,6 +112,17 @@ export default {
 
   },
   methods:{
+    openDeleteDeviceDialog(device){
+      this.currentDeviceForDelete=device
+      this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
+    },
+    openInfoDeviceDialog(device){
+      this.currentDeviceForInfo=device
+      this.deviceDialogVisible=!this.deviceDialogVisible
+    },
+    deleteDevice(){
+
+    },
     getSeverity(status) {
       switch (status) {
         case true:
