@@ -16,6 +16,22 @@ import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';   // optional
+import Row from 'primevue/row';                   // optional
+import Tag from 'primevue/tag';
+import Slider from 'primevue/slider';
+import ProgressBar from 'primevue/progressbar';
+import Checkbox from 'primevue/checkbox';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+
+
+
+
+
+
 
 const app = createApp(App)
 
@@ -28,5 +44,16 @@ app.component("pv-card",Card)
 app.component("pv-input",InputText)
 app.component("pv-dropdown",Dropdown)
 app.component("pv-dialog",Dialog)
+app.component("pv-dataTable",DataTable)
+app.component("pv-column",Column)
+app.component("pv-columnGroup",ColumnGroup)
+app.component("pv-row",Row)
+app.component("pv-tag",Tag)
+app.component("pv-slider",Slider)
+app.component("pv-progressBar",ProgressBar)
+app.component("pv-checkbox",Checkbox)
+app.component("pv-accordion",Accordion)
+app.component("pv-accordionTab",AccordionTab)
+
 
 app.mount('#app')
