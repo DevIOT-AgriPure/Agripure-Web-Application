@@ -17,10 +17,10 @@
                       currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} habitaciones"
                       responsiveLayout="scroll"
                       :globalFilterFields="['name', 'model', 'active', 'category']"
-                      tableStyle="min-width: 50rem">
+                      tableStyle="min-width: 10rem">
           <template #header>
             <div style="display: flex; width: 100%; justify-content: space-between ">
-              <pv-button severity="primary" >Add a device</pv-button>
+              <pv-button severity="primary" style=" font-weight: bold" @click="addNewDevice()">Add a device</pv-button>
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <pv-input v-model="filters['global'].value" placeholder="Keyword Search" />
@@ -29,8 +29,8 @@
           </template>
           <template #empty> No devices found. </template>
           <template #loading> Loading devices data. Please wait. </template>
-          <pv-column field="name" header="Name" style="min-width: 14rem"></pv-column>
-          <pv-column field="cropName" header="Plant" style="min-width: 14rem"></pv-column>
+          <pv-column field="name" header="Name" style="min-width: 1rem"></pv-column>
+          <pv-column field="cropName" header="Plant" style="min-width: 5rem"></pv-column>
           <pv-column  header="Active" style="min-width: 1rem">
             <template #body="{ data }">
               <pv-inputSwitch v-model="data.active" />
@@ -38,8 +38,10 @@
           </pv-column >
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
-              <pv-button style="margin-right: 1rem" icon="pi pi-info" severity="warning" rounded aria-label="Information" @click="openInfoDeviceDialog(data)"/>
-              <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
+                <div style="display: flex;justify-content: space-evenly">
+                    <pv-button style="margin-right: 1rem" label="Info" severity="warning" aria-label="Information" @click="openInfoDeviceDialog(data)"/>
+                    <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
+                </div>
             </template>
           </pv-column >
         </pv-dataTable>
@@ -56,18 +58,37 @@
       <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-            <h1>{{currentDeviceForInfo.name}}</h1>
-            <h4>{{currentDeviceForInfo.model}}</h4>
-            <h5>Crop: {{currentDeviceForInfo.cropName}}</h5>
-            <div>
-              <h5>Status: </h5>
+              <h1>{{currentDeviceForInfo.name}}</h1>
               <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
-            </div>
-            <h5>Project: {{currentCropForProject.name}}</h5>
+              <h4>{{currentDeviceForInfo.model}}</h4>
+            <h5>Crop: {{currentDeviceForInfo.cropName}}</h5>
+            <h5>Project: {{this.returnProjectName(currentDeviceForInfo.projectId)}}</h5>
 
           </div>
         </div>
       </pv-dialog>
+        <pv-dialog v-model:visible="addDeviceDialogVisible" maximizable modal header="Add Devices" :style="{ width: '80vw' }">
+            <div class="addplantbackground">
+                <div class="crop-details">
+                    <div v-for="device in devicesCataloge">
+                        <div style="display: flex;justify-content: left; padding: 1rem">
+                            <img :src="device.imageUrl" alt="" style="width: 100px; height: 100px;border-radius: 1rem; margin-right: 1.5rem">
+                            <div style="display: flex; width: 100%;justify-content: space-between">
+                                <div>
+                                    <h2 style="margin: 0.5rem 0">{{device.model}}</h2>
+                                    <h3 style="margin: 0.2rem 0">{{device.category}}</h3>
+                                    <h4>S/. {{device.price}}</h4>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <pv-button label="Add" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
     </div>
   </div>
 </template>
@@ -81,6 +102,7 @@ import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
 import {DeviceServices} from "@/services/device-service";
+import {DeviceCatalogeServices} from "@/services/devicesCataloge-service";
 
 export default {
   name: "farmer_devices",
@@ -90,19 +112,17 @@ export default {
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        description: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        weeks: { value: null, matchMode: FilterMatchMode.IN },
-        isProjectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
+          cropName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+        active: { value: null, matchMode: FilterMatchMode.IN },
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
       deviceDialogVisible:false,
       deleteDeviceDialogVisible:false,
-      currentActivities:[],
-      currentProjectDetail:{},
-      currentSpecialistForProject:{},
+        addDeviceDialogVisible:false,
       currentCropForProject:{},
       currentDeviceForDelete:{},
-      currentDeviceForInfo:{}
+      currentDeviceForInfo:{},
+        devicesCataloge:{},
     };
   },
   created(){
@@ -112,6 +132,24 @@ export default {
 
   },
   methods:{
+      returnDisplayableSpecification(specification){
+          if (specification) {
+              return specification.replace(/\$/g, ' - ');
+          } else {
+              return '';
+          }
+      },
+      returnProjectName(id){
+        new ProjectService().getProjectById(id).then(response=>{
+            return response.data.name.toString()
+        })
+      },
+      addNewDevice(){
+          new DeviceCatalogeServices().getAllDevices().then(response=>{
+              this.devicesCataloge=response.data
+              this.addDeviceDialogVisible=!this.addDeviceDialogVisible
+          })
+      },
     openDeleteDeviceDialog(device){
       this.currentDeviceForDelete=device
       this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
@@ -154,22 +192,6 @@ export default {
         this.currentActivities=response.data
       })
     },
-    getSpecialistInfo(id){
-      new SpecialistServices().getSpecialistInformationById(id).then(response=>{
-        new UserServices().getUserById(response.data.userId).then(res=>{
-          this.currentSpecialistForProject=res.data
-          console.log("SPCname is: "+this.currentSpecialistForProject.name)
-        })
-      })
-    },
-    getCropInfo(cropId){
-      new CropServices().getCropInfoById(cropId).then(response=>{
-        new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
-          this.currentCropForProject=resp.data
-          console.log("name is: "+this.currentCropForProject.name)
-        })
-      })
-    }
   }
 }
 </script>

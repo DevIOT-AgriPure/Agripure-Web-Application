@@ -7,4 +7,5 @@ export class DeviceServices{
     getAllDevicesByUserId(id){
         return http.get("?farmerId_like="+id);
     }
+
 }
