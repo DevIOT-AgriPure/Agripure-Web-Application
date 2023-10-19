@@ -7,4 +7,7 @@ export class ProjectService{
     getProjectByFarmerId(id){
         return http.get("?farmerId="+id);
     }
+    getProjectById(id){
+        return http.get(""+id);
+    }
 }

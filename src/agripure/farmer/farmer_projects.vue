@@ -19,7 +19,7 @@
                           :globalFilterFields="['name', 'isProjectStarted', 'weeks', 'description']"
                           tableStyle="min-width: 50rem">
                 <template #header>
-                    <div class="flex justify-content-end">
+                    <div style="display: flex; width: 100%; justify-content: end">
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <pv-input v-model="filters['global'].value" placeholder="Keyword Search" />
@@ -155,13 +155,6 @@ export default {
                 case false:
                     return 'danger';
             }
-        },
-        showProjectDetail(project){
-            this.getSpecialistInfo(project.specialistId)
-            this.getCropInfo(project.cropId)
-            this.currentProjectDetail=project
-            this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
-
         },
         getStatusProject(status){
             switch (status) {

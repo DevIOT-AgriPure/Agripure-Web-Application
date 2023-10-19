@@ -62,7 +62,7 @@
               <img
                   :src="currentContact.imageUrl"
                   alt="Specialist Image"
-                  class="centered-image"
+                  style="height: 15rem; border-radius: 1rem;"
               />
             </div>
             <div class="detail-row">
@@ -373,7 +373,6 @@ export default {
 
 .image-container {
   margin-top: 20px;
-  text-align: center;
 }
 
 .centered-image {

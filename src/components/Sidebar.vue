@@ -21,11 +21,11 @@
                 <i class="pi pi-calendar" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Projects</span>
             </router-link>
-            <router-link to="/" class="button" style="margin-bottom: 1rem">
+            <router-link to="/farmer/devices" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-tablet" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Devices</span>
             </router-link>
-            <router-link to="/farmer/chat" class="button" style="margin-bottom: 1rem">
+            <router-link to="/farmer/notifications" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-bell" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Notifications</span>
             </router-link>
