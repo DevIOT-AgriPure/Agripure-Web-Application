@@ -58,11 +58,15 @@
       <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-              <h1>{{currentDeviceForInfo.name}}</h1>
-              <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
-              <h4>{{currentDeviceForInfo.model}}</h4>
-            <h5>Crop: {{currentDeviceForInfo.cropName}}</h5>
-            <h5>Project: {{this.returnProjectName(currentDeviceForInfo.projectId)}}</h5>
+              <h1 style="margin: 1rem ">{{currentDeviceForInfo.name}}</h1>
+              <h4 style="margin: 1rem ">Model: {{currentDeviceForInfo.model}}</h4>
+            <h5 style="margin: 1rem ">Crop: {{currentDeviceForInfo.cropName}}</h5>
+            <h5 style="margin: 1rem " v-if="currentDeviceForInfo.projectId!==0">Project: {{currentDeviceForInfo.projectName}}</h5>
+              <div style="margin: 1rem ">
+                  <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
+
+              </div>
+
 
           </div>
         </div>
@@ -156,6 +160,9 @@ export default {
     },
     openInfoDeviceDialog(device){
       this.currentDeviceForInfo=device
+        new ProjectService().getProjectById(device.projectId).then(response=>{
+            this.currentDeviceForInfo.projectName= response.data.name.toString()
+        })
       this.deviceDialogVisible=!this.deviceDialogVisible
     },
     deleteDevice(){
@@ -169,13 +176,6 @@ export default {
         case false:
           return 'danger';
       }
-    },
-    showProjectDetail(project){
-      this.getSpecialistInfo(project.specialistId)
-      this.getCropInfo(project.cropId)
-      this.currentProjectDetail=project
-      this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
-
     },
     getDeviceStatus(status){
       switch (status) {

@@ -156,13 +156,6 @@ export default {
                     return 'danger';
             }
         },
-        showProjectDetail(project){
-            this.getSpecialistInfo(project.specialistId)
-            this.getCropInfo(project.cropId)
-            this.currentProjectDetail=project
-            this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
-
-        },
         getStatusProject(status){
             switch (status) {
                 case true:
