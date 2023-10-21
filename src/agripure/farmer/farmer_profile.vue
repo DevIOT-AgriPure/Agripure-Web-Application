@@ -39,9 +39,16 @@
             </div>
             <div class="profilePicture">
                 <div>
-                    <img
-                        src="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
-                        style="height: 300px; width: 300px; border-radius: 0.5rem;" class="mr-2" />
+                    <div class="profile-container">
+                        <img
+                            src="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
+                            style="height: 300px; width: 300px; border-radius: 0.5rem;"
+                            class="profile-image"
+                        />
+                        <div class="image-overlay">
+                            <p>Change profile picture</p>
+                        </div>
+                    </div>
                     <div style="display: flex;justify-content: space-around; margin-top: 1rem">
                         <div style="display: flex">
                             <pv-button icon="pi pi-pencil" label="Edit profile" text rounded aria-label="update" />
@@ -55,6 +62,39 @@
 </template>
 
 <style scoped>
+.profile-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
+}
+
+.profile-image {
+    transition: filter 0.3s;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.profile-container:hover .profile-image {
+    filter: grayscale(100%) brightness(70%);
+}
+
+.profile-container:hover .image-overlay {
+    opacity: 1;
+}
 .plan-image{
     margin-right: 1rem;
 }
@@ -68,15 +108,6 @@
     cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
     margin-bottom: 10px; /* Espaciado entre tarjetas */
     margin-top: 1rem;
-}
-.card {
-    display: flex;
-    align-items: center;
-    padding: 1.2rem;
-    background-color: #1c1c1c; /* Color de fondo negro */
-    color: white; /* Color de texto blanco */
-    border-radius: 10px; /* Bordes redondos */
-    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
 }
 .chat-content {
     flex-grow: 1;
