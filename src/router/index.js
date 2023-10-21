@@ -54,6 +54,11 @@ const router = createRouter({
             component: () => import('../agripure/farmer/farmer_projects.vue')
         },
         {
+            path: '/farmer/profile',
+            name: 'profile',
+            component: () => import('../agripure/farmer/farmer_profile.vue')
+        },
+        {
             path: '/info/:id',
             name: 'info',
             component: () => import('../agripure/farmer/Home_specialist2.vue'),
