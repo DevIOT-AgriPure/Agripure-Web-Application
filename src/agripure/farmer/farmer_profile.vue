@@ -1,6 +1,6 @@
 <template>
     <div class="background">
-        <div style="display: flex;justify-content: center">
+        <div style="display: flex;justify-content: center;align-items: center;align-content: center;height: 100%">
             <div class="text-container">
                 <h1 style="width: 100%;margin: 1.2rem 0 1.2rem 0">Huell Babineaux</h1>
                 <div class="profession-location">
@@ -42,18 +42,15 @@
                     <img
                         src="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
                         style="height: 300px; width: 300px; border-radius: 0.5rem;" class="mr-2" />
-                    <div style="display: flex;justify-content: space-between; margin-top: 1rem">
-                        <p style="display: flex;align-content: center; align-items: center">Actions:</p>
+                    <div style="display: flex;justify-content: space-around; margin-top: 1rem">
                         <div style="display: flex">
-                            <pv-button icon="pi pi-pencil" text rounded aria-label="update" />
-                            <pv-button icon="pi pi-times" text rounded aria-label="Filter" />
-
+                            <pv-button icon="pi pi-pencil" label="Edit profile" text rounded aria-label="update" />
+                            <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -71,6 +68,15 @@
     cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
     margin-bottom: 10px; /* Espaciado entre tarjetas */
     margin-top: 1rem;
+}
+.card {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem;
+    background-color: #1c1c1c; /* Color de fondo negro */
+    color: white; /* Color de texto blanco */
+    border-radius: 10px; /* Bordes redondos */
+    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
 }
 .chat-content {
     flex-grow: 1;
