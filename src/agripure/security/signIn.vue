@@ -27,7 +27,7 @@
                             </router-link>
                         </div>
                         <div class="buttons">
-                            <router-link to="/sign-up" class="rw" ><pv-button style="background-color: darkgreen;border-color: darkgreen;color: white" label="Sign Up"/></router-link>
+                            <router-link to="/sign-up" class="rw" ><pv-button style="background-color: darkgreen;border-color: darkgreen;color: white" label="Register"/></router-link>
                             <pv-button @click="signIn" style="background-color: darkgreen;border-color: darkgreen;color: white" label="Log in"></pv-button>
                         </div>
                     </div>
@@ -56,7 +56,7 @@ export default {
 
           }else {
             sessionStorage.setItem("type","specialist")
-            this.$router.push("/specialist/contacts")
+            this.$router.push("/specialist/farmers")
           }
             /*new UserServices().login(this.email,this.password).then(response=>{
                     sessionStorage.setItem("jwt",response.data.jwt)

@@ -18,25 +18,9 @@ const router = createRouter({
             component: () => import('../agripure/security/signUp.vue')
         },
         {
-            path: '/specialist',
-            name: 'about',
-            component: () => import('../agripure/Home_specialist.vue')
-        },
-        {
-            path: '/farmer/cropDetail',
-            name: 'cropdetail',
-            component: () => import('../agripure/farmer/crop_details.vue')
-        }
-        ,
-        {
             path: '/farmer/cropInventory',
             name: 'cropInventory',
             component: () => import('../agripure/farmer/crop_inventory.vue')
-        },
-        {
-            path:'/farmer/createCrop',
-            name:'createcrop',
-            component:()=>import('../agripure/farmer/create_crop.vue')
         },
         {
             path: '/specialist',
@@ -69,12 +53,6 @@ const router = createRouter({
             component: () => import('../agripure/farmer/farmer_profile.vue')
         },
         {
-            path: '/info/:id',
-            name: 'info',
-            component: () => import('../agripure/farmer/Home_specialist2.vue'),
-            props: true,
-        },
-        {
             path: '/farmer/chat/:id',
             name: 'chat',
             component: () => import('../agripure/farmer/farmer_chatMessages.vue'),
@@ -89,6 +67,26 @@ const router = createRouter({
             path: '/farmer/projects',
             name: 'farmerProject',
             component: () => import('../agripure/farmer/farmer_projects.vue')
+        },
+        {
+            path: '/specialist/farmers',
+            name: 'specialistFarmers',
+            component: () => import('../agripure/specialist/specialist_farmers.vue')
+        },
+        {
+            path: '/specialist/chat',
+            name: 'specialistChat',
+            component: () => import('../agripure/specialist/specialist_chat.vue')
+        },
+        {
+            path: '/specialist/projects',
+            name: 'specialistProjects',
+            component: () => import('../agripure/specialist/specialist_projects.vue')
+        },
+        {
+            path: '/specialist/notifications',
+            name: 'specialistNotifications',
+            component: () => import('../agripure/specialist/specialist_notifications.vue')
         },
     ]
 })
