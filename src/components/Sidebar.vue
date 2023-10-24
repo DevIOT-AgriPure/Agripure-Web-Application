@@ -1,7 +1,7 @@
 <template>
-    <aside >
+    <aside v-if="shouldShowSidebar">
         <div class="logo">
-            <img :src="logoURL" alt="Vue"/>
+            <img src="../assets/logo.png" alt="Vue"/>
             <h3 style="color: white;">Agripure</h3>
         </div>
         <div class="menu">
@@ -45,18 +45,38 @@
     </aside>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script>
+import { useRoute } from 'vue-router';
 import logoURL from '../assets/logo.png'
-const is_expanded = true
-const ToggleMenu = () => {
-    is_expanded.value = !is_expanded.value
-    localStorage.setItem("is_expanded", is_expanded.value)
-    this.buttonClicked = true;
-}
+export default {
+    data() {
+        return {
+            is_expanded: true,
+            route: null, // Variable para almacenar la ruta actual
+        };
+    },
+    computed: {
+        shouldShowSidebar() {
+            if (this.route) {
+                const path = this.route.path;
+                return path !== '/sign-in' && path !== '/sign-up';
+            }
+            return false;
+        },
+    },
+
+    methods: {
+        ToggleMenu() {
+            this.is_expanded = !this.is_expanded;
+            localStorage.setItem('is_expanded', this.is_expanded);
+            this.buttonClicked = true;
+        },
+    },
+    created() {
+        this.route = useRoute(); // Obtener la ruta actual
+    },
+};
 </script>
-
-
 
 
 <style lang="scss" scoped>

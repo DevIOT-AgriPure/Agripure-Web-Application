@@ -8,6 +8,16 @@ const router = createRouter({
             redirect: '/farmer/cropInventory',
         },
         {
+            path: '/sign-in',
+            name: 'signIn',
+            component: () => import('../agripure/security/signIn.vue')
+        },
+        {
+            path: '/sign-up',
+            name: 'signUp',
+            component: () => import('../agripure/security/signUp.vue')
+        },
+        {
             path: '/specialist',
             name: 'about',
             component: () => import('../agripure/Home_specialist.vue')

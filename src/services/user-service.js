@@ -11,4 +11,7 @@ export class UserServices{
         return http.get("?type=specialist");
     }
 
+    login(email,password){
+
+    }
 }
