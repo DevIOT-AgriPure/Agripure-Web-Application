@@ -50,7 +50,8 @@ export default {
     },
     methods:{
         signIn(){
-            new UserServices().login(this.email,this.password).then(response=>{
+          this.$router.push("/farmer/cropInventory")
+            /*new UserServices().login(this.email,this.password).then(response=>{
                     sessionStorage.setItem("jwt",response.data.jwt)
                     sessionStorage.setItem("id",response.data.id)
                     sessionStorage.setItem("name",response.data.name)
@@ -68,7 +69,7 @@ export default {
                 }
             ).catch(reason => {
                 this.$toast.add({severity:'error', summary: 'Credenciales invalidad', detail:'Correo o contraseña incorrecta', life: 3000});
-            })
+            })*/
         },
         sendMessage(type,name){
             let obj={
