@@ -58,6 +58,7 @@ const ToggleMenu = () => {
 
 
 
+
 <style lang="scss" scoped>
 aside {
     display: flex;
@@ -203,7 +204,6 @@ aside {
             }
 
             &.router-link-exact-active {
-                border-right: 5px solid var(--primary);
 
                 .material-icons, .text {
                     color: var(--primary);
@@ -472,7 +472,6 @@ aside {
                 }
 
                 &.router-link-exact-active {
-                    border-right: 5px solid var(--primary);
 
                     .material-icons, .text {
                         color: var(--primary);
@@ -655,7 +654,6 @@ aside {
                 }
 
                 &.router-link-exact-active {
-                    border-right: 5px solid var(--primary);
 
                     .material-icons, .text {
                         color: var(--primary);
