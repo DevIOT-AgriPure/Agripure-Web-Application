@@ -42,7 +42,7 @@
                     <div class="profile-container">
                         <img
                             src="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
-                            style="height: 300px; width: 300px; border-radius: 0.5rem;"
+                            style="height: 400px; width: 400px; border-radius: 0.5rem;"
                             class="profile-image"
                         />
                         <div class="image-overlay">
@@ -53,6 +53,7 @@
                         <div style="display: flex">
                             <pv-button icon="pi pi-pencil" label="Edit profile" text rounded aria-label="update" />
                             <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
+                            <pv-button icon="pi pi-sign-out" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
                         </div>
                     </div>
                 </div>
@@ -160,5 +161,12 @@
     align-items: center; /* Alinea los elementos verticalmente en el centro */
 }
 </style>
-<script setup>
+<script >
+  export default {
+    methods:{
+      logOut(){
+        this.$router.push("/sign-in")
+      }
+    }
+  }
 </script>
