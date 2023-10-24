@@ -5,30 +5,46 @@
             <h3 style="color: white;">Agripure</h3>
         </div>
         <div class="menu">
-            <router-link to="/farmer/cropInventory" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/cropInventory" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-home" ></i>
                 <p class="text" style="font-size: 1.2rem;color: white">Home</p>
             </router-link>
-            <router-link to="/farmer/specialist" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/specialist" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-user" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Specialist</span>
             </router-link>
-            <router-link to="/farmer/chat" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/chat" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-comments" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Chat</span>
             </router-link>
-            <router-link to="/farmer/projects" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/projects" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-calendar" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Projects</span>
             </router-link>
-            <router-link to="/farmer/devices" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/devices" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-tablet" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Devices</span>
             </router-link>
-            <router-link to="/farmer/notifications" class="button" style="margin-bottom: 1rem">
+            <router-link v-if="usertype==='farmer'" to="/farmer/notifications" class="button" style="margin-bottom: 1rem">
                 <i class="pi pi-bell" ></i>
                 <span class="text" style="font-size: 1.2rem;color: white">Notifications</span>
             </router-link>
+            <router-link v-if="usertype==='specialist'" to="/specialist/farmers" class="button" style="margin-bottom: 1rem">
+            <i class="pi pi-user" ></i>
+            <span class="text" style="font-size: 1.2rem;color: white">Farmers</span>
+          </router-link>
+            <router-link v-if="usertype==='specialist'" to="/specialist/chat" class="button" style="margin-bottom: 1rem">
+            <i class="pi pi-comments" ></i>
+            <span class="text" style="font-size: 1.2rem;color: white">Chat</span>
+          </router-link>
+            <router-link v-if="usertype==='specialist'" to="/specialist/projects" class="button" style="margin-bottom: 1rem">
+            <i class="pi pi-calendar" ></i>
+            <span class="text" style="font-size: 1.2rem;color: white">Projects</span>
+          </router-link>
+            <router-link v-if="usertype==='specialist'" to="/specialist/notifications" class="button" style="margin-bottom: 1rem">
+            <i class="pi pi-bell" ></i>
+            <span class="text" style="font-size: 1.2rem;color: white">Notifications</span>
+          </router-link>
             <router-link to="/farmer/profile" class="button-profile" style="margin-bottom: 1rem">
                 <div style="display:flex">
                     <pv-avatar
@@ -53,18 +69,19 @@ export default {
         return {
             is_expanded: true,
             route: null, // Variable para almacenar la ruta actual
+          usertype:""
         };
     },
     computed: {
         shouldShowSidebar() {
             if (this.route) {
                 const path = this.route.path;
+                this.usertype=sessionStorage.getItem("type")
                 return path !== '/sign-in' && path !== '/sign-up';
             }
             return false;
-        },
+        }
     },
-
     methods: {
         ToggleMenu() {
             this.is_expanded = !this.is_expanded;

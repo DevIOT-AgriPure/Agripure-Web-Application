@@ -50,7 +50,14 @@ export default {
     },
     methods:{
         signIn(){
-          this.$router.push("/farmer/cropInventory")
+          if(this.email==="farmer"){
+            sessionStorage.setItem("type","farmer")
+            this.$router.push("/farmer/cropInventory")
+
+          }else {
+            sessionStorage.setItem("type","specialist")
+            this.$router.push("/specialist/contacts")
+          }
             /*new UserServices().login(this.email,this.password).then(response=>{
                     sessionStorage.setItem("jwt",response.data.jwt)
                     sessionStorage.setItem("id",response.data.id)
