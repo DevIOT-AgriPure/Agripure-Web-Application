@@ -80,6 +80,7 @@
 import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
+import {SpecialistServices} from "@/services/specialists-service";
 
 export default {
     name: "Specialist_farmers",
@@ -132,17 +133,28 @@ export default {
         getDisplayableContacts(rawContacts){
             for (let i = 0; i < rawContacts.length; i++) {
                 new UserServices().getUserById(rawContacts[i].farmerId).then(response=>{
-                    this.displayableContacts.push(response.data)
+                    let temp=response.data
+                    temp.contactId=rawContacts[i].id
+                    this.displayableContacts.push(temp)
                 })
                 this.currentContactResultsFarmers=this.displayableContacts
             }
         },
+        loadContactDetails(id) {
+            new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
+                this.currentContact.expertise=response.data[0].expertise
+                this.currentContact.contactEmail = response.data[0].contactEmail
+                this.currentContact.areasOfFocus= response.data[0].areasOfFocus
+                this.currentContact.specialistId=response.data[0].id
+            })
+        },
         showFarmerDetails(contact) {
+            this.loadContactDetails(contact.id)
             this.contactDetailsVisible=!this.contactDetailsVisible
             this.currentContact= contact;
         },
         contactFarmer() {
-            this.$router.push("/specialist/chat/" + this.currentContact.id)
+            this.$router.push("/specialist/chat/" + this.currentContact.contactId)
         }
     },
 };

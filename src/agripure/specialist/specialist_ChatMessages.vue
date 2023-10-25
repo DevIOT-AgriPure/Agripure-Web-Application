@@ -39,32 +39,32 @@ import {ChatServices} from "@/services/chat-service";
 import {ContactServices} from "@/services/contacts-service";
 
 export default {
-    name: "farmer_chatMessages",
+    name: "specialist_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
     data() {
         return {
             token: sessionStorage.getItem("jwt"),
             displayableContactInfo:{},
             rawMessages:[],
-            userId:1
+            userId:2
         };
     },
     created() {
-        console.log("MI CONTACT ID ES: "+this.id)
+        console.log("HI")
         new ChatServices().getChatByContactId(this.id).then(response=>{
             this.rawMessages=response.data
         })
         new ContactServices().getContactById(this.id).then(response=>{
-            new UserServices().getUserById(response.data.specialistId).then(response=>{
+            new UserServices().getUserById(response.data.farmerId).then(response=>{
                 this.displayableContactInfo=response.data
                 this.scrollBottom()
             })
         })
     },
     methods:{
-      goback(){
-          this.$router.push("/farmer/chat")
-      },
+        goback(){
+            this.$router.push("/specialist/chat")
+        },
         enviarMensaje(){
 
         },
