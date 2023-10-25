@@ -7,5 +7,8 @@ export class NotificationService{
     getAllNotificationByUserId(userId){
         return http.get("?userId="+userId);
     }
+    getAllNotificationBySpecialistId(userId){
+        return http.get("?specialistId="+userId);
+    }
 
 }
