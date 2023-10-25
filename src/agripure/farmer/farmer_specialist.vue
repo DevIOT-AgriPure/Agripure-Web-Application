@@ -252,7 +252,9 @@ export default {
     getDisplayableContacts(rawContacts){
       for (let i = 0; i < rawContacts.length; i++) {
         new UserServices().getUserById(rawContacts[i].specialistId).then(response=>{
-          this.displayableContacts.push(response.data)
+            let temp=response.data
+            temp.contactId=rawContacts[i].id
+          this.displayableContacts.push(temp)
         })
         this.currentContactResultsSpecialists=this.displayableContacts
       }
@@ -284,7 +286,7 @@ export default {
       })
     },
     contactSpecialist() {
-      this.$router.push("/farmer/chat/" + this.currentContact.specialistId)
+      this.$router.push("/farmer/chat/" + this.currentContact.contactId)
     },
     addSpecialist(){
       //this.$router.push("/farmer/createCrop")

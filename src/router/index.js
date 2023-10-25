@@ -59,6 +59,12 @@ const router = createRouter({
             props: true,
         },
         {
+            path: '/specialist/chat/:id',
+            name: 'specialist_chat',
+            component: () => import('../agripure/specialist/specialist_ChatMessages.vue'),
+            props: true,
+        },
+        {
             path: '/farmer/chat',
             name: 'farmerChat',
             component: () => import('../agripure/farmer/farmer_chat.vue')
