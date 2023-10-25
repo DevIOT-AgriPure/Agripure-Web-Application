@@ -27,6 +27,8 @@ import Checkbox from 'primevue/checkbox';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import InputSwitch from 'primevue/inputswitch';
+import Textarea from 'primevue/textarea';
+import Calendar from 'primevue/calendar';
 
 
 
@@ -56,6 +58,8 @@ app.component("pv-checkbox",Checkbox)
 app.component("pv-accordion",Accordion)
 app.component("pv-accordionTab",AccordionTab)
 app.component("pv-inputSwitch",InputSwitch)
+app.component("pv-textArea",Textarea)
+app.component("pv-calendar",Calendar)
 
 
 app.mount('#app')
