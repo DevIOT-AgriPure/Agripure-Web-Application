@@ -54,7 +54,7 @@ export default {
         }
     },
     created() {
-        new ContactServices().getContactsForSpecialist(2).then(response=>{
+        new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
     },

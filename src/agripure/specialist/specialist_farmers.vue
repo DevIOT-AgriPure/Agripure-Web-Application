@@ -86,8 +86,8 @@ export default {
     name: "Specialist_farmers",
     data() {
         return {
+            username:sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
-            username: "Huell",
             searchContactValue: ref(""),
             searchContactItems: ref([]),
             showDropdown: false,
@@ -100,7 +100,7 @@ export default {
         };
     },
     created() {
-        new ContactServices().getContactsForSpecialist(2).then(response=>{
+        new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
     },
