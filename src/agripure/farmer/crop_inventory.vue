@@ -77,7 +77,7 @@
                               <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="showDetailsForSearch=!showDetailsForSearch">
                                   <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
                               </pv-button>
-                              <pv-button style="width: 10rem; color: white; font-weight: bold;" @click="addPlantToCrop">
+                              <pv-button :disabled="isAddPlantDisable" style="width: 10rem; color: white; font-weight: bold;" @click="addPlantToCrop">
                                   <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Add plant</div>
                               </pv-button>
                           </div>
@@ -188,6 +188,7 @@ export default {
             currentPlantInSearch:{},
             defaultResultsPlants:[],
             visible :false,
+            isAddPlantDisable :true,
             cropDetailsVisible :false,
             showDetailsForSearch:false,
             currentResultsPlants:[],
@@ -266,8 +267,9 @@ export default {
             }
         },
         deleteCrop(){
-            this.currentInventoryResultsPlants = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
-            this.displayableCrops=this.currentInventoryResultsPlants
+            // delete plant in service
+            this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
+            this.currentInventoryResultsPlants=this.displayableCrops
             this.cropDetailsVisible=!this.cropDetailsVisible
         },
         getAllPlants(){
@@ -281,8 +283,9 @@ export default {
             this.currentCrop= crop;
         },
         showDetailsForPlantInSearch(crop){
-            this.showDetailsForSearch=!this.showDetailsForSearch
             this.currentPlantInSearch=crop;
+            this.isPlantRepeated()
+            this.showDetailsForSearch=!this.showDetailsForSearch
         },
         findIndexById(id) {
             //return this.rooms.findIndex((room) => room.id === id);
@@ -295,11 +298,24 @@ export default {
             this.getAllPlants()
         },
         addPlantToCrop(){
-            //this.$router.push("/farmer/createCrop")
+            //add plant in service
+            let newPlantForInventory=this.currentPlantInSearch
+            newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
+            this.displayableCrops.push(newPlantForInventory)
             this.visible=!this.visible
             this.showDetailsForSearch=false
             this.getAllPlants()
+        },
+        isPlantRepeated() {
+            if(this.currentInventoryResultsPlants.some(plant => plant.name === this.currentPlantInSearch.name)){
+                console.log("repetido: "+this.currentPlantInSearch.name)
+                this.isAddPlantDisable=true
+            }else {
+                console.log("libre: "+this.currentPlantInSearch.name)
+                this.isAddPlantDisable=false
+            }
         }
+
     }
 }
 
