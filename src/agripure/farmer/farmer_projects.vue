@@ -141,7 +141,7 @@ export default {
         };
     },
     created(){
-        new ProjectService().getProjectByFarmerId(1).then(response=>{
+        new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
         })
 
@@ -179,12 +179,9 @@ export default {
             })
         },
         getSpecialistInfo(id){
-            new SpecialistServices().getSpecialistInformationById(id).then(response=>{
-                new UserServices().getUserById(response.data.userId).then(res=>{
-                    this.currentSpecialistForProject=res.data
-                    console.log("SPCname is: "+this.currentSpecialistForProject.name)
-                })
-            })
+          new UserServices().getUserById(id).then(res=>{
+            this.currentSpecialistForProject=res.data
+          })
         },
         getCropInfo(cropId){
             new CropServices().getCropInfoById(cropId).then(response=>{

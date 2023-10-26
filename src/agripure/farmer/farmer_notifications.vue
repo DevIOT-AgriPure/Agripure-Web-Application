@@ -1,6 +1,7 @@
 <template>
   <div class="background">
     <div style="margin: 2rem 2rem 2rem 2rem" >
+      <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
       <div v-for="notification in notifications"
            :key="notification.id">
         <div class="chat-card">
@@ -36,12 +37,13 @@ export default {
   name: "farmer_devices",
   data(){
     return {
+      userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
       notifications:{},
     };
   },
   created(){
-    new NotificationService().getAllNotificationByUserId(1).then(response=>{
+    new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
       this.notifications=response.data
         const fecha = new Date(); // Obtiene la fecha y hora actual
         this.getFormatDay(fecha)

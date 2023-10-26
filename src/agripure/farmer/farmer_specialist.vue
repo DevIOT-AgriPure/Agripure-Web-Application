@@ -2,7 +2,7 @@
   <div class="background">
     <div class="container">
       <div class="header" style="display: flex;justify-content: left;">
-        <h1>Good morning {{ username }}!</h1>
+        <h1>Good morning {{ userName }}!</h1>
         <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
           <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
           <div class="card p-fluid" style="width: 80%">
@@ -176,7 +176,7 @@ export default {
   data() {
     return {
       token: sessionStorage.getItem("jwt"),
-      username: "Huell",
+      userName: sessionStorage.getItem("name"),
       searchContactValue: ref(""),
       searchContactItems: ref([]),
       searchNewSpecialistValue: ref(""),
@@ -194,7 +194,7 @@ export default {
     };
   },
   created() {
-    new ContactServices().getContactsForFarmer(1).then(response=>{
+    new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
       this.getDisplayableContacts(response.data)
     })
   },

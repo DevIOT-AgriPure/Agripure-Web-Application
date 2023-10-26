@@ -54,7 +54,7 @@ export default {
         }
     },
     created() {
-        new ContactServices().getContactsForFarmer(1).then(response=>{
+        new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
     },

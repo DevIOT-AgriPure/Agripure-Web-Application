@@ -130,7 +130,7 @@ export default {
     };
   },
   created(){
-    new DeviceServices().getAllDevicesByUserId(1).then(response=>{
+    new DeviceServices().getAllDevicesByUserId(sessionStorage.getItem("id")).then(response=>{
       this.devices=response.data
     })
 
