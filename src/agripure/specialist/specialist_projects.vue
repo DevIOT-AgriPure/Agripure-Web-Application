@@ -19,14 +19,14 @@
                               :globalFilterFields="['name', 'isProjectStarted', 'weeks', 'description']"
                               tableStyle="min-width: 50rem">
                     <template #header>
-                        <div class="flex" style="justify-content: space-between">
+                        <div class="flex" style="display:flex;justify-content: space-between;width: 100%;">
                             <span class="p-input-icon-left">
                               <pv-button label="Create project" severity="success" @click="createProject()"  />
                             </span>
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search" />
-                        <pv-input v-model="filters['global'].value" placeholder="Keyword Search" />
-                    </span>
+                            <span class="p-input-icon-left">
+                              <i class="pi pi-search" />
+                              <pv-input v-model="filters['global'].value" placeholder="Keyword Search" />
+                            </span>
                         </div>
                     </template>
                     <template #empty> No projects found. </template>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </pv-dialog>
-            <pv-dialog v-model:visible="createProjectVisible" maximizable modal header="Create a project" :style="{ width: '70vw' }">
+            <pv-dialog v-model:visible="createProjectVisible" maximizable modal header="Create a project" :style="{ width: '800px' }">
                 <div class="addplantbackground">
                     <div v-if="selectionStep">
                         <div v-if="!stepContactSelected">
@@ -134,38 +134,53 @@
                         <div style="display:flex; justify-content: center">
                             <h2 style="margin: 0rem 2rem 2rem 0">INFORMATION</h2>
                         </div>
-                        <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-input @input="validateNextButtonDisable" v-model="projectName" class="w-full md:w-14rem"/>
-                        <label >Project name</label>
-                    </span>
-                        <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-textArea @input="validateNextButtonDisable" v-model="projectDescription" class="w-full md:w-14rem" />
-                        <label>Project description</label>
-                    </span>
+                      <div style="display:flex; justify-content: center; width: 100%;">
+                        <span style="margin: 1.5rem 2rem 0rem 2rem;width: 100%;display:flex; justify-content: center;" class="p-float-label">
+                          <pv-input @input="validateNextButtonDisable" v-model="projectName" style="width: 100%"/>
+                          <label style="width: 100%">Project name</label>
+                        </span>
+                      </div>
+                      <div style="display:flex; justify-content: center; width: 100%;">
+                        <span style="margin: 1.8rem 2rem 2rem 2rem;width: 100%;display:flex; justify-content: center;" class="p-float-label">
+                          <pv-textArea style="width: 100%" @input="validateNextButtonDisable" rows="3" cols="15" v-model="projectDescription"/>
+                          <label style="width: 100%">Project description</label>
+                        </span>
+                      </div>
+
+
+
                     </div>
                     <div v-if="dateStep">
-                        <h2 style="margin: 0 2rem 2rem 0">Project duration</h2>
-                        <p style="margin: 2rem 2rem 0.5rem 0">Start date</p>
-                        <div class="card flex justify-content-center">
-                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="startProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectMinDate" :manualInput="false" />
+                        <h2 style="margin: 0 2rem 1rem 0">Project duration</h2>
+                      <div style="display: flex; justify-content: center; width: 100%;">
+                        <div style="width: 90%;">
+                          <p style="margin: 0.5rem 0 0.5rem 0">Start date</p>
+                          <pv-calendar @dateSelect="validateNextButtonDisable" v-model="startProjectDate" date-format="dd/mm/yy" style="width: 100%" showIcon :minDate="startProjectMinDate" :manualInput="false" />
                         </div>
-                        <p style="margin: 2rem 2rem 0.5rem 0">Finish date</p>
-                        <div class="card flex justify-content-center">
-                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="finishProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectDate" :manualInput="false" />
+                      </div>
+                        <div style="display: flex; justify-content: center; width: 100%;">
+                          <div style="width: 90%;">
+                            <p style="margin: 2rem 0 0.5rem 0">Finish date</p>
+                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="finishProjectDate" date-format="dd/mm/yy" style=" width: 100%" showIcon :minDate="startProjectDate" :manualInput="false" />
+                          </div>
                         </div>
                     </div>
                     <div v-if="taskStep">
                         <h2 style="margin: 0 2rem 2rem 0">Add tasks</h2>
                         <div style="display: flex;justify-content: space-around">
-                            <div style="width: 50%">
-                               <span style="margin: 0 2rem 0 0" class="p-float-label">
-                                <pv-input @input="validateAddTaskButtonDisable" class="w-full md:w-14rem" v-model="taskName" />
-                                <label>Task name</label>
+                            <div style="width: 35%">
+                              <div style="display:flex; justify-content: center; width: 100%;">
+                                <span style="margin: 0 1rem 0 0;width: 100%;display:flex; justify-content: center;" class="p-float-label">
+                                  <pv-input @input="validateAddTaskButtonDisable" style="width: 100%" v-model="taskName" />
+                                  <label style="width: 100%">Task name</label>
                                </span>
-                                <span style="margin: 1.5rem 2rem 0 0" class="p-float-label">
-                                  <pv-textArea @input="validateAddTaskButtonDisable" class="w-full md:w-14rem" rows="2" cols="15" v-model="taskDescription" />
-                                  <label>Task description</label>
+                              </div>
+                              <div style="display:flex; justify-content: center; width: 100%;">
+                                <span style="margin: 1.5rem 1rem 0 0;width: 100%;display:flex; justify-content: center;" class="p-float-label">
+                                  <pv-textArea @input="validateAddTaskButtonDisable" style="width: 100%" rows="2" cols="15" v-model="taskDescription" />
+                                  <label style="width: 100%">Task description</label>
                                 </span>
+                              </div>
                                 <div style="display: flex;justify-content: center; width: 93%">
                                     <pv-button :disabled="isAddTaskButtonDisable" style="margin-top: 1rem; width: 100%"  label="Add" severity="success" @click="addTask()"/>
                                 </div>
@@ -181,7 +196,7 @@
                                 </div>
 
                             </div>
-                            <div style="width: 50%">
+                            <div style="width: 65%">
                                 <div class="card flex justify-content-center">
                                     <pv-calendar @dateSelect="validateAddTaskButtonDisable" v-model="activityProjectDate" :minDate="startProjectDate" :maxDate="finishProjectDate" inline showWeek />
                                 </div>
@@ -196,8 +211,6 @@
                     </div>
                 </div>
             </pv-dialog>
-
-
         </div>
     </div>
 </template>
