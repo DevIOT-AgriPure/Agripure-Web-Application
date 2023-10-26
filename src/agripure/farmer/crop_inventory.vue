@@ -307,11 +307,9 @@ export default {
             this.getAllPlants()
         },
         isPlantRepeated() {
-            if(this.currentInventoryResultsPlants.some(plant => plant.name === this.currentPlantInSearch.name)){
-                console.log("repetido: "+this.currentPlantInSearch.name)
+            if(this.displayableCrops.some(plant => plant.name === this.currentPlantInSearch.name)){
                 this.isAddPlantDisable=true
             }else {
-                console.log("libre: "+this.currentPlantInSearch.name)
                 this.isAddPlantDisable=false
             }
         }

@@ -46,38 +46,43 @@
           </pv-card>
         </div>
       </div>
-      <pv-dialog v-model:visible="contactDetailsVisible" maximizable modal header="Specialist Detail" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="contactDetailsVisible" maximizable modal header="Specialist Detail" :style="{ width: '70vw' }">
         <div class="addplantbackground">
           <div class="agriculture-specialist-details">
-            <div class="title">
+            <div class="title" style="display: flex; justify-content: center">
               <h1 class="title-text">Agriculture Specialist Details</h1>
             </div>
-            <div class="detail">
-              <p class="detail-text">Name: {{ currentContact.name }}</p>
-            </div>
-            <div class="detail">
-              <p class="detail-text">Expertise: {{ currentContact.expertise }}</p>
-            </div>
-            <div class="image-container">
-              <img
-                  :src="currentContact.imageUrl"
-                  alt="Specialist Image"
-                  style="height: 15rem; border-radius: 1rem;"
-              />
-            </div>
-            <div class="detail-row">
-              <p class="detail-text">Location: {{ currentContact.location }}</p>
-            </div>
-            <div class="divider"></div>
-            <div class="detail-row">
-              <p class="detail-text">Contact Email: {{ currentContact.contactEmail }}</p>
-            </div>
-            <div class="divider"></div>
-            <div class="detail-row">
-              <p class="detail-text">Areas of Focus: {{ currentContact.areasOfFocus }}</p>
-            </div>
-            <div class="button-row">
-              <pv-button class="green-button" @click="contactSpecialist">Contact</pv-button>
+              <div style="display: flex; justify-content: space-around">
+                  <div>
+                      <div class="detail">
+                          <p class="detail-text">Name: {{ currentContact.name }}</p>
+                      </div>
+                      <div class="detail">
+                          <p class="detail-text">Expertise: {{ currentContact.expertise }}</p>
+                      </div>
+                      <div class="detail-row">
+                          <p class="detail-text">Location: {{ currentContact.location }}</p>
+                      </div>
+                      <div class="detail-row">
+                          <p class="detail-text">Contact Email: {{ currentContact.contactEmail }}</p>
+                      </div>
+                      <div class="detail-row">
+                          <p class="detail-text">Areas of Focus: {{ currentContact.areasOfFocus }}</p>
+                      </div>
+                  </div>
+                  <div>
+                      <div class="image-container">
+                          <img
+                                  :src="currentContact.imageUrl"
+                                  alt="Specialist Image"
+                                  style="border-radius: 1rem;width: 300px"
+                          />
+                      </div>
+                  </div>
+              </div>
+            <div class="button-row" style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
+                <pv-button class="red-button" @click="deleteSpecialist">Delete contact</pv-button>
+                <pv-button class="green-button" @click="contactSpecialist">Open Chat</pv-button>
             </div>
           </div>
         </div>
@@ -100,6 +105,7 @@
                     :src="currentSpecialistInSearch.imageUrl"
                     alt="Specialist Image"
                     class="centered-image"
+                    style="width: 200px"
                 />
               </div>
               <div class="detail-row">
@@ -117,8 +123,8 @@
                 <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="showDetailsForSearch=!showDetailsForSearch">
                   <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
                 </pv-button>
-                <pv-button style="width: 15rem; color: white; font-weight: bold;" @click="sendRequestToSpecialist">
-                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Send request</div>
+                <pv-button style="width: 15rem; color: white; font-weight: bold;" :disabled="isAddContactDisable" @click="sendRequestToSpecialist">
+                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%" >Send request</div>
                 </pv-button>
               </div>
             </div>
@@ -191,6 +197,7 @@ export default {
       currentResultsSpecialists:[],
       currentSpecialistInSearch:{},
       currentContactResultsSpecialists:[],
+        isAddContactDisable:true
     };
   },
   created() {
@@ -288,8 +295,13 @@ export default {
     contactSpecialist() {
       this.$router.push("/farmer/chat/" + this.currentContact.contactId)
     },
+      deleteSpecialist(){
+        // add delete specialist service
+          this.displayableContacts = this.currentContactResultsSpecialists.filter(specialist => specialist.id !== this.currentContact.id);
+          this.currentContactResultsSpecialists=this.displayableContacts
+          this.contactDetailsVisible=false
+      },
     addSpecialist(){
-      //this.$router.push("/farmer/createCrop")
       this.searchNewPlantValue=""
       this.addSpecialistVisible=!this.addSpecialistVisible
       this.showDetailsForSearch=false
@@ -298,13 +310,50 @@ export default {
     
     showDetailsForSpecialistInSearch(specialist){
       this.loadSpecialistDetails(specialist.id)
+        this.currentSpecialistInSearch=specialist;
+        this.isContactRepeated()
       this.showDetailsForSearch=!this.showDetailsForSearch
-      this.currentSpecialistInSearch=specialist;
     },
+      formatDate(date) {
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+
+          return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+      },
     sendRequestToSpecialist(){
+
+        //Aqui envio una solicitud pormedio del service
+        //creo una notificacion
+        let requestNotification={}
+        requestNotification.message=(sessionStorage.getItem("name")+" just sent you a request!").toString()
+        requestNotification.notificationType="request"
+        requestNotification.date=this.formatDate(new Date()).toString()
+        requestNotification.imageUrl=sessionStorage.getItem("imageUrl").toString()
+        requestNotification.toUserId=this.currentSpecialistInSearch.id
+        requestNotification.plantId=0
+        requestNotification.fromUserId=parseInt(sessionStorage.getItem("id").toString())
+        requestNotification.seen=false
+        console.log(requestNotification)
+        //envio la notificacion pormedio del service
+        //si acepta la solicitud automaticamente se crea un chat
+
+        let newSpecialist=this.currentSpecialistInSearch
+        newSpecialist.id=this.displayableContacts.length+1//solucion temporal
+        this.displayableContacts.push(newSpecialist)
       this.addSpecialistVisible=!this.addSpecialistVisible
       this.showDetailsForSearch=false
-    }
+    },
+      isContactRepeated() {
+          if(this.displayableContacts.some(contact => contact.email === this.currentSpecialistInSearch.email)){
+              this.isAddContactDisable=true
+          }else {
+              this.isAddContactDisable=false
+          }
+      }
   },
 };
 </script>
@@ -352,7 +401,6 @@ export default {
 }
 
 .green-button {
-  margin-top: 1.5rem;
   color: white;
 }
 
@@ -387,7 +435,7 @@ export default {
 .divider {
   height: 1px;
   background-color: #ccc;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .button-row {
@@ -404,8 +452,19 @@ export default {
   cursor: pointer;
   font-size: 18px;
 }
+.red-button {
+    background-color: #ee7979;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
 
 .green-button:hover {
   background-color: darkgreen;
+}
+.red-button:hover {
+    background-color: darkred;
 }
 </style>
