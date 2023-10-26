@@ -34,9 +34,9 @@
                     <pv-column field="name" header="Name" style="min-width: 7rem"></pv-column>
                     <pv-column field="farmerName" header="Farmer" style="min-width: 7rem">
                     </pv-column>
-                    <pv-column field="weeks" header="Duration" style="min-width: 7rem">
+                    <pv-column field="durationDays" header="Duration" style="min-width: 7rem">
                         <template #body="{ data }">
-                            <p>{{data.weeks}} weeks</p>
+                            <p>{{data.durationDays}} days</p>
                         </template>
                     </pv-column>
                     <pv-column field="totalActivities" header="Activities" style="min-width: 7rem">
@@ -101,7 +101,7 @@
                         <h5>Specialist: {{currentSpecialistForProject.name}}</h5>
                         <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
                         <h5>Crop: {{currentCropForProject.name}}</h5>
-                        <h5>Duration: {{currentProjectDetail.weeks}}</h5>
+                        <h5>Duration: {{currentProjectDetail.durationDays}} days</h5>
                         <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
                         <h5>Progress: {{ currentProjectDetail.progress }} %</h5>
 
