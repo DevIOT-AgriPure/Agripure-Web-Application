@@ -154,14 +154,14 @@
                         <h2 style="margin: 0 2rem 1rem 0">Project duration</h2>
                       <div style="display: flex; justify-content: center; width: 100%;">
                         <div style="width: 90%;">
-                          <p style="margin: 0.5rem 0 0.5rem 0">Start date</p>
+                          <p style="margin: 1rem 0 0.5rem 0">Start date</p>
                           <pv-calendar @dateSelect="validateNextButtonDisable" v-model="startProjectDate" date-format="dd/mm/yy" style="width: 100%" showIcon :minDate="startProjectMinDate" :manualInput="false" />
                         </div>
                       </div>
                         <div style="display: flex; justify-content: center; width: 100%;">
                           <div style="width: 90%;">
-                            <p style="margin: 2rem 0 0.5rem 0">Finish date</p>
-                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="finishProjectDate" date-format="dd/mm/yy" style=" width: 100%" showIcon :minDate="startProjectDate" :manualInput="false" />
+                            <p style="margin: 1.5rem 0 0.5rem 0">Finish date</p>
+                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="finishProjectDate" date-format="dd/mm/yy" style=" width: 100%;margin-bottom: 1rem" showIcon :minDate="startProjectDate" :manualInput="false" />
                           </div>
                         </div>
                     </div>
@@ -184,13 +184,15 @@
                                 <div style="display: flex;justify-content: center; width: 93%">
                                     <pv-button :disabled="isAddTaskButtonDisable" style="margin-top: 1rem; width: 100%"  label="Add" severity="success" @click="addTask()"/>
                                 </div>
-                                <div class="task-grid">
+                                <div class="task-grid" style="height: 100%">
                                     <div class="task-icon" v-for="task in taskForProject">
-                                        <div class="overlay"></div> <!-- Agrega la capa overlay aquí -->
-                                        <div class="content" @click="deleteTask(task.id)">
-                                            <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
-                                            <div class="task-name">{{ task.name }}</div>
-                                            <div class="delete-text" style="font-weight: bold">Delete</div>
+                                        <div>
+                                            <div class="overlay"></div> <!-- Agrega la capa overlay aquí -->
+                                            <div class="content" @click="deleteTask(task.id)">
+                                                <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
+                                                <div class="task-name">{{ task.name }}</div>
+                                                <div class="delete-text" style="font-weight: bold">Delete</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -529,7 +531,7 @@ export default {
 <style scoped>
 .task-grid {
     margin-top: 1rem;
-    margin-right: 2rem;
+    margin-right: 1rem;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Ajusta el ancho de las columnas según tus necesidades */
     gap: 10px; /* Espacio entre las tarjetas */
@@ -537,6 +539,7 @@ export default {
     overflow-y: auto; /* Habilita el desplazamiento vertical */
 }
 .task-icon {
+    max-height: 70px;
     position: relative;
     border-radius: 5px;
     background-color: black;

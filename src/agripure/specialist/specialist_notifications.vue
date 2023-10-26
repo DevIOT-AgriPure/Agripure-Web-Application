@@ -44,7 +44,7 @@ export default {
         };
     },
     created(){
-        new NotificationService().getAllNotificationBySpecialistId(sessionStorage.getItem("id")).then(response=>{
+        new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
             this.notifications=response.data
             const fecha = new Date(); // Obtiene la fecha y hora actual
             this.getFormatDay(fecha)
@@ -56,11 +56,6 @@ export default {
         redirectTo(notificationType){
             console.log(notificationType)
             switch (notificationType) {
-                case 'crop':
-                    console.log("crop");
-                    this.$router.push("/farmer/cropInventory")
-                    return 0
-
                 case 'request':
                     console.log("request");
                     this.$router.push("/specialist/farmers")

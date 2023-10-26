@@ -60,7 +60,7 @@ export default {
                   this.$router.push("/farmer/cropInventory")
                   return 0
 
-              case 'request':
+              case 'acceptedRequest':
                   console.log("request");
                   this.$router.push("/farmer/specialist")
                   return 0

@@ -50,7 +50,7 @@
             <router-link v-if="usertype==='farmer'" to="/farmer/profile" class="button-profile" style="margin-bottom: 1rem">
                 <div style="display:flex">
                     <pv-avatar
-                        image="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
+                        :image="imageUrl"
                         class="footer-img" shape="circle" />
                     <div class="footer-text">
                         <p class="text" style="color: white;font-weight: bold">{{ userName }}</p>
