@@ -175,7 +175,7 @@
                                         <div class="content" @click="deleteTask(task.id)">
                                             <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
                                             <div class="task-name">{{ task.name }}</div>
-                                            <div class="delete-text" style="font-weight: bold">Eliminar</div>
+                                            <div class="delete-text" style="font-weight: bold">Delete</div>
                                         </div>
                                     </div>
                                 </div>

@@ -53,6 +53,11 @@ const router = createRouter({
             component: () => import('../agripure/farmer/farmer_profile.vue')
         },
         {
+            path: '/specialist/profile',
+            name: 'profile',
+            component: () => import('../agripure/specialist/specialist_profile.vue')
+        },
+        {
             path: '/farmer/chat/:id',
             name: 'chat',
             component: () => import('../agripure/farmer/farmer_chatMessages.vue'),

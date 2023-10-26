@@ -9,7 +9,7 @@
                     </div>
                     <div class="chat-content" >
                         <div class="chat-header">
-                            <div @click="redirectTo(notification.notificationType)">
+                            <div @click="redirectTo(notification.notificationType)" style="width: 100%;">
                                 <h3 style="margin-bottom: 0.5rem">{{ notification.message }}</h3>
                                 <p>{{this.calculateTime(notification.date)}}</p>
                             </div>

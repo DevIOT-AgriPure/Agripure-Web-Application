@@ -45,11 +45,24 @@
             <i class="pi pi-bell" ></i>
             <span class="text" style="font-size: 1.2rem;color: white">Notifications</span>
           </router-link>
-            <router-link to="/farmer/profile" class="button-profile" style="margin-bottom: 1rem">
+
+
+            <router-link v-if="usertype==='farmer'" to="/farmer/profile" class="button-profile" style="margin-bottom: 1rem">
                 <div style="display:flex">
                     <pv-avatar
                         image="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
                         class="footer-img" shape="circle" />
+                    <div class="footer-text">
+                        <p class="text" style="color: white;font-weight: bold">Username</p>
+                        <p class="text" style="color: #939393;">@usertag</p>
+                    </div>
+                </div>
+            </router-link>
+            <router-link v-if="usertype==='specialist'" to="/specialist/profile" class="button-profile" style="margin-bottom: 1rem">
+                <div style="display:flex">
+                    <pv-avatar
+                            image="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
+                            class="footer-img" shape="circle" />
                     <div class="footer-text">
                         <p class="text" style="color: white;font-weight: bold">Username</p>
                         <p class="text" style="color: #939393;">@usertag</p>
