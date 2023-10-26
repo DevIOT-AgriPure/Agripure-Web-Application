@@ -264,15 +264,30 @@ export default {
     },
     methods:{
         validateNextButtonDisable(){
+            if(this.selectionStep){
+                if(this.selectedCrop!==null){
+                    this.isNextButtonDisable=false
+                }
+                if(this.projectName !== "" && this.projectDescription !== ""){
+                    this.isNextButtonDisable=false
+                }
+            }
             if(this.informationStep){
+                if(this.startProjectDate !== null && this.finishProjectDate !== null){
+                    this.isNextButtonDisable=false
+                }
                 if(this.projectName !== "" && this.projectDescription !== ""){
                     this.isNextButtonDisable=false
                 }
             }
             if(this.dateStep){
+
                 if(this.startProjectDate !== null && this.finishProjectDate !== null){
                     this.isNextButtonDisable=false
                 }
+            }
+            if(this.taskForProject.length!==0){
+                this.isCreateProjectButtonDisable=false
             }
 
         },
@@ -300,10 +315,17 @@ export default {
             if(this.selectionStep){
                 if(this.selectedContact)
                 if(this.stepContactSelected){
+                    if(this.projectName !== ""&&this.projectDescription!== ""){
+                        this.isNextButtonDisable=false
+                    }
                     this.selectionStep=false
                     this.informationStep=true
                 }else{
+                    if(this.selectedContact!==null){
+                        this.isNextButtonDisable=false
+                    }
                     this.stepContactSelected=true
+
                 }
             }
         },
@@ -314,18 +336,30 @@ export default {
                     this.cleanProjectData
                 }
                 else{
+                    if(this.selectedContact!==null){
+                        this.isNextButtonDisable=false
+                    }
                     this.stepContactSelected=false
                 }
             }
             if(this.informationStep){
+                if(this.selectedCrop!==null){
+                    this.isNextButtonDisable=false
+                }
                 this.informationStep=false
                 this.selectionStep=true
             }
             if(this.dateStep){
+                if(this.projectName !== "" && this.projectDescription !== ""){
+                    this.isNextButtonDisable=false
+                }
                 this.informationStep=true
                 this.dateStep=false
             }
             if(this.taskStep){
+                if(this.startProjectDate !== null && this.finishProjectDate !== null){
+                    this.isNextButtonDisable=false
+                }
                 this.dateStep=true
                 this.taskStep=false
             }
