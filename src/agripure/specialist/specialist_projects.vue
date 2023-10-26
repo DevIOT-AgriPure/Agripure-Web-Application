@@ -110,10 +110,10 @@
             </pv-dialog>
             <pv-dialog v-model:visible="createProjectVisible" maximizable modal header="Create a project" :style="{ width: '70vw' }">
                 <div class="addplantbackground">
-                    <div v-if="true">
+                    <div v-if="selectionStep">
                         <div v-if="!stepContactSelected">
                             <div style="display:flex; justify-content: center">
-                                <h2 style="margin: 2rem 0">SELECT A CONTACT</h2>
+                                <h2 style="margin-bottom: 2rem">SELECT A CONTACT</h2>
                             </div>
                             <pv-dropdown v-model="selectedContact" class="w-full md:w-14rem" editable :options="currentContactForSpecialist"
                                          optionLabel="name" placeholder="Select a contact" @change="getCropForProject()"/>
@@ -125,57 +125,64 @@
                             <pv-dropdown :disabled="selectedContact===null" class="w-full md:w-14rem" v-model="selectedCrop" editable :options="currentCropsForFarmer"
                                          optionLabel="name" placeholder="Select a crop" />
                         </div>
-                        <div style="display: flex;justify-content: space-between; margin: 2rem 1rem 0rem 1rem">
-                            <pv-button v-if="!stepContactSelected" label="Cancel" severity="danger" @click="addTask()"  />
-                            <pv-button v-if="stepContactSelected" label="Previous" severity="secondary" @click="stepContactSelected=!stepContactSelected"  />
-                            <pv-button label="Next" severity="success" @click="stepContactSelected=!stepContactSelected"  />
-                        </div>
                     </div>
-                    <div v-if="false">
-                        <h2 style="margin: 2rem 2rem 2rem 0">Project information</h2>
+                    <div v-if="informationStep">
+                        <div style="display:flex; justify-content: center">
+                            <h2 style="margin: 0rem 2rem 2rem 0">INFORMATION</h2>
+                        </div>
                         <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-input  v-model="projectName" />
+                        <pv-input  v-model="projectName" class="w-full md:w-14rem"/>
                         <label >Project name</label>
                     </span>
                         <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-textArea  v-model="projectDescription" />
+                        <pv-textArea  v-model="projectDescription" class="w-full md:w-14rem" />
                         <label>Project description</label>
                     </span>
                     </div>
-                    <div v-if="false">
-                        <h2 style="margin: 2rem 2rem 2rem 0">Duracion</h2>
+                    <div v-if="dateStep">
+                        <h2 style="margin: 0rem 2rem 2rem 0">Duracion del proyecto</h2>
                         <p style="margin: 2rem 2rem 2rem 0">Fecha de inicio</p>
                         <div class="card flex justify-content-center">
-                            <pv-calendar v-model="startProjectDate" :minDate="startProjectMinDate" :manualInput="false" />
+                            <pv-calendar v-model="startProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" @dateSelect="formatDate()" :minDate="startProjectMinDate" :manualInput="false" />
                         </div>
                         <p style="margin: 2rem 2rem 2rem 0">Fecha de finalizacion</p>
                         <div class="card flex justify-content-center">
-                            <pv-calendar v-model="finishProjectDate" :minDate="startProjectDate" :manualInput="false" />
+                            <pv-calendar v-model="finishProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectDate" :manualInput="false" />
                         </div>
                     </div>
-                    <div v-if="false">
-                        <h2 style="margin: 2rem 2rem 2rem 0">Tareas</h2>
-                        <div>
-                        <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-input  v-model="taskName" />
-                        <label>Nombre</label>
-                    </span>
-                            <div>
-                            <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                              <pv-textArea  v-model="taskDescription" />
-                              <label>Description</label>
-                            </span>
+                    <div v-if="taskStep">
+                        <h2 style="margin: 0rem 2rem 2rem 0">Add tasks</h2>
+                        <div style="display: flex;justify-content: space-around">
+                            <div style="width: 50%">
+                               <span style="margin: 0 2rem 0 0" class="p-float-label">
+                                <pv-input class="w-full md:w-14rem" v-model="taskName" />
+                                <label>Nombre</label>
+                               </span>
+                                <span style="margin: 1.5rem 2rem 0 0" class="p-float-label">
+                                  <pv-textArea class="w-full md:w-14rem" rows="3" cols="15" v-model="taskDescription" />
+                                  <label>Description</label>
+                                </span>
+                                <div style="display: flex;justify-content: center; width: 93%">
+                                    <pv-button style="margin-top: 1rem; width: 100%"  label="Add" severity="success" @click="addTask()"/>
+                                </div>
+                                <div class="task-grid">
+                                    <div class="task-icon" v-for="task in taskForProject">
+                                        <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
+                                        <div class="task-name">{{ task.name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 50%">
+                                <div class="card flex justify-content-center">
+                                    <pv-calendar  v-model="activityProjectDate" :minDate="startProjectDate" :maxDate="finishProjectDate" inline showWeek />
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <p style="margin: 1rem 1rem 1rem 0">Fecha</p>
-                            <div class="card flex justify-content-center">
-                                <pv-calendar v-model="activityProjectDate" :minDate="startProjectDate" :maxDate="finishProjectDate" :manualInput="false" />
-                            </div>
-                        </div>
-                        <div style="margin: 1rem 1rem 1rem 0">
-                            <pv-button label="Add" severity="success" @click="addTask()"  />
-                        </div>
+                    </div>
+                    <div style="display: flex;justify-content: space-between; margin: 2rem 1rem 0 1rem">
+                        <pv-button v-if="!stepContactSelected" label="Cancel" severity="danger" @click="addTask()"  />
+                        <pv-button v-if="stepContactSelected" label="Previous" severity="secondary" @click="stepContactSelected=!stepContactSelected"  />
+                        <pv-button label="Next" severity="success" @click="addProjectStepNext()"/>
                     </div>
                 </div>
             </pv-dialog>
@@ -199,6 +206,10 @@ export default {
     name: "farmer_projects",
     data(){
         return{
+            selectionStep:true,
+            informationStep:false,
+            dateStep:false,
+            taskStep:false,
             stepContactSelected:false,
             startProjectDate: null,
             startProjectMinDate: null,
@@ -228,6 +239,7 @@ export default {
             projectDescription:"",
             taskName:"",
             taskDescription:"",
+            taskForProject:[],
         };
     },
     created(){
@@ -236,11 +248,45 @@ export default {
             this.projects=response.data
             this.setFarmerDataToProject()
         })
-
     },
     methods:{
-        addTask(){
+        addProjectStepNext(){
+            if(this.dateStep){
+                this.dateStep = false
+                this.taskStep=true
+            }
+            if(this.informationStep){
+                this.informationStep = false
+                this.dateStep = true
+            }
+            if(this.selectionStep){
+                if(this.stepContactSelected){
+                    this.selectionStep=false
+                    this.informationStep=true
+                }else{
+                    this.stepContactSelected=true
+                }
+            }
 
+
+        },
+        formatCardDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${day}`;
+        },
+        formatPeruvianDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        },
+        addTask(){
+            let newTask= {}
+            newTask.name=this.taskName
+            newTask.description=this.taskDescription
+            newTask.date=this.activityProjectDate
+            this.taskForProject.push(newTask)
         },
         getCropForProject(){
             this.currentCropsForFarmer=[]
@@ -321,11 +367,43 @@ export default {
                 })
             })
         }
-    }
+    },
 }
 </script>
 
 <style scoped>
+.task-grid {
+    margin-top: 1rem;
+    margin-right: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Ajusta el ancho de las columnas según tus necesidades */
+    gap: 10px; /* Espacio entre las tarjetas */
+    max-height: 180px; /* Establece la altura máxima según tus necesidades */
+    overflow-y: auto; /* Habilita el desplazamiento vertical */
+}
+
+.task-icon {
+    background-color: #0e0e0e;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    text-align: center;
+}
+
+.calendar-day {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.task-name {
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+/* Ajusta los estilos según tus preferencias */
+
+
 .background {
     background-color: #242424;
     color: white; /* Cambiar el color del texto si es necesario */
