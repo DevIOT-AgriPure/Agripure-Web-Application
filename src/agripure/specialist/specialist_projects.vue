@@ -159,7 +159,7 @@
                                 <label>Nombre</label>
                                </span>
                                 <span style="margin: 1.5rem 2rem 0 0" class="p-float-label">
-                                  <pv-textArea class="w-full md:w-14rem" rows="3" cols="15" v-model="taskDescription" />
+                                  <pv-textArea class="w-full md:w-14rem" rows="2" cols="15" v-model="taskDescription" />
                                   <label>Description</label>
                                 </span>
                                 <div style="display: flex;justify-content: center; width: 93%">
@@ -167,10 +167,15 @@
                                 </div>
                                 <div class="task-grid">
                                     <div class="task-icon" v-for="task in taskForProject">
-                                        <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
-                                        <div class="task-name">{{ task.name }}</div>
+                                        <div class="overlay"></div> <!-- Agrega la capa overlay aquí -->
+                                        <div class="content" @click="deleteTask(task.id)">
+                                            <div class="calendar-day">{{ formatCardDate(task.date) }}</div>
+                                            <div class="task-name">{{ task.name }}</div>
+                                            <div class="delete-text" style="font-weight: bold">Eliminar</div>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                             <div style="width: 50%">
                                 <div class="card flex justify-content-center">
@@ -283,10 +288,16 @@ export default {
         },
         addTask(){
             let newTask= {}
+            newTask.id=this.taskForProject.length+1
             newTask.name=this.taskName
             newTask.description=this.taskDescription
             newTask.date=this.activityProjectDate
             this.taskForProject.push(newTask)
+        },
+        deleteTask(id) {
+            console.log("delete: "+id)
+            // Filtrar el arreglo para excluir el elemento con el ID proporcionado
+            this.taskForProject = this.taskForProject.filter(task => task.id !== id);
         },
         getCropForProject(){
             this.currentCropsForFarmer=[]
@@ -378,17 +389,28 @@ export default {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Ajusta el ancho de las columnas según tus necesidades */
     gap: 10px; /* Espacio entre las tarjetas */
-    max-height: 180px; /* Establece la altura máxima según tus necesidades */
+    max-height: 200px; /* Establece la altura máxima según tus necesidades */
     overflow-y: auto; /* Habilita el desplazamiento vertical */
 }
-
 .task-icon {
-    background-color: #0e0e0e;
-    color: white;
+    position: relative;
     border-radius: 5px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
     text-align: center;
+    transition: transform 0.3s;
+}
+
+.task-icon:hover {
+    transform: scale(1.05); /* Agranda la tarjeta al pasar el mouse */
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; /* Asegura que el contenido esté sobre la capa negra */
 }
 
 .calendar-day {
@@ -400,6 +422,40 @@ export default {
     font-size: 10px;
     margin-top: 5px;
 }
+
+.delete-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2; /* Asegura que el texto esté sobre la capa negra */
+    font-size: 12px;
+    opacity: 0;
+}
+
+.task-icon:hover .delete-text {
+    cursor: pointer;
+    opacity: 1; /* Muestra el texto "Eliminar" al pasar el mouse */
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Color negro con opacidad */
+    border-radius: 5px;
+    z-index: 0; /* Asegura que esté detrás del contenido */
+    opacity: 0; /* Inicialmente transparente */
+    transition: opacity 0.3s;
+}
+
+.task-icon:hover .overlay {
+    opacity: 1; /* Muestra la capa negra al pasar el mouse */
+}
+
+
 
 /* Ajusta los estilos según tus preferencias */
 
