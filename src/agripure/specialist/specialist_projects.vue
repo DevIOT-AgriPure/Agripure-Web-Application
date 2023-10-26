@@ -115,15 +115,19 @@
                             <div style="display:flex; justify-content: center">
                                 <h2 style="margin-bottom: 2rem">SELECT A CONTACT</h2>
                             </div>
-                            <pv-dropdown v-model="selectedContact" class="w-full md:w-14rem" editable :options="currentContactForSpecialist"
-                                         optionLabel="name" placeholder="Select a contact" @change="getCropForProject()"/>
+                            <div style="display:flex; justify-content: center">
+                                <pv-dropdown style="width: 90%" v-model="selectedContact" editable :options="currentContactForSpecialist"
+                                             optionLabel="name" placeholder="Select a contact" @change="getCropForProject()"/>
+                            </div>
                         </div>
                         <div v-if="stepContactSelected">
                             <div style="display:flex; justify-content: center">
-                                <h2 style="margin: 2rem 2rem 2rem 0">SELECT A CROP</h2>
+                                <h2 style="margin: 0 2rem 2rem 0">SELECT A CROP</h2>
                             </div>
-                            <pv-dropdown :disabled="selectedContact===null" class="w-full md:w-14rem" v-model="selectedCrop" editable :options="currentCropsForFarmer"
-                                         optionLabel="name" placeholder="Select a crop" />
+                            <div style="display:flex; justify-content: center">
+                                <pv-dropdown style="width: 90%" :disabled="selectedContact===null" v-model="selectedCrop" @change="this.isNextButtonDisable=false" editable :options="currentCropsForFarmer"
+                                             optionLabel="name" placeholder="Select a crop" />
+                            </div>
                         </div>
                     </div>
                     <div v-if="informationStep">
@@ -131,39 +135,39 @@
                             <h2 style="margin: 0rem 2rem 2rem 0">INFORMATION</h2>
                         </div>
                         <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-input  v-model="projectName" class="w-full md:w-14rem"/>
+                        <pv-input @input="validateNextButtonDisable" v-model="projectName" class="w-full md:w-14rem"/>
                         <label >Project name</label>
                     </span>
                         <span style="margin: 2rem 2rem 2rem 0" class="p-float-label">
-                        <pv-textArea  v-model="projectDescription" class="w-full md:w-14rem" />
+                        <pv-textArea @input="validateNextButtonDisable" v-model="projectDescription" class="w-full md:w-14rem" />
                         <label>Project description</label>
                     </span>
                     </div>
                     <div v-if="dateStep">
-                        <h2 style="margin: 0rem 2rem 2rem 0">Duracion del proyecto</h2>
-                        <p style="margin: 2rem 2rem 2rem 0">Fecha de inicio</p>
+                        <h2 style="margin: 0 2rem 2rem 0">Project duration</h2>
+                        <p style="margin: 2rem 2rem 0.5rem 0">Start date</p>
                         <div class="card flex justify-content-center">
-                            <pv-calendar v-model="startProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" @dateSelect="formatDate()" :minDate="startProjectMinDate" :manualInput="false" />
+                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="startProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectMinDate" :manualInput="false" />
                         </div>
-                        <p style="margin: 2rem 2rem 2rem 0">Fecha de finalizacion</p>
+                        <p style="margin: 2rem 2rem 0.5rem 0">Finish date</p>
                         <div class="card flex justify-content-center">
-                            <pv-calendar v-model="finishProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectDate" :manualInput="false" />
+                            <pv-calendar @dateSelect="validateNextButtonDisable" v-model="finishProjectDate" date-format="dd/mm/yy" class="w-full md:w-14rem" :minDate="startProjectDate" :manualInput="false" />
                         </div>
                     </div>
                     <div v-if="taskStep">
-                        <h2 style="margin: 0rem 2rem 2rem 0">Add tasks</h2>
+                        <h2 style="margin: 0 2rem 2rem 0">Add tasks</h2>
                         <div style="display: flex;justify-content: space-around">
                             <div style="width: 50%">
                                <span style="margin: 0 2rem 0 0" class="p-float-label">
-                                <pv-input class="w-full md:w-14rem" v-model="taskName" />
-                                <label>Nombre</label>
+                                <pv-input @input="validateAddTaskButtonDisable" class="w-full md:w-14rem" v-model="taskName" />
+                                <label>Task name</label>
                                </span>
                                 <span style="margin: 1.5rem 2rem 0 0" class="p-float-label">
-                                  <pv-textArea class="w-full md:w-14rem" rows="2" cols="15" v-model="taskDescription" />
-                                  <label>Description</label>
+                                  <pv-textArea @input="validateAddTaskButtonDisable" class="w-full md:w-14rem" rows="2" cols="15" v-model="taskDescription" />
+                                  <label>Task description</label>
                                 </span>
                                 <div style="display: flex;justify-content: center; width: 93%">
-                                    <pv-button style="margin-top: 1rem; width: 100%"  label="Add" severity="success" @click="addTask()"/>
+                                    <pv-button :disabled="isAddTaskButtonDisable" style="margin-top: 1rem; width: 100%"  label="Add" severity="success" @click="addTask()"/>
                                 </div>
                                 <div class="task-grid">
                                     <div class="task-icon" v-for="task in taskForProject">
@@ -179,15 +183,16 @@
                             </div>
                             <div style="width: 50%">
                                 <div class="card flex justify-content-center">
-                                    <pv-calendar  v-model="activityProjectDate" :minDate="startProjectDate" :maxDate="finishProjectDate" inline showWeek />
+                                    <pv-calendar @dateSelect="validateAddTaskButtonDisable" v-model="activityProjectDate" :minDate="startProjectDate" :maxDate="finishProjectDate" inline showWeek />
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div style="display: flex;justify-content: space-between; margin: 2rem 1rem 0 1rem">
-                        <pv-button v-if="!stepContactSelected" label="Cancel" severity="danger" @click="addTask()"  />
-                        <pv-button v-if="stepContactSelected" label="Previous" severity="secondary" @click="stepContactSelected=!stepContactSelected"  />
-                        <pv-button label="Next" severity="success" @click="addProjectStepNext()"/>
+                        <pv-button v-if="!stepContactSelected" label="Cancel" severity="danger" @click="addProjectStepPrevious()"  />
+                        <pv-button v-if="stepContactSelected" label="Previous" severity="secondary" @click="addProjectStepPrevious()"  />
+                        <pv-button v-if="!taskStep" :disabled="isNextButtonDisable" label="Next" severity="success" @click="addProjectStepNext()"/>
+                        <pv-button v-if="taskStep" :disabled="isCreateProjectButtonDisable" label="Create" severity="success" @click="sendCreatedProject()"/>
                     </div>
                 </div>
             </pv-dialog>
@@ -217,7 +222,7 @@ export default {
             taskStep:false,
             stepContactSelected:false,
             startProjectDate: null,
-            startProjectMinDate: null,
+            startProjectMinDate: new Date(),
             finishProjectDate: null,
             activityProjectDate: null,
             projects:[],
@@ -245,6 +250,9 @@ export default {
             taskName:"",
             taskDescription:"",
             taskForProject:[],
+            isNextButtonDisable:true,
+            isAddTaskButtonDisable:true,
+            isCreateProjectButtonDisable:true
         };
     },
     created(){
@@ -255,7 +263,32 @@ export default {
         })
     },
     methods:{
+        validateNextButtonDisable(){
+            if(this.informationStep){
+                if(this.projectName !== "" && this.projectDescription !== ""){
+                    this.isNextButtonDisable=false
+                }
+            }
+            if(this.dateStep){
+                if(this.startProjectDate !== null && this.finishProjectDate !== null){
+                    this.isNextButtonDisable=false
+                }
+            }
+
+        },
+        validateAddTaskButtonDisable(){
+            if(this.taskName !== "" && this.taskDescription !== "" && this.activityProjectDate!==null){
+                this.isAddTaskButtonDisable=false
+            }
+        },
+        sendCreatedProject(){
+            this.createProjectVisible=false
+            this.taskStep=false
+            this.selectionStep=true
+            this.cleanProjectData()
+        },
         addProjectStepNext(){
+            this.isNextButtonDisable=true
             if(this.dateStep){
                 this.dateStep = false
                 this.taskStep=true
@@ -265,6 +298,7 @@ export default {
                 this.dateStep = true
             }
             if(this.selectionStep){
+                if(this.selectedContact)
                 if(this.stepContactSelected){
                     this.selectionStep=false
                     this.informationStep=true
@@ -272,12 +306,32 @@ export default {
                     this.stepContactSelected=true
                 }
             }
-
-
+        },
+        addProjectStepPrevious(){
+            if(this.selectionStep){
+                if(this.stepContactSelected===false){
+                    this.createProjectVisible=false
+                    this.cleanProjectData
+                }
+                else{
+                    this.stepContactSelected=false
+                }
+            }
+            if(this.informationStep){
+                this.informationStep=false
+                this.selectionStep=true
+            }
+            if(this.dateStep){
+                this.informationStep=true
+                this.dateStep=false
+            }
+            if(this.taskStep){
+                this.dateStep=true
+                this.taskStep=false
+            }
         },
         formatCardDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
             return `${day}`;
         },
         formatPeruvianDate(date) {
@@ -293,14 +347,22 @@ export default {
             newTask.description=this.taskDescription
             newTask.date=this.activityProjectDate
             this.taskForProject.push(newTask)
+            this.taskName=""
+            this.taskDescription=""
+            this.activityProjectDate=null
+            this.isAddTaskButtonDisable=true
+            this.isCreateProjectButtonDisable=false
         },
         deleteTask(id) {
-            console.log("delete: "+id)
+            if(this.taskForProject.length===1){
+                this.isCreateProjectButtonDisable=true
+            }
             // Filtrar el arreglo para excluir el elemento con el ID proporcionado
             this.taskForProject = this.taskForProject.filter(task => task.id !== id);
         },
         getCropForProject(){
             this.currentCropsForFarmer=[]
+            this.isNextButtonDisable=false
             new CropServices().getCropsByFarmerId(this.selectedContact.id).then(response=>{
                 let cropsForFarmer=response.data
                 for (let i = 0; i < cropsForFarmer.length; i++) {
@@ -310,7 +372,28 @@ export default {
                 }
             })
         },
+        cleanProjectData(){
+            this.selectedContact=null
+            this.selectedCrop=null
+            this.projectName=""
+            this.projectDescription=""
+            this.startProjectDate=null
+            this.finishProjectDate=null
+            this.activityProjectDate=null
+            this.taskName=""
+            this.taskDescription=""
+            this.taskForProject=[]
+        },
         createProject(){
+            this.cleanProjectData()
+            this.isAddTaskButtonDisable=true
+            this.isCreateProjectButtonDisable=true
+            this.isNextButtonDisable=true
+            this.informationStep=false
+            this.dateStep=false
+            this.taskStep=false
+            this.selectionStep=true
+            this.stepContactSelected=false
             this.currentContactForSpecialist=[]
             new ContactServices().getContactsForSpecialist(2).then(response=>{
                 let rawContact=response.data
@@ -319,8 +402,9 @@ export default {
                         this.currentContactForSpecialist.push(response.data)
                     })
                 }
+                this.createProjectVisible=!this.createProjectVisible
             })
-            this.createProjectVisible=!this.createProjectVisible
+
         },
         getSeverity(status) {
             switch (status) {
@@ -395,6 +479,7 @@ export default {
 .task-icon {
     position: relative;
     border-radius: 5px;
+    background-color: black;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
     text-align: center;
