@@ -270,7 +270,7 @@ export default {
     },
     created(){
         this.startProjectMinDate = new Date();
-        new ProjectService().getProjectsBySpecialistId(1).then(response=>{
+        new ProjectService().getProjectsBySpecialistId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
             this.setFarmerDataToProject()
         })
@@ -490,7 +490,6 @@ export default {
             this.getCropInfo(project.cropId)
             this.currentProjectDetail=project
             this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
-
         },
         getStatusProject(status){
             switch (status) {

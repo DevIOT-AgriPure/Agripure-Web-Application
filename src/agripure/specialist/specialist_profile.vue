@@ -2,7 +2,7 @@
     <div class="background">
         <div style="display: flex;justify-content: center;align-items: center;align-content: center;height: 100%">
             <div class="text-container">
-                <h1 style="width: 100%;margin: 1.2rem 0 1.2rem 0">Huell Babineaux</h1>
+                <h1 style="width: 100%;margin: 1.2rem 0 1.2rem 0">{{ userName }}</h1>
                 <div class="profession-location">
                     <div style="display: flex;justify-content: space-between; width: 100%">
                         <p>Type</p>
@@ -16,32 +16,18 @@
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
-                    <h3 >Email: Huel@gmail.com</h3>
+                    <h3 >Email: {{ userEmail }}</h3>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <p>Hola, soy Huell y amo las lechugas. Estoy emocionado de unirme a agripure para aprender y compartir sobre el cultivo de lechugas. ¡Juntos cultivaremos de manera más inteligente y saludable!</p>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin: 2rem 0 0rem 0">
-                    <h2>Plan</h2>
-                </div>
-                <div class="chat-card" @click="">
-                    <div class="plan-image">
-                        <i class="pi pi-bolt" style="font-size: 2.5rem"></i>
-                    </div>
-                    <div class="chat-content" >
-                        <div class="chat-header">
-                            <h3 style="margin-bottom: 0.5rem">Premium</h3>
-                            <pv-button label="UPDATE" />
-                        </div>
-                        <p style="width: 30%">S/. 50</p>
-                    </div>
-                </div>
+
             </div>
             <div class="profilePicture">
                 <div>
                     <div class="profile-container">
                         <img
-                                src="https://pyxis.nymag.com/v1/imgs/049/bc0/0c4563fc79b3284bdb33bd8ac3521ef94f-14-huell-breaking-bad.2x.rsquare-zoom.w190.jpg"
+                                :src="imageUrl"
                                 style="height: 400px; width: 400px; border-radius: 0.5rem;"
                                 class="profile-image"
                         />
@@ -163,6 +149,13 @@
 </style>
 <script >
 export default {
+  data(){
+    return{
+      userName:sessionStorage.getItem("name"),
+      userEmail:sessionStorage.getItem("email"),
+      imageUrl:sessionStorage.getItem("imageUrl"),
+    }
+  },
     methods:{
         logOut(){
             this.$router.push("/sign-in")
