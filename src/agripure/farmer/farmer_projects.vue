@@ -52,7 +52,6 @@
                     <pv-column  header="" style="min-width: 1rem">
                         <template #body="{ data }">
                             <pv-button v-if="data.isProjectStarted" label="Details" severity="success" @click="showProjectDetail(data)"  />
-                            <pv-button v-if="!data.isProjectStarted" label="Start" severity="success"   />
                         </template>
                     </pv-column >
                 </pv-dataTable>
