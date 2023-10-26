@@ -24,11 +24,7 @@
               <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
                       <template #header>
-                          <img
-                                  alt="user header"
-                                  :src="crop.imageUrl"
-                                  style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"
-                          />
+                          <img alt="user header" :src="crop.imageUrl" style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"/>
                       </template>
                       <template #title>{{ crop.name }}</template>
                       <template #footer>
@@ -45,7 +41,6 @@
                       </pv-button>
                   </template>
               </pv-card>
-
           </div>
           <pv-dialog v-model:visible="visible" maximizable modal header="Add a plant" :style="{ width: '800px' }">
               <div class="addplantbackground" >
@@ -235,8 +230,6 @@ export default {
             }
         },
         inventorySearch(event) {
-            console.log("Busque: "+this.searchInventorValue.toString())
-            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
             const matchingCrops = this.displayableCrops.filter(crop =>
                 crop.name.toLowerCase().includes(this.searchInventorValue.toString().toLowerCase())
             );
@@ -273,6 +266,8 @@ export default {
             }
         },
         deleteCrop(){
+            this.currentInventoryResultsPlants = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
+            this.displayableCrops=this.currentInventoryResultsPlants
             this.cropDetailsVisible=!this.cropDetailsVisible
         },
         getAllPlants(){
