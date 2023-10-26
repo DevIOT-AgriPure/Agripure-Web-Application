@@ -380,13 +380,27 @@ export default {
             newTask.name=this.taskName
             newTask.description=this.taskDescription
             newTask.date=this.activityProjectDate
-            this.taskForProject.push(newTask)
+            if(this.isTaskUnique(newTask)){
+                this.taskForProject.push(newTask)
+            }else {
+                console.log("tarea repetida")
+                this.$toast.add({severity:'error', summary: 'Repeated task ', detail:'You have entered a repeated task on the same day', life: 3000});
+            }
             this.taskName=""
             this.taskDescription=""
             this.activityProjectDate=null
             this.isAddTaskButtonDisable=true
             this.isCreateProjectButtonDisable=false
         },
+        isTaskUnique(task) {
+          // Verifica si existe algún elemento en el arreglo con el mismo name y date
+            return !this.taskForProject.some(existingTask => {
+              return (
+                existingTask.name === task.name &&
+                existingTask.date.getTime() === task.date.getTime()
+              );
+            });
+          },
         deleteTask(id) {
             if(this.taskForProject.length===1){
                 this.isCreateProjectButtonDisable=true

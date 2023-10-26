@@ -1,6 +1,6 @@
 import router from './router/index.js'
 import PrimeVue from 'primevue/config';
-
+import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue'
 import App from './App.vue'
 
@@ -29,6 +29,7 @@ import AccordionTab from 'primevue/accordiontab';
 import InputSwitch from 'primevue/inputswitch';
 import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar';
+import Toast from 'primevue/toast';
 
 
 
@@ -37,9 +38,9 @@ import Calendar from 'primevue/calendar';
 
 
 const app = createApp(App)
-
 app.use(PrimeVue);
 app.use(router)
+app.use(ToastService);
 app.component("pv-button",Button)
 app.component("pv-avatar",Avatar)
 app.component("pv-autoComplete",AutoComplete)
@@ -60,6 +61,7 @@ app.component("pv-accordionTab",AccordionTab)
 app.component("pv-inputSwitch",InputSwitch)
 app.component("pv-textArea",Textarea)
 app.component("pv-calendar",Calendar)
+app.component("pv-toast",Toast)
 
 
 app.mount('#app')
