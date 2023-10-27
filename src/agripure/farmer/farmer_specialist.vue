@@ -453,6 +453,7 @@ export default {
   font-size: 18px;
 }
 .red-button {
+    height: 1rem;
     background-color: #ee7979;
     color: white;
     border: none;

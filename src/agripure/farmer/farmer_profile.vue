@@ -1,6 +1,6 @@
 <template>
     <div class="background">
-        <div style="display: flex;justify-content: center;align-items: center;align-content: center;height: 100%">
+        <div class="content-container">
             <div class="text-container">
                 <h1 style="width: 100%;margin: 1.2rem 0 1.2rem 0">{{ userName }}</h1>
                 <div class="profession-location">
@@ -63,10 +63,22 @@
 </template>
 
 <style scoped>
+.content-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.text-container {
+    flex: 1;
+    margin-right: 2rem;
+}
 .profile-container {
+    width: 400px;
     position: relative;
     display: inline-block;
-    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
+    cursor: pointer;
 }
 
 .profile-image {

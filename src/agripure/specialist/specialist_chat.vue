@@ -59,6 +59,10 @@ export default {
         new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
+        setInterval(() => {
+            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+            console.log("ImplementarWebSocket")
+        }, 5000);
     },
     methods:{
         reset(){

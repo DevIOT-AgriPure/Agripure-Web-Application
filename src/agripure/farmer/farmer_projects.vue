@@ -36,12 +36,7 @@
                     </pv-column>
                     <pv-column field="totalActivities" header="Activities" style="min-width: 7rem">
                         <template #body="{ data }">
-                            <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
-                        </template>
-                    </pv-column>
-                    <pv-column field="progress" header="Progress" style="min-width: 14rem">
-                        <template #body="{ data }">
-                            <pv-progressBar :value="data.progress" :showValue="false" style="height: 6px"></pv-progressBar>
+                            <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id,data)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
                         </template>
                     </pv-column>
                     <pv-column field="isProjectStarted" header="Status" style="min-width: 1rem">
@@ -59,26 +54,26 @@
             <pv-dialog v-model:visible="activitiesDialogVisible" maximizable modal header="Activities" :style="{ width: '80vw' }">
                 <div class="addplantbackground">
                     <div class="crop-details">
-                        <div v-for="activities in currentActivities"
-                             :key="activities.id">
+                        <div v-for="activity in currentActivities"
+                             :key="activity.id">
                             <pv-accordion>
                                 <pv-accordionTab>
                                     <template #header>
                                         <div style="width: 100%;display: flex;justify-content: space-between">
-                                            <span>{{ activities.title }}</span>
-                                            <pv-tag v-if="activities.completed" severity="success" >Finished</pv-tag>
-                                            <pv-tag v-if="!activities.completed" severity="danger" >Pending</pv-tag>
+                                            <span>{{ activity.title }}</span>
+                                            <pv-tag v-if="activity.completed" severity="success" >Finished</pv-tag>
+                                            <pv-tag v-if="!activity.completed" severity="danger" >Pending</pv-tag>
                                         </div>
                                     </template>
                                     <div class="chat-card">
                                         <div class="chat-content" >
                                             <div class="chat-header">
-                                                <h3 style="margin-bottom: 0.5rem">{{ activities.description }}</h3>
-                                                <pv-checkbox v-model="activities.completed" :binary="true"/>
+                                                <h3 style="margin-bottom: 0.5rem">{{ activity.description }}</h3>
+                                                <pv-checkbox v-model="activity.completed" @click="updateActivity(activity)" :binary="true"/>
                                             </div>
                                             <div style="display: flex;">
                                                 <i class="pi pi-calendar" style="margin-right: 1rem"></i>
-                                                <p style="width: 50%">{{ activities.date }}</p>
+                                                <p style="width: 50%">{{ activity.date }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -98,7 +93,6 @@
                         <h5>Crop: {{currentCropForProject.name}}</h5>
                         <h5>Duration: {{currentProjectDetail.durationDays}} days</h5>
                         <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
-                        <h5>Progress: {{ currentProjectDetail.progress }} %</h5>
 
                     </div>
                 </div>
@@ -135,6 +129,7 @@ export default {
             projectDetailsDialogVisible:false,
             currentActivities:[],
             currentProjectDetail:{},
+            currentProjectForActivities:{},
             currentSpecialistForProject:{},
             currentCropForProject:{}
         };
@@ -142,10 +137,65 @@ export default {
     created(){
         new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
+            this.setDurationDayToProject()
+            this.setActivitysForProject()
         })
+
 
     },
     methods:{
+        setActivitysForProject(){
+            for (let i = 0; i < this.projects.length; i++) {
+                new ActivitiesService().getActivitiesByProjectId(this.projects[i].id).then(response=>{
+                    let activities=response.data
+                    let activitiesDone=0
+                    for (let i = 0; i < activities.length; i++) {
+                        if(activities[i].completed===true){
+                            activitiesDone+=1
+                        }
+                    }
+                    this.projects[i].totalActivities=activities.length
+                    this.projects[i].activitiesDone=activitiesDone
+                })
+            }
+
+        },
+        setDurationDayToProject(){
+            for (let i = 0; i < this.projects.length; i++) {
+                this.projects[i].durationDays=this.calculateDurationDay(this.projects[i].startDate,this.projects[i].endDate)
+            }
+        },
+        calculateDurationDay(start, end) {
+            const [startDay, startMonth, startYear] = start.split('/');
+            const [endDay, endMonth, endYear] = end.split('/');
+
+            const startDate = new Date(startYear, startMonth - 1, startDay);
+            const endDate = new Date(endYear, endMonth - 1, endDay);
+
+            const timeDifference = endDate - startDate;
+            const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            return daysDifference;
+        },
+        updateActivity(activity){
+            //update activity by service
+            if(activity.completed){
+                console.log("Actividad pendiente")
+                this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)-1
+            }else {
+                console.log("Actividad completa")
+                this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)+1
+            }
+            this.updateProjectInProjectsById(this.currentProjectForActivities)
+        },
+        updateProjectInProjectsById(project) {
+            this.projects = this.projects.map((p) => {
+                if (p.id === project.id) {
+                    return project; // Reemplaza el proyecto con el mismo ID
+                } else {
+                    return p; // Mantén los demás proyectos sin cambios
+                }
+            });
+        },
         getSeverity(status) {
             switch (status) {
                 case true:
@@ -171,7 +221,8 @@ export default {
                     return 'Pending';
             }
         },
-        openActivities(id){
+        openActivities(id,project){
+            this.currentProjectForActivities=project
             this.activitiesDialogVisible=!this.activitiesDialogVisible
             new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
                 this.currentActivities=response.data

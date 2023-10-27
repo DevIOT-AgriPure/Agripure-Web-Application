@@ -44,11 +44,6 @@
                             <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
                         </template>
                     </pv-column>
-                    <pv-column field="progress" header="Progress" style="min-width: 14rem">
-                        <template #body="{ data }">
-                            <pv-progressBar :value="data.progress" :showValue="false" style="height: 6px"></pv-progressBar>
-                        </template>
-                    </pv-column>
                     <pv-column field="isProjectStarted" header="Status" style="min-width: 1rem">
                         <template #body="{ data }">
                             <pv-tag :value="getStatusProject(data.isProjectStarted)" :severity="getSeverity(data.isProjectStarted)" />
@@ -98,12 +93,11 @@
                     <div class="crop-details">
                         <h1>{{currentProjectDetail.name}}</h1>
                         <h4>{{currentProjectDetail.description}}</h4>
-                        <h5>Specialist: {{currentSpecialistForProject.name}}</h5>
+                        <h5>Farmer: {{currentProjectDetail.farmerName}}</h5>
                         <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
                         <h5>Crop: {{currentCropForProject.name}}</h5>
                         <h5>Duration: {{currentProjectDetail.durationDays}} days</h5>
                         <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
-                        <h5>Progress: {{ currentProjectDetail.progress }} %</h5>
 
                     </div>
                 </div>
@@ -274,10 +268,45 @@ export default {
         this.startProjectMinDate = new Date();
         new ProjectService().getProjectsBySpecialistId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
+            console.log(this.projects)
             this.setFarmerDataToProject()
+            this.setDurationDayToProject()
+            this.setActivitysForProject()
         })
     },
     methods:{
+        setActivitysForProject(){
+            for (let i = 0; i < this.projects.length; i++) {
+                new ActivitiesService().getActivitiesByProjectId(this.projects[i].id).then(response=>{
+                    let activities=response.data
+                    let activitiesDone=0
+                    for (let i = 0; i < activities.length; i++) {
+                        if(activities[i].completed===true){
+                            activitiesDone+=1
+                        }
+                    }
+                    this.projects[i].totalActivities=activities.length
+                    this.projects[i].activitiesDone=activitiesDone
+                })
+            }
+
+        },
+        setDurationDayToProject(){
+            for (let i = 0; i < this.projects.length; i++) {
+                this.projects[i].durationDays=this.calculateDurationDay(this.projects[i].startDate,this.projects[i].endDate)
+            }
+        },
+        calculateDurationDay(start, end) {
+            const [startDay, startMonth, startYear] = start.split('/');
+            const [endDay, endMonth, endYear] = end.split('/');
+
+            const startDate = new Date(startYear, startMonth - 1, startDay);
+            const endDate = new Date(endYear, endMonth - 1, endDay);
+
+            const timeDifference = endDate - startDate;
+            const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            return daysDifference;
+        },
         validateNextButtonDisable(){
             if(this.selectionStep){
                 if(this.selectedCrop!==null){
@@ -312,10 +341,47 @@ export default {
             }
         },
         sendCreatedProject(){
+            let newProject={}
+            newProject.id=this.projects.length+1
+            newProject.name=this.projectName
+            newProject.description=this.projectDescription
+            newProject.farmerId=this.selectedContact.id
+            newProject.farmerName=this.selectedContact.name
+            newProject.farmerImageUrl=this.selectedContact.imageUrl
+            newProject.cropId=this.selectedCrop.id
+            newProject.startDate=this.formatPeruvianDate(this.startProjectDate)
+            newProject.endDate=this.formatPeruvianDate(this.finishProjectDate)
+            newProject.specialistId=parseInt(sessionStorage.getItem("id").toString())
+            newProject.durationDays=this.calculateDurationDay(this.formatPeruvianDate(this.startProjectDate),this.formatPeruvianDate(this.finishProjectDate))
+            newProject.totalActivities=this.taskForProject.length
+            newProject.activitiesDone=0
+            newProject.isProjectStarted=this.isProjectStarted()
+            //add project by service
+
+            console.log(newProject)
+            this.projects.push(newProject)
+
+            for (let i = 0; i < this.taskForProject.length; i++) {
+                
+            }
+
             this.createProjectVisible=false
             this.taskStep=false
             this.selectionStep=true
             this.cleanProjectData()
+        },
+        isProjectStarted() {
+            // Obtiene la fecha actual
+            const currentDate = new Date();
+
+            // Compara currentDate con startProjectDate
+            if (currentDate >= this.startProjectDate) {
+                // La fecha actual es igual o posterior a startProjectDate
+                return true;
+            } else {
+                // La fecha actual es anterior a startProjectDate
+                return false;
+            }
         },
         addProjectStepNext(){
             this.isNextButtonDisable=true
@@ -509,18 +575,14 @@ export default {
             })
         },
         getSpecialistInfo(id){
-            new SpecialistServices().getSpecialistInformationById(id).then(response=>{
-                new UserServices().getUserById(response.data.userId).then(res=>{
-                    this.currentSpecialistForProject=res.data
-                    console.log("SPCname is: "+this.currentSpecialistForProject.name)
-                })
+            new UserServices().getUserById(id).then(res=>{
+                this.currentSpecialistForProject=res.data
             })
         },
         getCropInfo(cropId){
             new CropServices().getCropInfoById(cropId).then(response=>{
                 new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
                     this.currentCropForProject=resp.data
-                    console.log("name is: "+this.currentCropForProject.name)
                 })
             })
         }

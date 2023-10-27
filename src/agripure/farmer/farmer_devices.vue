@@ -33,7 +33,7 @@
           <pv-column field="cropName" header="Plant" style="min-width: 5rem"></pv-column>
           <pv-column  header="Active" style="min-width: 1rem">
             <template #body="{ data }">
-              <pv-inputSwitch v-model="data.active" />
+              <pv-inputSwitch v-model="data.active" @click="updateActiveDevice(data)" />
             </template>
           </pv-column >
           <pv-column  header="" style="min-width: 1rem">
@@ -136,6 +136,14 @@ export default {
 
   },
   methods:{
+      updateActiveDevice(device){
+          if(device.active){
+              //hacer el update en el service de device
+              console.log("prendi: "+device.active)
+          }else {
+              console.log("apague: "+device.active)
+          }
+      },
       returnDisplayableSpecification(specification){
           if (specification) {
               return specification.replace(/\$/g, ' - ');
@@ -166,7 +174,12 @@ export default {
       this.deviceDialogVisible=!this.deviceDialogVisible
     },
     deleteDevice(){
-
+          // delete device using device service
+        const index = this.devices.findIndex(device => device.id === this.currentDeviceForDelete.id);
+        if (index !== -1) {
+            this.devices.splice(index, 1); // Elimina el dispositivo del arreglo
+        }
+        this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
     getSeverity(status) {
       switch (status) {

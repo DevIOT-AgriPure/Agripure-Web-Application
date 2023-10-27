@@ -18,7 +18,7 @@
                     ‎
                 </div>
                 <div>
-                    <pv-button icon="pi pi-times" severity="danger" text rounded aria-label="Cancel"/>
+                    <pv-button icon="pi pi-times" severity="danger" @click="deleteNotification(notification)" text rounded aria-label="Cancel"/>
                 </div>
             </div>
           </div>
@@ -39,7 +39,7 @@ export default {
     return {
       userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
-      notifications:{},
+      notifications:[],
     };
   },
   created(){
@@ -106,6 +106,13 @@ export default {
           } else {
               const dias = Math.floor(segundosTranscurridos / 86400);
               return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
+          }
+      },
+      deleteNotification(notification) {
+          //delete notifications with notification service
+          const index = this.notifications.findIndex(item => item.id === notification.id);
+          if (index !== -1) {
+              this.notifications.splice(index, 1); // Elimina la notificación del arreglo
           }
       }
   }

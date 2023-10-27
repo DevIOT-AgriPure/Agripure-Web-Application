@@ -39,37 +39,43 @@
                     </div>
                 </div>
             </div>
-            <pv-dialog v-model:visible="contactDetailsVisible" maximizable modal header="Specialist Detail" :style="{ width: '80vw' }">
+            <pv-dialog v-model:visible="contactDetailsVisible" maximizable modal header="Specialist Detail" :style="{ width: '70vw' }">
                 <div class="addplantbackground">
                     <div class="agriculture-specialist-details">
-                        <div class="title">
+                        <div class="title" style="display: flex; justify-content: center">
                             <h1 class="title-text">Agriculture Specialist Details</h1>
                         </div>
-                        <div class="detail">
-                            <p class="detail-text">Name: {{ currentContact.name }}</p>
+                        <div style="display: flex; justify-content: space-around">
+                            <div style="margin-top: 2rem">
+                                <div class="detail">
+                                    <p class="detail-text">Name: {{ currentContact.name }}</p>
+                                </div>
+                                <div class="detail-row">
+                                    <p class="detail-text">Location: {{ currentContact.location }}</p>
+                                </div>
+                                <div class="detail-row">
+                                    <p class="detail-text">Contact Email: {{ currentContact.email }}</p>
+                                </div>
+                                <div class="detail-row">
+                                    <p class="detail-text">Description: {{ currentContact.description }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="image-container">
+                                    <img
+                                        :src="currentContact.imageUrl"
+                                        alt="Specialist Image"
+                                        style="border-radius: 1rem;width: 300px"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                        <div class="image-container">
-                            <img
-                                    :src="currentContact.imageUrl"
-                                    alt="Specialist Image"
-                                    style="height: 15rem; border-radius: 1rem;"
-                            />
-                        </div>
-                        <div class="detail-row">
-                            <p class="detail-text">Location: {{ currentContact.location }}</p>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="detail-row">
-                            <p class="detail-text">Contact Email: {{ currentContact.email }}</p>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="detail">
-                            <p class="detail-text">Description: {{ currentContact.description }}</p>
-                        </div>
-                        <div class="button-row">
-                            <pv-button class="green-button" @click="contactFarmer">Contact</pv-button>
+                        <div style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
+                            <pv-button  class="red-button" @click="deleteFarmer()">Delete contact</pv-button>
+                            <pv-button class="green-button" @click="contactFarmer()">Open Chat</pv-button>
                         </div>
                     </div>
+
                 </div>
             </pv-dialog>
         </div>
@@ -105,6 +111,12 @@ export default {
         })
     },
     methods: {
+        deleteFarmer(){
+            // add delete specialist service
+            this.displayableContacts = this.currentContactResultsFarmers.filter(specialist => specialist.id !== this.currentContact.id);
+            this.currentContactResultsFarmers=this.displayableContacts
+            this.contactDetailsVisible=false
+        },
         resetContacts(){
             this.currentContactResultsFarmers=this.displayableContacts
             this.searchContactValue=""
@@ -206,6 +218,10 @@ export default {
     margin-top: 1.5rem;
     color: white;
 }
+.red-button {
+    margin-top: 1.5rem;
+    color: white;
+}
 
 .agriculture-specialist-details {
     text-align: left;
@@ -228,24 +244,6 @@ export default {
     margin-top: 20px;
 }
 
-.centered-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.divider {
-    height: 1px;
-    background-color: #ccc;
-    margin: 20px 0;
-}
-
-.button-row {
-    display: flex;
-    justify-content: center;
-}
-
 .green-button {
     background-color: green;
     color: white;
@@ -254,6 +252,17 @@ export default {
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
+}
+.red-button {
+    background-color: #ee7979;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+.red-button:hover {
+    background-color: darkred;
 }
 
 .green-button:hover {
