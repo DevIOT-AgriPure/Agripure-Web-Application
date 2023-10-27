@@ -1,6 +1,6 @@
 <template>
     <div class="background">
-        <div style="display: flex;justify-content: center;align-items: center;align-content: center;height: 100%">
+        <div class="content-container">
             <div class="text-container">
                 <h1 style="width: 100%;margin: 1.2rem 0 1.2rem 0">{{ userName }}</h1>
                 <div class="profession-location">
@@ -21,15 +21,14 @@
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <p>Hola, soy Huell y amo las lechugas. Estoy emocionado de unirme a agripure para aprender y compartir sobre el cultivo de lechugas. ¡Juntos cultivaremos de manera más inteligente y saludable!</p>
                 </div>
-
             </div>
             <div class="profilePicture">
                 <div>
                     <div class="profile-container">
                         <img
-                                :src="imageUrl"
-                                style="height: 400px; width: 400px; border-radius: 0.5rem;"
-                                class="profile-image"
+                            :src="imageUrl"
+                            style="height: 400px; width: 400px; border-radius: 0.5rem;"
+                            class="profile-image"
                         />
                         <div class="image-overlay">
                             <p>Change profile picture</p>
@@ -49,10 +48,22 @@
 </template>
 
 <style scoped>
+.content-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.text-container {
+    flex: 1;
+    margin-right: 2rem;
+}
 .profile-container {
+    width: 400px;
     position: relative;
     display: inline-block;
-    cursor: pointer; /* Cambia el cursor al pasar por encima para indicar que es clickeable */
+    cursor: pointer;
 }
 
 .profile-image {
@@ -149,13 +160,13 @@
 </style>
 <script >
 export default {
-  data(){
-    return{
-      userName:sessionStorage.getItem("name"),
-      userEmail:sessionStorage.getItem("email"),
-      imageUrl:sessionStorage.getItem("imageUrl"),
-    }
-  },
+    data(){
+        return{
+            userName:sessionStorage.getItem("name"),
+            userEmail:sessionStorage.getItem("email"),
+            imageUrl:sessionStorage.getItem("imageUrl"),
+        }
+    },
     methods:{
         logOut(){
             this.$router.push("/sign-in")
