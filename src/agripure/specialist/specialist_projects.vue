@@ -342,7 +342,7 @@ export default {
         },
         sendCreatedProject(){
             let newProject={}
-            newProject.id=this.projects.length+1
+            newProject.id=this.projects.length+1//solucion temporal
             newProject.name=this.projectName
             newProject.description=this.projectDescription
             newProject.farmerId=this.selectedContact.id
@@ -361,14 +361,31 @@ export default {
             console.log(newProject)
             this.projects.push(newProject)
 
-            for (let i = 0; i < this.taskForProject.length; i++) {
-                
-            }
+            //add task as activities
+            this.createStorableTaskForProject(newProject)
 
             this.createProjectVisible=false
             this.taskStep=false
             this.selectionStep=true
             this.cleanProjectData()
+        },
+        createStorableTaskForProject(project){
+            let storableTasks=[]
+            for (let i = 0; i < this.taskForProject.length; i++) {
+                let tempStorableTask={}
+                tempStorableTask.id=i+1
+                tempStorableTask.projectId=this.projects.length//project.id
+                tempStorableTask.title=this.taskForProject[i].name
+                tempStorableTask.description=this.taskForProject[i].description
+                tempStorableTask.date=this.formatPeruvianDate(this.taskForProject[i].date)
+                tempStorableTask.completed=false
+                storableTasks.push(tempStorableTask)
+            }
+            console.log(storableTasks)
+            this.uploadTaskAsActivities(storableTasks)
+        },
+        uploadTaskAsActivities(storableTasks){
+            // use activities service for
         },
         isProjectStarted() {
             // Obtiene la fecha actual
@@ -524,7 +541,7 @@ export default {
             this.selectionStep=true
             this.stepContactSelected=false
             this.currentContactForSpecialist=[]
-            new ContactServices().getContactsForSpecialist(2).then(response=>{
+            new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
                 let rawContact=response.data
                 for (let i = 0; i < rawContact.length; i++) {
                     new UserServices().getUserById(rawContact[i].farmerId).then(response=>{
