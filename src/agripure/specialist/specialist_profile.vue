@@ -11,7 +11,7 @@
                 </div>
                 <div class="profession-location">
                     <div style="display: flex;justify-content: space-between; width: 100%">
-                        <h3>Farmer</h3>
+                        <h3>Specialist</h3>
                         <h5 style="display: flex;align-content: center; align-items: center">Lima, Peru</h5>
                     </div>
                 </div>
@@ -20,21 +20,6 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <p>Hola, soy Huell y amo las lechugas. Estoy emocionado de unirme a agripure para aprender y compartir sobre el cultivo de lechugas. ¡Juntos cultivaremos de manera más inteligente y saludable!</p>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin: 2rem 0 0rem 0">
-                    <h2>Plan</h2>
-                </div>
-                <div class="chat-card" @click="">
-                    <div class="plan-image">
-                        <i class="pi pi-bolt" style="font-size: 2.5rem"></i>
-                    </div>
-                    <div class="chat-content" >
-                        <div class="chat-header">
-                            <h3 style="margin-bottom: 0.5rem">Premium</h3>
-                            <pv-button label="UPDATE" />
-                        </div>
-                        <p style="width: 30%">S/. 50</p>
-                    </div>
                 </div>
             </div>
             <div class="profilePicture">
@@ -160,12 +145,12 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Alinea la parte superior de la imagen */
-    //background-color: red;
+//background-color: red;
 }
 
 .text-container {
     width: 50%;
-    //background-color: blue;
+//background-color: blue;
 
 }
 .profession-location {
@@ -174,18 +159,18 @@
 }
 </style>
 <script >
-  export default {
+export default {
     data(){
-      return{
-        userName:sessionStorage.getItem("name"),
-        userEmail:sessionStorage.getItem("email"),
-        imageUrl:sessionStorage.getItem("imageUrl"),
-      }
+        return{
+            userName:sessionStorage.getItem("name"),
+            userEmail:sessionStorage.getItem("email"),
+            imageUrl:sessionStorage.getItem("imageUrl"),
+        }
     },
     methods:{
-      logOut(){
-        this.$router.push("/sign-in")
-      }
+        logOut(){
+            this.$router.push("/sign-in")
+        }
     }
-  }
+}
 </script>

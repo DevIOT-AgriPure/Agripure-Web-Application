@@ -1,5 +1,6 @@
 <template>
     <div class="background">
+      <h1 style="margin: 4rem 2rem 0rem 2rem">Hello {{ userName }}!</h1>
         <div style="width: 100%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
             <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
             <div class="card p-fluid" style="width: 80%">
@@ -45,6 +46,7 @@ export default {
     name: "specialist_chat",
     data(){
         return{
+          userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
             items : ref([]),
@@ -54,9 +56,13 @@ export default {
         }
     },
     created() {
-        new ContactServices().getContactsForSpecialist(2).then(response=>{
+        new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
+        setInterval(() => {
+            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+            console.log("ImplementarWebSocket")
+        }, 5000);
     },
     methods:{
         reset(){

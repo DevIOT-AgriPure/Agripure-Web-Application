@@ -1,7 +1,9 @@
 <template>
     <div class="background">
         <div style="margin: 2rem 2rem 2rem 2rem" >
-            <div v-for="notification in notifications"
+          <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
+
+          <div v-for="notification in notifications"
                  :key="notification.id">
                 <div class="chat-card">
                     <div class="profile-image" @click="redirectTo(notification.notificationType)">
@@ -9,7 +11,7 @@
                     </div>
                     <div class="chat-content" >
                         <div class="chat-header">
-                            <div @click="redirectTo(notification.notificationType)">
+                            <div @click="redirectTo(notification.notificationType)" style="width: 100%;">
                                 <h3 style="margin-bottom: 0.5rem">{{ notification.message }}</h3>
                                 <p>{{this.calculateTime(notification.date)}}</p>
                             </div>
@@ -17,7 +19,7 @@
                                 ‎
                             </div>
                             <div>
-                                <pv-button icon="pi pi-times" severity="danger" text rounded aria-label="Cancel"/>
+                                <pv-button icon="pi pi-times" severity="danger" @click="deleteNotification(notification)" text rounded aria-label="Cancel"/>
                             </div>
                         </div>
                     </div>
@@ -36,12 +38,13 @@ export default {
     name: "specialist_notifications",
     data(){
         return {
+          userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             notifications:{},
         };
     },
     created(){
-        new NotificationService().getAllNotificationBySpecialistId(2).then(response=>{
+        new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
             this.notifications=response.data
             const fecha = new Date(); // Obtiene la fecha y hora actual
             this.getFormatDay(fecha)
@@ -53,11 +56,6 @@ export default {
         redirectTo(notificationType){
             console.log(notificationType)
             switch (notificationType) {
-                case 'crop':
-                    console.log("crop");
-                    this.$router.push("/farmer/cropInventory")
-                    return 0
-
                 case 'request':
                     console.log("request");
                     this.$router.push("/specialist/farmers")
@@ -104,6 +102,13 @@ export default {
             } else {
                 const dias = Math.floor(segundosTranscurridos / 86400);
                 return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
+            }
+        },
+        deleteNotification(notification) {
+            //delete notifications with notification service
+            const index = this.notifications.findIndex(item => item.id === notification.id);
+            if (index !== -1) {
+                this.notifications.splice(index, 1); // Elimina la notificación del arreglo
             }
         }
     }

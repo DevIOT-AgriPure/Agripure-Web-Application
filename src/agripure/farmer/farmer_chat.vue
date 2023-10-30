@@ -49,14 +49,18 @@ export default {
             value : ref(""),
             items : ref([]),
             displayableContacts:[],
-            currentContacts:[]
+            currentContacts:[],
 
         }
     },
     created() {
-        new ContactServices().getContactsForFarmer(1).then(response=>{
+        new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
+        setInterval(() => {
+            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+            console.log("ImplementarWebSocket")
+        }, 5000);
     },
     methods:{
         reset(){

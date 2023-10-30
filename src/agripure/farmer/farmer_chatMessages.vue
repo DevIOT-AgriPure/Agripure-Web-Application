@@ -23,8 +23,8 @@
                 </div>
             </div>
             <div class="message-box" style="display: flex; justify-content: space-between; align-items: center;">
-                <pv-input type="text" placeholder="Escribe tu mensaje aquí" style="width: 95%;"/>
-                <pv-button @click="scrollBottom" style="width: 5%; display: flex; justify-content: center; align-items: center;">
+                <pv-input @input="checkSendButtonDisable" v-model="message" type="text" placeholder="Escribe tu mensaje aquí" style="width: 95%;"/>
+                <pv-button :disabled="isSendButtonDisable" @click="sendMessage" style="width: 5%; display: flex; justify-content: center; align-items: center;">
                     <i class="pi pi-send"></i>
                 </pv-button>
 
@@ -46,11 +46,12 @@ export default {
             token: sessionStorage.getItem("jwt"),
             displayableContactInfo:{},
             rawMessages:[],
-            userId:1
+            userId:parseInt(sessionStorage.getItem("id").toString()),
+            message:"",
+            isSendButtonDisable:true
         };
     },
     created() {
-        console.log("MI CONTACT ID ES: "+this.id)
         new ChatServices().getChatByContactId(this.id).then(response=>{
             this.rawMessages=response.data
         })
@@ -60,15 +61,45 @@ export default {
                 this.scrollBottom()
             })
         })
+        setInterval(() => {
+            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+            console.log("ImplementarWebSocket")
+        }, 5000);
     },
     methods:{
       goback(){
           this.$router.push("/farmer/chat")
       },
-        enviarMensaje(){
+        formatTimeWithAmPm(date) {
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const amPm = hours < 12 ? "am" : "pm";
+            const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+            return `${formattedHours}:${formattedMinutes} ${amPm}`;
+        },
+        checkSendButtonDisable(){
+          if(this.message!==""){
+              this.isSendButtonDisable=false
+          }else {
+              this.isSendButtonDisable=true
+          }
+        },
+        sendMessage(){
+            let newMessage={}
+            newMessage.contactId=this.id
+            newMessage.AutorId=parseInt(sessionStorage.getItem("id").toString())
+            newMessage.message=this.message
+            newMessage.order=this.rawMessages.length+1
+            newMessage.hour=this.formatTimeWithAmPm(new Date())
+            this.rawMessages.push(newMessage)
+            //Enviar el mensaje en el service
+            this.message=""
+            setTimeout(this.scrollBottom,100)
 
         },
         scrollBottom(){
+          console.log("scroll")
             let messageContainer = document.querySelector(".message-content"); // Cambia la clase aquí
             if (messageContainer) {
                 messageContainer.scrollTop = messageContainer.scrollHeight;

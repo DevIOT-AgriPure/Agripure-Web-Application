@@ -1,7 +1,7 @@
 <template>
   <div class="background" >
       <div class="header" style="display: flex;justify-content: left;">
-          <h1>Good morning {{ username }}!</h1>
+          <h1>Good morning {{ userName }}!</h1>
           <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
               <i class="pi pi-search" style="margin-top: 0.5rem; margin-right: 1rem"></i>
               <div class="card p-fluid" style="width: 80%">
@@ -24,11 +24,7 @@
               <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
                   <pv-card style="width: 17em; border-radius: 15px;">
                       <template #header>
-                          <img
-                                  alt="user header"
-                                  :src="crop.imageUrl"
-                                  style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"
-                          />
+                          <img alt="user header" :src="crop.imageUrl" style="margin: 1em; width: 15em; height: 150px; border-radius: 15px;"/>
                       </template>
                       <template #title>{{ crop.name }}</template>
                       <template #footer>
@@ -45,49 +41,52 @@
                       </pv-button>
                   </template>
               </pv-card>
-
           </div>
-          <pv-dialog v-model:visible="visible" maximizable modal header="Add a plant" :style="{ width: '80vw' }">
+          <pv-dialog v-model:visible="visible" maximizable modal header="Add a plant" :style="{ width: '800px' }">
               <div class="addplantbackground" >
                   <div class="detail" v-if="showDetailsForSearch">
                       <div class="crop-details">
-                          <div class="title">
-                              <h1 class="title-text">{{ currentPlantInSearch.name }} Details</h1>
+                          <div style="display: flex; justify-content: space-around;width: 100%">
+                              <div>
+                                  <div class="title">
+                                      <h1 class="title-text">{{ currentPlantInSearch.name }} Details</h1>
+                                  </div>
+                                  <div class="detail">
+                                      <p class="detail-text">Scientific name: {{ currentPlantInSearch.scientificName }}</p>
+                                  </div>
+                                  <div class="detail">
+                                      <p class="detail-text">Variety: {{ currentPlantInSearch.variety }}</p>
+                                  </div>
+                                  <div class="detail-row">
+                                      <p class="detail-text">Land type: {{ currentPlantInSearch.landType }}</p>
+                                  </div>
+                                  <div class="detail-row">
+                                      <p class="detail-text">Distance between plants: {{ currentPlantInSearch.distanceBetweenPlants }}</p>
+                                  </div>
+                                  <div class="detail-row">
+                                      <p class="detail-text">Weather conditions: {{ currentPlantInSearch.weatherConditions }}</p>
+                                  </div>
+                              </div>
+                              <div>
+                                  <div class="image-container">
+                                      <img :src="currentPlantInSearch.imageUrl" alt="crop Image" class="centered-image" style="width: 300px">
+                                  </div>
+                              </div>
                           </div>
-                          <div class="detail">
-                              <p class="detail-text">Scientific name: {{ currentPlantInSearch.scientificName }}</p>
-                          </div>
-                          <div class="detail">
-                              <p class="detail-text">Variety: {{ currentPlantInSearch.variety }}</p>
-                          </div>
-                          <div class="image-container">
-                              <img :src="currentPlantInSearch.imageUrl" alt="crop Image" class="centered-image">
-                          </div>
-                          <div class="detail-row">
-                              <p class="detail-text">Land type: {{ currentPlantInSearch.landType }}</p>
-                          </div>
-                          <div class="divider"></div>
-                          <div class="detail-row">
-                              <p class="detail-text">Distance between plants: {{ currentPlantInSearch.distanceBetweenPlants }}</p>
-                          </div>
-                          <div class="divider"></div>
-                          <div class="detail-row">
-                              <p class="detail-text">Weather conditions: {{ currentPlantInSearch.weatherConditions }}</p>
-                          </div>
-                          <div style="display: flex; width: 100%;justify-content: end">
+                          <div style="margin-top: 2rem; display: flex; width: 100%;justify-content: space-around">
                               <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="showDetailsForSearch=!showDetailsForSearch">
                                   <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
                               </pv-button>
-                              <pv-button style="width: 15rem; color: white; font-weight: bold;" @click="addPlantToCrop">
+                              <pv-button :disabled="isAddPlantDisable" style="width: 10rem; color: white; font-weight: bold;" @click="addPlantToCrop">
                                   <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Add plant</div>
                               </pv-button>
                           </div>
                       </div>
                   </div>
                   <div class="results" v-if="!showDetailsForSearch">
-                      <div style="margin: 0 3rem 3rem 3rem">
+                      <div style="margin: 0 3rem 0 3rem">
                           <h1 style="margin-bottom: 2rem;">Search for a new plant</h1>
-                          <div class="card p-fluid" style="margin: 0 3rem 4rem 3rem">
+                          <div class="card p-fluid" style="margin: 0 3rem 0rem 3rem">
                               <pv-autoComplete v-model="searchNewPlantValue"
                                                :suggestions="searchNewPlantItems"
                                                @complete="newPlantSearch"
@@ -101,7 +100,7 @@
                           <p v-if="currentResultsPlants !== defaultResultsPlants" @click="resetAddPlant()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
                           <div class="cards" style="margin-top: 2rem">
                               <div v-for="crop in currentResultsPlants" :key="crop.id">
-                                  <pv-card style="width: 17em; border-radius: 15px;">
+                                  <pv-card  style="width: 17em; border-radius: 15px;background-color: #171717">
                                       <template #header>
                                           <img
                                               alt="user header"
@@ -121,40 +120,43 @@
                           </div>
                       </div>
                   </div>
-
               </div>
           </pv-dialog>
-          <pv-dialog v-model:visible="cropDetailsVisible" maximizable modal header="Crop Detail" :style="{ width: '80vw' }">
+          <pv-dialog v-model:visible="cropDetailsVisible" maximizable modal header="Crop Detail" :style="{ width: '700px' }">
               <div class="addplantbackground">
                   <div class="crop-details">
-                      <div class="title">
-                          <h1 class="title-text">{{ currentCrop.name }} Details</h1>
+                      <div style="display: flex; justify-content: space-around;width: 100%">
+                          <div>
+                              <div class="title">
+                                  <h1 class="title-text">{{ currentCrop.name }} Details</h1>
+                              </div>
+                              <div class="detail">
+                                  <p class="detail-text">Scientific name: {{ currentCrop.scientificName }}</p>
+                              </div>
+                              <div class="detail">
+                                  <p class="detail-text">Variety: {{ currentCrop.variety }}</p>
+                              </div>
+                              <div class="detail-row">
+                                  <p class="detail-text">Land type: {{ currentCrop.landType }}</p>
+                              </div>
+                              <div class="detail-row">
+                                  <p class="detail-text">Distance between plants: {{ currentCrop.distanceBetweenPlants }}</p>
+                              </div>
+                              <div class="detail-row">
+                                  <p class="detail-text">Weather conditions: {{ currentCrop.weatherConditions }}</p>
+                              </div>
+                          </div>
+                          <div>
+                              <div class="image-container">
+                                  <img :src="currentCrop.imageUrl" alt="crop Image" class="centered-image" style="width: 300px">
+                              </div>
+                          </div>
                       </div>
-                      <div class="detail">
-                          <p class="detail-text">Scientific name: {{ currentCrop.scientificName }}</p>
-                      </div>
-                      <div class="detail">
-                          <p class="detail-text">Variety: {{ currentCrop.variety }}</p>
-                      </div>
-                      <div class="image-container">
-                          <img :src="currentCrop.imageUrl" alt="crop Image" class="centered-image">
-                      </div>
-                      <div class="detail-row">
-                          <p class="detail-text">Land type: {{ currentCrop.landType }}</p>
-                      </div>
-                      <div class="divider"></div>
-                      <div class="detail-row">
-                          <p class="detail-text">Distance between plants: {{ currentCrop.distanceBetweenPlants }}</p>
-                      </div>
-                      <div class="divider"></div>
-                      <div class="detail-row">
-                          <p class="detail-text">Weather conditions: {{ currentCrop.weatherConditions }}</p>
-                      </div>
-                      <div style="display: flex; width: 100%;justify-content: end">
-                          <pv-button severity="secondary" style="margin-right: 3rem; color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
+                      <div style="margin-top: 2rem; display: flex; width: 100%;justify-content: space-around">
+                          <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
                               <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
                           </pv-button>
-                          <pv-button severity="danger" style="width: 15rem; color: white; font-weight: bold;" @click="deleteCrop">
+                          <pv-button severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
                           </pv-button>
                       </div>
@@ -174,7 +176,7 @@ export default {
     data(){
         return{
             token: sessionStorage.getItem("jwt"),
-            username:"Huell",
+            userName: sessionStorage.getItem("name"),
             searchInventorValue: ref(""),
             searchInventorItems: ref([]),
             searchNewPlantValue: ref(""),
@@ -186,6 +188,7 @@ export default {
             currentPlantInSearch:{},
             defaultResultsPlants:[],
             visible :false,
+            isAddPlantDisable :true,
             cropDetailsVisible :false,
             showDetailsForSearch:false,
             currentResultsPlants:[],
@@ -195,7 +198,7 @@ export default {
         }
     },
     created(){
-        new CropServices().getCropsByFarmerId(1).then(response=>{
+        new CropServices().getCropsByFarmerId(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableCrops(response.data)
         })
 
@@ -228,8 +231,6 @@ export default {
             }
         },
         inventorySearch(event) {
-            console.log("Busque: "+this.searchInventorValue.toString())
-            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
             const matchingCrops = this.displayableCrops.filter(crop =>
                 crop.name.toLowerCase().includes(this.searchInventorValue.toString().toLowerCase())
             );
@@ -266,6 +267,9 @@ export default {
             }
         },
         deleteCrop(){
+            // delete plant in service
+            this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
+            this.currentInventoryResultsPlants=this.displayableCrops
             this.cropDetailsVisible=!this.cropDetailsVisible
         },
         getAllPlants(){
@@ -279,8 +283,9 @@ export default {
             this.currentCrop= crop;
         },
         showDetailsForPlantInSearch(crop){
-            this.showDetailsForSearch=!this.showDetailsForSearch
             this.currentPlantInSearch=crop;
+            this.isPlantRepeated()
+            this.showDetailsForSearch=!this.showDetailsForSearch
         },
         findIndexById(id) {
             //return this.rooms.findIndex((room) => room.id === id);
@@ -293,11 +298,22 @@ export default {
             this.getAllPlants()
         },
         addPlantToCrop(){
-            //this.$router.push("/farmer/createCrop")
+            //add plant in service
+            let newPlantForInventory=this.currentPlantInSearch
+            newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
+            this.displayableCrops.push(newPlantForInventory)
             this.visible=!this.visible
             this.showDetailsForSearch=false
             this.getAllPlants()
+        },
+        isPlantRepeated() {
+            if(this.displayableCrops.some(plant => plant.name === this.currentPlantInSearch.name)){
+                this.isAddPlantDisable=true
+            }else {
+                this.isAddPlantDisable=false
+            }
         }
+
     }
 }
 
@@ -322,11 +338,9 @@ export default {
     padding-bottom: 3rem;
 }
 .addplantbackground {
-    background-color: #242424;
     color: white; /* Cambiar el color del texto si es necesario */
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
-    padding-bottom: 3rem;
     padding-top: 1rem;
 }
 

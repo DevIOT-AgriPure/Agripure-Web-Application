@@ -51,10 +51,20 @@ export default {
     methods:{
         signIn(){
           if(this.email==="farmer"){
+              sessionStorage.setItem("id","1")
+              sessionStorage.setItem("name","Diego Talledo")
+              sessionStorage.setItem("email","diego@gmail.com")
+              sessionStorage.setItem("imageUrl","https://static.educalingo.com/img/en/800/farmer.jpg")
+              sessionStorage.setItem("type","farmer")
+              sessionStorage.setItem("plan","premium")
             sessionStorage.setItem("type","farmer")
             this.$router.push("/farmer/cropInventory")
 
           }else {
+              sessionStorage.setItem("id","2")
+              sessionStorage.setItem("name","Alonso Sanchez")
+              sessionStorage.setItem("email","alonso@gmail.com")
+              sessionStorage.setItem("imageUrl","https://iica.int/sites/default/files/2020-01/Depositphotos_76015093_s-2019.jpg")
             sessionStorage.setItem("type","specialist")
             this.$router.push("/specialist/farmers")
           }

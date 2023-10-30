@@ -1,6 +1,7 @@
 <template>
   <div class="background">
     <div style="margin: 2rem 2rem 2rem 2rem" >
+      <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
       <div v-for="notification in notifications"
            :key="notification.id">
         <div class="chat-card">
@@ -9,7 +10,7 @@
           </div>
           <div class="chat-content" >
             <div class="chat-header">
-                <div @click="redirectTo(notification.notificationType)">
+                <div @click="redirectTo(notification.notificationType)" style="width: 100%;">
                     <h3 style="margin-bottom: 0.5rem">{{ notification.message }}</h3>
                     <p>{{this.calculateTime(notification.date)}}</p>
                 </div>
@@ -17,7 +18,7 @@
                     ‎
                 </div>
                 <div>
-                    <pv-button icon="pi pi-times" severity="danger" text rounded aria-label="Cancel"/>
+                    <pv-button icon="pi pi-times" severity="danger" @click="deleteNotification(notification)" text rounded aria-label="Cancel"/>
                 </div>
             </div>
           </div>
@@ -36,12 +37,13 @@ export default {
   name: "farmer_devices",
   data(){
     return {
+      userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
-      notifications:{},
+      notifications:[],
     };
   },
   created(){
-    new NotificationService().getAllNotificationByUserId(1).then(response=>{
+    new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
       this.notifications=response.data
         const fecha = new Date(); // Obtiene la fecha y hora actual
         this.getFormatDay(fecha)
@@ -58,7 +60,7 @@ export default {
                   this.$router.push("/farmer/cropInventory")
                   return 0
 
-              case 'request':
+              case 'acceptedRequest':
                   console.log("request");
                   this.$router.push("/farmer/specialist")
                   return 0
@@ -104,6 +106,13 @@ export default {
           } else {
               const dias = Math.floor(segundosTranscurridos / 86400);
               return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
+          }
+      },
+      deleteNotification(notification) {
+          //delete notifications with notification service
+          const index = this.notifications.findIndex(item => item.id === notification.id);
+          if (index !== -1) {
+              this.notifications.splice(index, 1); // Elimina la notificación del arreglo
           }
       }
   }

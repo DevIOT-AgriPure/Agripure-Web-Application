@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar.vue'
 
 <template>
     <div class="app">
+        <pv-toast></pv-toast>
         <!-- Sidebar -->
         <Sidebar />
 
