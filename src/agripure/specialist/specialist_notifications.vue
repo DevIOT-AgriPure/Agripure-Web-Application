@@ -36,17 +36,22 @@
 <script>
 import {FilterMatchMode} from "primevue/api";
 import {NotificationService} from "@/services/notification-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "specialist_notifications",
     data(){
         return {
-          userName: sessionStorage.getItem("name"),
+            route: null,
+
+            userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             notifications:{},
         };
     },
     created(){
+        this.route = useRoute(); // Obtener la ruta actual
+
         new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
             if(response.data!==null){
                 this.notifications=response.data
@@ -58,6 +63,26 @@ export default {
             }
 
         })
+        setInterval(() => {
+            if (this.route) {
+                const path = this.route.path;
+                if(path==="/specialist/notifications"){
+                    new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
+                        if(response.data!==null){
+                            this.notifications=response.data
+                            const fecha = new Date(); // Obtiene la fecha y hora actual
+                            this.getFormatDay(fecha)
+                        }
+                        else {
+                            this.notifications=[]
+                        }
+
+                    })
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
+        }, 5000);
 
     },
     methods:{

@@ -35,23 +35,41 @@
 <script>
 import {FilterMatchMode} from "primevue/api";
 import {NotificationService} from "@/services/notification-service";
+import {useRoute} from "vue-router";
 
 export default {
   name: "farmer_devices",
   data(){
     return {
+        route: null,
       userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
       notifications:[],
     };
   },
   created(){
+      this.route = useRoute(); // Obtener la ruta actual
     new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
       this.notifications=response.data
         const fecha = new Date(); // Obtiene la fecha y hora actual
         this.getFormatDay(fecha)
 
     })
+      setInterval(() => {
+          if (this.route) {
+              const path = this.route.path;
+              if(path==="/farmer/notifications"){
+                  new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
+                      this.notifications=response.data
+                      const fecha = new Date(); // Obtiene la fecha y hora actual
+                      this.getFormatDay(fecha)
+
+                  })
+                  console.log("ImplementarWebSocket")
+              }
+          }
+
+      }, 5000);
 
   },
   methods:{

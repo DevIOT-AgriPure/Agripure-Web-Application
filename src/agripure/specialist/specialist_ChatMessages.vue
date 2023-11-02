@@ -37,36 +37,47 @@
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
 import {ContactServices} from "@/services/contacts-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "specialist_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
     data() {
         return {
+            route: null,
             token: sessionStorage.getItem("jwt"),
             displayableContactInfo:{},
             rawMessages:[],
             userId:parseInt(sessionStorage.getItem("id").toString()),
             message:"",
-            isSendButtonDisable:true
+            isSendButtonDisable:true,
+            chatStarted:false
         };
     },
     created() {
+        this.route = useRoute(); // Obtener la ruta actual
         new ChatServices().getChatByContactId(this.id).then(response=>{
             this.rawMessages=response.data
         })
         new ContactServices().getContactById(this.id).then(response=>{
+            this.chatStarted =response.data.isChatStarted
             new UserServices().getUserById(response.data.farmerId).then(response=>{
                 this.displayableContactInfo=response.data
                 this.scrollBottom()
             })
         })
         setInterval(() => {
-            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
-            new ChatServices().getChatByContactId(this.id).then(response=>{
-                this.rawMessages=response.data
-            })
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path===("/specialist/chat/"+this.id)){
+                    new ChatServices().getChatByContactId(this.id).then(response=>{
+                        console.log(response.data)
+                        this.rawMessages=response.data
+                    })
+                    console.log("ImplementarWebSocket para chat")
+                }
+            }
+
         }, 5000);
     },
     methods:{
@@ -95,7 +106,11 @@ export default {
             newMessage.message=this.message
             newMessage.order=this.rawMessages.length+1
             newMessage.hour=this.formatTimeWithAmPm(new Date())
+            if(this.chatStarted===false){
+                new ContactServices().startChatContact(this.id).then(res=>{
 
+                })
+            }
             new ChatServices().sendMessage(newMessage).then(res=>{
                 this.rawMessages.push(newMessage)
                 //Enviar el mensaje en el service

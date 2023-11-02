@@ -43,11 +43,13 @@ import {ref} from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "farmer_chat",
     data(){
         return{
+            route: null,
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
             items : ref([]),
@@ -57,12 +59,19 @@ export default {
         }
     },
     created() {
+        this.route = useRoute(); // Obtener la ruta actual
         new ContactServices().getContactsForFarmer(this.token,parseInt(sessionStorage.getItem("id").toString())).then(response=>{
             this.getDisplayableContacts(response.data)
         })
         setInterval(() => {
-            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path==="/farmer/chat"){
+                    // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
         }, 5000);
     },
     methods:{

@@ -44,11 +44,13 @@ import {ref} from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "specialist_chat",
     data(){
         return{
+            route: null,
           userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
@@ -59,12 +61,18 @@ export default {
         }
     },
     created() {
+        this.route = useRoute(); // Obtener la ruta actual
         new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
         setInterval(() => {
-            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path===("/specialist/chat")){
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
         }, 5000);
     },
     methods:{

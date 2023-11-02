@@ -37,37 +37,48 @@
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
 import {ContactServices} from "@/services/contacts-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "farmer_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
     data() {
         return {
+            route: null,
             token: sessionStorage.getItem("jwt"),
             displayableContactInfo:{},
             rawMessages:[],
             userId:parseInt(sessionStorage.getItem("id").toString()),
             message:"",
-            isSendButtonDisable:true
+            isSendButtonDisable:true,
+            chatStarted:false
         };
     },
     created() {
+        this.route = useRoute(); // Obtener la ruta actual
         new ChatServices().getChatByContactId(this.id).then(response=>{
             console.log(response.data)
             this.rawMessages=response.data
         })
         new ContactServices().getContactById(this.id).then(response=>{
+            this.chatStarted =response.data.isChatStarted
             new UserServices().getUserById(response.data.specialistId).then(response=>{
                 this.displayableContactInfo=response.data
                 this.scrollBottom()
             })
         })
         setInterval(() => {
-            new ChatServices().getChatByContactId(this.id).then(response=>{
-                console.log(response.data)
-                this.rawMessages=response.data
-            })
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path===("/farmer/chat/"+this.id)){
+                    new ChatServices().getChatByContactId(this.id).then(response=>{
+                        console.log(response.data)
+                        this.rawMessages=response.data
+                    })
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
         }, 5000);
     },
     methods:{
@@ -95,6 +106,11 @@ export default {
             newMessage.authorId=parseInt(sessionStorage.getItem("id").toString())
             newMessage.message=this.message
             newMessage.hour=this.formatTimeWithAmPm(new Date())
+            if(this.chatStarted===false){
+                new ContactServices().startChatContact(this.id).then(res=>{
+
+                })
+            }
             new ChatServices().sendMessage(newMessage).then(res=>{
                 this.rawMessages.push(newMessage)
                 this.message=""

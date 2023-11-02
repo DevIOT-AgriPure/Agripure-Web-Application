@@ -4,6 +4,9 @@ const http = axios.create({
     headers: { "Content-type": "application/json" },
 })
 export class ContactServices{
+    startChatContact(id){
+        return http.put("/startChatForContact/"+id);
+    }
     getContactsForFarmer(token,id){
         return http.get("/contactByFarmerId/"+id);
     }
