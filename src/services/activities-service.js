@@ -5,6 +5,6 @@ const http = axios.create({
 })
 export class ActivitiesService{
     getActivitiesByProjectId(token,id){
-        return http.get("activityByProjectId/"+id,{ headers: {"Authorization" : `Bearer ${token}`} });
+        return http.get("activityByProjectId/"+id,);
     }
 }

@@ -107,7 +107,6 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
-import {SpecialistServices} from "@/services/specialists-service";
 import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
@@ -116,6 +115,7 @@ export default {
     name: "farmer_projects",
     data(){
         return{
+            token: sessionStorage.getItem("jwt"),
             projects:[],
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -146,7 +146,7 @@ export default {
     methods:{
         setActivitysForProject(){
             for (let i = 0; i < this.projects.length; i++) {
-                new ActivitiesService().getActivitiesByProjectId(this.projects[i].id).then(response=>{
+                new ActivitiesService().getActivitiesByProjectId(this.token,this.projects[i].id).then(response=>{
                     let activities=response.data
                     let activitiesDone=0
                     for (let i = 0; i < activities.length; i++) {
@@ -224,7 +224,7 @@ export default {
         openActivities(id,project){
             this.currentProjectForActivities=project
             this.activitiesDialogVisible=!this.activitiesDialogVisible
-            new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
+            new ActivitiesService().getActivitiesByProjectId(this.token,id).then(response=>{
                 this.currentActivities=response.data
             })
         },
@@ -234,10 +234,9 @@ export default {
           })
         },
         getCropInfo(cropId){
-            new CropServices().getCropInfoById(cropId).then(response=>{
+            new CropServices().getCropInfoById(this.token,cropId).then(response=>{
                 new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
                     this.currentCropForProject=resp.data
-                    console.log("name is: "+this.currentCropForProject.name)
                 })
             })
         }

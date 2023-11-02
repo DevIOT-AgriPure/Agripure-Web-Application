@@ -16,7 +16,7 @@ export class CropServices{
         
     }
     getCropInfoById(token,id){
-        return http.get("crops/getCrop/"+id,{ headers: {"Authorization" : `Bearer ${token}`} });
+        return http.get("crops/getCrop/"+id,);
 
     }
  

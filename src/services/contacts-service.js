@@ -11,7 +11,7 @@ export class ContactServices{
         return http.get("?specialistId="+id);
     }
     getContactById(id){
-        return http.get(""+id);
+        return http.get("/contactById/"+id);
     }
     deleteContactById(id){
         return http.delete("/deleteContactById/"+id)

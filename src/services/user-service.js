@@ -8,7 +8,7 @@ export class UserServices{
         return http.get("api/v1/profiles/getProfile/"+id);
     }
     getUserByEmail(token,email){
-        return http.get("api/v1/profiles/getProfileByEmail/"+email,{ headers: {"Authorization" : `Bearer ${token}`} });
+        return http.get("api/v1/profiles/getProfileByEmail/"+email,);
     }
     getAllUsersSpecialists(token){
         return http.get("api/v1/profiles/getSpecialists");

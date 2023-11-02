@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"https://my-json-server.typicode.com/DevIOT-AgriPure/Agripure-JsonDos/projects/",
+    baseURL:"http://localhost:8080/api/v1/projects",
     headers: { "Content-type": "application/json" },
 })
 export class ProjectService{
@@ -8,7 +8,7 @@ export class ProjectService{
         return http.get("?farmerId="+id);
     }
     getProjectsBySpecialistId(id){
-        return http.get("?specialistId="+id);
+        return http.get("/projectsByFarmerId/"+id);
     }
     getProjectById(id){
         return http.get(""+id);

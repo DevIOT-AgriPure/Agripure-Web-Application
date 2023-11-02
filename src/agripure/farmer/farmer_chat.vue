@@ -54,7 +54,7 @@ export default {
         }
     },
     created() {
-        new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
+        new ContactServices().getContactsForFarmer(this.token,parseInt(sessionStorage.getItem("id").toString())).then(response=>{
             this.getDisplayableContacts(response.data)
         })
         setInterval(() => {
