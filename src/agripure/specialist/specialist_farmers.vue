@@ -17,10 +17,11 @@
                 </div>
             </div>
             <div class="inventory" style="margin-bottom: 20px;">
-                <h2 style="margin: 2rem 0 2rem 0">Contacts:</h2>
-                <p v-if="currentContactResultsFarmers !== displayableContacts" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+                <h2 v-if="currentContactResultsFarmers.length>=1" style="margin: 2rem 0 2rem 0">Contacts:</h2>
+                <h2 v-else="currentContactResultsFarmers.length>=1" style="margin: 2rem 0 2rem 0">You have no contacts</h2>
+                <p v-if="currentContactResultsFarmers.length !== displayableContacts.length" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
                 <div class="cards">
-                    <div v-for="contact in currentContactResultsFarmers" :key="contact.id">
+                    <div v-if="currentContactResultsFarmers.length>=1" v-for="contact in currentContactResultsFarmers" :key="contact.id">
                         <pv-card style="width: 17em; border-radius: 15px;">
                             <template #header>
                                 <img

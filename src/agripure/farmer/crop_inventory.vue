@@ -18,7 +18,7 @@
       <div class="inventory">
           <div style="margin-left: 1rem">
                 <h2>Your plants:</h2>
-                <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+                <p v-if="currentInventoryResultsPlants.length !== displayableCrops.length" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
           </div>
           <div class="cards" style="margin-top: 2rem">
               <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">

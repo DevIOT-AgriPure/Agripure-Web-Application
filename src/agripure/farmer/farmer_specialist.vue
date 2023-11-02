@@ -18,7 +18,7 @@
       </div>
       <div class="inventory" style="margin-bottom: 20px;">
         <h2 style="margin: 2rem 0 2rem 0">Contacts:</h2>
-        <p v-if="currentContactResultsSpecialists !== displayableContacts" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+        <p v-if="currentContactResultsSpecialists.length !== displayableContacts.length" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
         <div class="cards">
           <div v-for="contact in currentContactResultsSpecialists" :key="contact.id">
             <pv-card style="width: 17em; border-radius: 15px;">
@@ -143,7 +143,7 @@
             </div>
             <div class="inventory">
               <h2 style="margin-left: 2rem">Results:</h2>
-              <p v-if="currentResultsSpecialists !== defaultResultsSpecialists" @click="resetNewSpecialist()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
+              <p v-if="currentResultsSpecialists.length !== defaultResultsSpecialists.length" @click="resetNewSpecialist()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem;margin-left: 1.9rem">Reset search</p>
               <div class="cards" style="margin-top: 2rem">
                 <div v-for="specialist in currentResultsSpecialists" :key="specialist.id">
                   <pv-card style="width: 17em; border-radius: 15px;">

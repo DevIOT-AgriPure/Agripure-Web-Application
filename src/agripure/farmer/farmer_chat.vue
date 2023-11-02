@@ -13,8 +13,8 @@
             </div>
         </div>
         <div style="margin: 0 2rem 0 2rem" >
-            <p v-if="currentContacts !== displayableContacts" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
-            <div v-for="contact in currentContacts"
+            <p v-if="currentContacts.length !== displayableContacts.length" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
+            <div v-if="currentContacts.length" v-for="contact in currentContacts"
                  :key="contact.id">
                 <div class="chat-card" @click="irAChat(contact.contactId)">
                     <div class="profile-image">
@@ -28,6 +28,9 @@
                         <p style="width: 30%">{{ contact.message }}</p>
                     </div>
                 </div>
+            </div>
+            <div v-else>
+                <h3>You have no chats at the moment</h3>
             </div>
         </div>
 

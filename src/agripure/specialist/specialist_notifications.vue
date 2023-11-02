@@ -3,7 +3,7 @@
         <div style="margin: 2rem 2rem 2rem 2rem" >
           <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
 
-          <div v-for="notification in notifications"
+          <div v-if="notifications.length>=1" v-for="notification in notifications"
                  :key="notification.id">
                 <div class="chat-card">
                     <div class="profile-image" @click="redirectTo(notification.notificationType)">
@@ -25,6 +25,9 @@
                     </div>
                 </div>
             </div>
+            <div v-else>
+                <h3>You have no notifications at the moment</h3>
+            </div>
         </div>
     </div>
 </template>
@@ -45,9 +48,14 @@ export default {
     },
     created(){
         new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
-            this.notifications=response.data
-            const fecha = new Date(); // Obtiene la fecha y hora actual
-            this.getFormatDay(fecha)
+            if(response.data!==null){
+                this.notifications=response.data
+                const fecha = new Date(); // Obtiene la fecha y hora actual
+                this.getFormatDay(fecha)
+            }
+            else {
+                this.notifications=[]
+            }
 
         })
 
