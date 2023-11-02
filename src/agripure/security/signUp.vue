@@ -227,11 +227,20 @@ export default {
           newUser.location="Lima, Peru"
           newUser.type=this.selectedUserType.toUpperCase()
           newUser.plan=this.userPlanSelected
-          new UserServices().register(newUser).then(response=>{
-              this.$router.push("/sign-in")
-          }).catch(error=>{
-              this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
-          })
+          if(this.selectedUserType==="farmer"){
+              new UserServices().registerFarmer(newUser).then(response=>{
+                  this.$router.push("/sign-in")
+              }).catch(error=>{
+                  this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+              })
+          }else {
+              new UserServices().registerSpecialist(newUser).then(response=>{
+                  this.$router.push("/sign-in")
+              }).catch(error=>{
+                  this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+              })
+          }
+
       },
       nextPath(){
         if(this.selectedUserType==="farmer"){

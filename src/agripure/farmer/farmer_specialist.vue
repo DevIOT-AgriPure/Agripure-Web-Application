@@ -81,7 +81,7 @@
                   </div>
               </div>
             <div class="button-row" style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
-                <pv-button class="red-button" @click="deleteSpecialist">Delete contact</pv-button>
+                <pv-button class="red-button" style="height: 2.5rem;" @click="deleteSpecialist">Delete contact</pv-button>
                 <pv-button class="green-button" @click="contactSpecialist">Open Chat</pv-button>
             </div>
           </div>
@@ -176,6 +176,7 @@ import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {SpecialistServices} from "@/services/specialists-service";
+import {NotificationService} from "@/services/notification-service";
 
 export default {
   name: "Farmer_specialist",
@@ -201,7 +202,7 @@ export default {
     };
   },
   created() {
-    new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
+    new ContactServices().getContactsForFarmer(this.token,sessionStorage.getItem("id")).then(response=>{
       this.getDisplayableContacts(response.data)
     })
   },
@@ -273,23 +274,24 @@ export default {
       })
     },
     showSpecialistDetails(contact) {
-      this.loadContactDetails(contact.id)
+        console.log(contact)
+      this.loadContactDetails(contact.accountId)
       this.contactDetailsVisible=!this.contactDetailsVisible
       this.currentContact= contact;
     },
     loadContactDetails(id) {
       new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
-        this.currentContact.expertise=response.data[0].expertise
-        this.currentContact.contactEmail = response.data[0].contactEmail
-        this.currentContact.areasOfFocus= response.data[0].areasOfFocus
-          this.currentContact.specialistId=response.data[0].id
+        this.currentContact.expertise=response.data.expertise
+        this.currentContact.contactEmail = response.data.contactEmail
+        this.currentContact.areasOfFocus= response.data.areasOfFocus
+          this.currentContact.specialistId=response.data.accountId
       })
     },
     loadSpecialistDetails(id) {
       new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
-        this.currentSpecialistInSearch.expertise=response.data[0].expertise
-        this.currentSpecialistInSearch.contactEmail = response.data[0].contactEmail
-        this.currentSpecialistInSearch.areasOfFocus= response.data[0].areasOfFocus
+        this.currentSpecialistInSearch.expertise=response.data.expertise
+        this.currentSpecialistInSearch.contactEmail = response.data.contactEmail
+        this.currentSpecialistInSearch.areasOfFocus= response.data.areasOfFocus
       })
     },
     contactSpecialist() {
@@ -297,9 +299,13 @@ export default {
     },
       deleteSpecialist(){
         // add delete specialist service
-          this.displayableContacts = this.currentContactResultsSpecialists.filter(specialist => specialist.id !== this.currentContact.id);
-          this.currentContactResultsSpecialists=this.displayableContacts
-          this.contactDetailsVisible=false
+          console.log(this.currentContact)
+          new ContactServices().deleteContactById(this.currentContact.contactId).then(response=>{
+              this.displayableContacts = this.currentContactResultsSpecialists.filter(specialist => specialist.id !== this.currentContact.id);
+              this.currentContactResultsSpecialists=this.displayableContacts
+              this.contactDetailsVisible=false
+          })
+
       },
     addSpecialist(){
       this.searchNewPlantValue=""
@@ -309,7 +315,7 @@ export default {
     },
     
     showDetailsForSpecialistInSearch(specialist){
-      this.loadSpecialistDetails(specialist.id)
+      this.loadSpecialistDetails(specialist.accountId)
         this.currentSpecialistInSearch=specialist;
         this.isContactRepeated()
       this.showDetailsForSearch=!this.showDetailsForSearch
@@ -325,7 +331,9 @@ export default {
           return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
       },
     sendRequestToSpecialist(){
+        new ContactServices().addContact(parseInt(sessionStorage.getItem("id").toString()),this.currentSpecialistInSearch.accountId).then(response=>{
 
+        })
         //Aqui envio una solicitud pormedio del service
         //creo una notificacion
         let requestNotification={}
@@ -333,17 +341,20 @@ export default {
         requestNotification.notificationType="request"
         requestNotification.date=this.formatDate(new Date()).toString()
         requestNotification.imageUrl=sessionStorage.getItem("imageUrl").toString()
-        requestNotification.toUserId=this.currentSpecialistInSearch.id
+        requestNotification.toUserId=this.currentSpecialistInSearch.accountId
         requestNotification.plantId=0
         requestNotification.fromUserId=parseInt(sessionStorage.getItem("id").toString())
         requestNotification.seen=false
-        console.log(requestNotification)
+        new NotificationService().sendNotification(requestNotification).then(res=>{
+
+        })
         //envio la notificacion pormedio del service
         //si acepta la solicitud automaticamente se crea un chat
 
         let newSpecialist=this.currentSpecialistInSearch
-        newSpecialist.id=this.displayableContacts.length+1//solucion temporal
+        newSpecialist.accountId=this.displayableContacts.length+1//solucion temporal
         this.displayableContacts.push(newSpecialist)
+        console.log(this.displayableContacts)
       this.addSpecialistVisible=!this.addSpecialistVisible
       this.showDetailsForSearch=false
     },
