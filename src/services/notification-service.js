@@ -9,7 +9,7 @@ export class NotificationService{
             "message": notification.message,
             "imageUrl": notification.imageUrl,
             "notificationType": notification.notificationType,
-            "date": notification.notificationType,
+            "date": notification.date,
             "toAccountId": notification.toUserId,
             "plantId": notification.plantId,
             "fromAccountId": notification.fromUserId,
@@ -18,6 +18,10 @@ export class NotificationService{
     }
     getAllNotificationByUserId(userId){
         return http.get("/getByToAccountId/"+userId);
+    }
+
+    deleteNotification(id){
+        return http.delete("/deleteNotificationById/"+id)
     }
 
 }

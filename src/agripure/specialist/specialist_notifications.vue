@@ -106,10 +106,13 @@ export default {
         },
         deleteNotification(notification) {
             //delete notifications with notification service
-            const index = this.notifications.findIndex(item => item.id === notification.id);
-            if (index !== -1) {
-                this.notifications.splice(index, 1); // Elimina la notificación del arreglo
-            }
+            new NotificationService().deleteNotification(notification.id).then(res=>{
+                const index = this.notifications.findIndex(item => item.id === notification.id);
+                if (index !== -1) {
+                    this.notifications.splice(index, 1); // Elimina la notificación del arreglo
+                }
+            })
+
         }
     }
 }

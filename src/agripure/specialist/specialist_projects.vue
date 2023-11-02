@@ -215,7 +215,6 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
-import {SpecialistServices} from "@/services/specialists-service";
 import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
@@ -225,6 +224,7 @@ export default {
     name: "farmer_projects",
     data(){
         return{
+            token: sessionStorage.getItem("jwt"),
             selectionStep:true,
             informationStep:false,
             dateStep:false,
@@ -277,7 +277,7 @@ export default {
     methods:{
         setActivitysForProject(){
             for (let i = 0; i < this.projects.length; i++) {
-                new ActivitiesService().getActivitiesByProjectId(this.projects[i].id).then(response=>{
+                new ActivitiesService().getActivitiesByProjectId(this.token,this.projects[i].id).then(response=>{
                     let activities=response.data
                     let activitiesDone=0
                     for (let i = 0; i < activities.length; i++) {
@@ -356,10 +356,11 @@ export default {
             newProject.totalActivities=this.taskForProject.length
             newProject.activitiesDone=0
             newProject.isProjectStarted=this.isProjectStarted()
-            //add project by service
 
-            console.log(newProject)
-            this.projects.push(newProject)
+            new ProjectService().createProject(newProject).then(res=>{
+                console.log(newProject)
+                this.projects.push(newProject)
+            })
 
             //add task as activities
             this.createStorableTaskForProject(newProject)
@@ -379,7 +380,9 @@ export default {
                 tempStorableTask.description=this.taskForProject[i].description
                 tempStorableTask.date=this.formatPeruvianDate(this.taskForProject[i].date)
                 tempStorableTask.completed=false
-                storableTasks.push(tempStorableTask)
+                new ActivitiesService().addActivity(tempStorableTask).then(res=>{
+                    storableTasks.push(tempStorableTask)
+                })
             }
             console.log(storableTasks)
             this.uploadTaskAsActivities(storableTasks)
@@ -509,7 +512,7 @@ export default {
         getCropForProject(){
             this.currentCropsForFarmer=[]
             this.isNextButtonDisable=false
-            new CropServices().getCropsByFarmerId(this.selectedContact.id).then(response=>{
+            new CropServices().getCropsByFarmerId(this.token,this.selectedContact.accountId).then(response=>{
                 let cropsForFarmer=response.data
                 for (let i = 0; i < cropsForFarmer.length; i++) {
                     new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
@@ -597,7 +600,7 @@ export default {
             })
         },
         getCropInfo(cropId){
-            new CropServices().getCropInfoById(cropId).then(response=>{
+            new CropServices().getCropInfoById(this.token,cropId).then(response=>{
                 new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
                     this.currentCropForProject=resp.data
                 })
