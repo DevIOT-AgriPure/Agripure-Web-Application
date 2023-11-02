@@ -53,13 +53,12 @@ export default {
             new UserServices().login(this.email,this.password).then(response=>{
                 sessionStorage.setItem("jwt",response.data.token)
                 new UserServices().getUserByEmail(response.data.token,this.email).then(resp=>{
-                    sessionStorage.setItem("id",resp.data.id)
+                    sessionStorage.setItem("id",resp.data.accountId)
                     sessionStorage.setItem("name",resp.data.name)
                     sessionStorage.setItem("email",resp.data.email)
                     sessionStorage.setItem("imageUrl",resp.data.imageUrl)
                     sessionStorage.setItem("type",resp.data.type.toString().toLowerCase())
                     sessionStorage.setItem("planId",resp.data.planId)
-                    sessionStorage.setItem("accountId",resp.data.accountId)
                     if(resp.data.type==="FARMER"){
                         this.$router.push("/farmer/cropInventory")
                     }else {

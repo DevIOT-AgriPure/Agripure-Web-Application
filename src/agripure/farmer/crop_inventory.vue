@@ -198,7 +198,7 @@ export default {
         }
     },
     created(){
-        new CropServices().getCropsByFarmerId(sessionStorage.getItem("id")).then(response=>{
+        new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableCrops(response.data)
         })
 
@@ -242,7 +242,6 @@ export default {
             }
         },
         newPlantSearch(event){
-            console.log("Busque: "+this.searchNewPlantValue)
             new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
                 this.newPlantsSearchOptions=response.data
                 let options=[]
@@ -299,12 +298,15 @@ export default {
         },
         addPlantToCrop(){
             //add plant in service
-            let newPlantForInventory=this.currentPlantInSearch
-            newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
-            this.displayableCrops.push(newPlantForInventory)
-            this.visible=!this.visible
-            this.showDetailsForSearch=false
-            this.getAllPlants()
+            new CropServices().addCrop(this.token,parseInt(sessionStorage.getItem("id").toString()),parseInt(this.currentPlantInSearch.id)).then(response=>{
+                let newPlantForInventory=this.currentPlantInSearch
+                newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
+                this.displayableCrops.push(newPlantForInventory)
+                this.visible=!this.visible
+                this.showDetailsForSearch=false
+                this.getAllPlants()
+            })
+
         },
         isPlantRepeated() {
             if(this.displayableCrops.some(plant => plant.name === this.currentPlantInSearch.name)){
