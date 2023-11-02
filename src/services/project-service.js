@@ -8,7 +8,7 @@ export class ProjectService{
         return http.post("",{
             "farmerId": project.farmerId,
             "specialistId": project.specialistId,
-            "isStarted": project.isProjectStarted,
+            "isStarted": project.projectStarted,
             "cropId": project.cropId,
             "name": project.name,
             "description": project.description,
@@ -17,10 +17,10 @@ export class ProjectService{
         })
     }
     getProjectByFarmerId(id){
-        return http.get("?farmerId="+id);
+        return http.get("/projectsByFarmerId/"+id);
     }
     getProjectsBySpecialistId(id){
-        return http.get("/projectsByFarmerId/"+id);
+        return http.get("/projectsBySpecialistId/"+id);
     }
     getProjectById(id){
         return http.get(""+id);

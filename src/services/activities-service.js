@@ -4,6 +4,9 @@ const http = axios.create({
     headers: { "Content-type": "application/json" },
 })
 export class ActivitiesService{
+    setActivityCompleted(id){
+        return http.put("/completeActivity/"+id);
+    }
     getActivitiesByProjectId(token,id){
         return http.get("/activityByProjectId/"+id,);
     }

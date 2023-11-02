@@ -28,7 +28,12 @@
                     </template>
                     <template #empty> No projects found. </template>
                     <template #loading> Loading projects data. Please wait. </template>
-                    <pv-column field="name" header="Name" style="min-width: 14rem"></pv-column>
+                    <pv-column field="name" header="Name" style="min-width: 7rem"></pv-column>
+                    <pv-column field="startDate" header="Start date" style="min-width: 7rem">
+                        <template #body="{ data }">
+                            <p>{{data.startDate}}</p>
+                        </template>
+                    </pv-column>
                     <pv-column field="durationDays" header="Duration" style="min-width: 7rem">
                         <template #body="{ data }">
                             <p>{{data.durationDays}} days</p>
@@ -39,14 +44,14 @@
                             <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id,data)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
                         </template>
                     </pv-column>
-                    <pv-column field="isProjectStarted" header="Status" style="min-width: 1rem">
+                    <pv-column field="projectStarted" header="Status" style="min-width: 1rem">
                         <template #body="{ data }">
-                            <pv-tag :value="getStatusProject(data.isProjectStarted)" :severity="getSeverity(data.isProjectStarted)" />
+                            <pv-tag :value="getStatusProject(data.projectStarted)" :severity="getSeverity(data.projectStarted)" />
                         </template>
                     </pv-column >
                     <pv-column  header="" style="min-width: 1rem">
                         <template #body="{ data }">
-                            <pv-button v-if="data.isProjectStarted" label="Details" severity="success" @click="showProjectDetail(data)"  />
+                            <pv-button label="Details" severity="success" @click="showProjectDetail(data)"  />
                         </template>
                     </pv-column >
                 </pv-dataTable>
@@ -69,7 +74,7 @@
                                         <div class="chat-content" >
                                             <div class="chat-header">
                                                 <h3 style="margin-bottom: 0.5rem">{{ activity.description }}</h3>
-                                                <pv-checkbox v-model="activity.completed" @click="updateActivity(activity)" :binary="true"/>
+                                                <pv-checkbox :disabled="activity.completed || isActivityStarted(activity.date)" v-model="activity.completed" @click="updateActivity(activity)" :binary="true"/>
                                             </div>
                                             <div style="display: flex;">
                                                 <i class="pi pi-calendar" style="margin-right: 1rem"></i>
@@ -89,7 +94,7 @@
                         <h1>{{currentProjectDetail.name}}</h1>
                         <h4>{{currentProjectDetail.description}}</h4>
                         <h5>Specialist: {{currentSpecialistForProject.name}}</h5>
-                        <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
+                        <h5>Status: {{getStatusProject(currentProjectDetail.projectStarted)}}</h5>
                         <h5>Crop: {{currentCropForProject.name}}</h5>
                         <h5>Duration: {{currentProjectDetail.durationDays}} days</h5>
                         <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
@@ -97,8 +102,6 @@
                     </div>
                 </div>
             </pv-dialog>
-
-
         </div>
     </div>
 </template>
@@ -122,7 +125,7 @@ export default {
                 name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 description: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 weeks: { value: null, matchMode: FilterMatchMode.IN },
-                isProjectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
+                projectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
                 verified: { value: null, matchMode: FilterMatchMode.EQUALS }
             },
             activitiesDialogVisible:false,
@@ -137,6 +140,7 @@ export default {
     created(){
         new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
+            console.log(this.projects)
             this.setDurationDayToProject()
             this.setActivitysForProject()
         })
@@ -144,6 +148,30 @@ export default {
 
     },
     methods:{
+        isActivityStarted(startDate) {
+            let startDateInDateObject=this.stringToDate(startDate)
+
+            // Obtiene la fecha actual
+            const currentDate = new Date();
+
+            // Compara currentDate con startDate
+            if (currentDate >= startDateInDateObject) {
+                // La fecha actual es igual o posterior a startDateInDateObject
+                return false;
+            } else {
+                // La fecha actual es anterior a startDateInDateObject
+                return true;
+            }
+        },
+        stringToDate(dateString) {
+            const parts = dateString.split('/'); // Divide la cadena en día, mes y año
+            const day = parseInt(parts[0], 10); // Convierte el día en un número
+            const month = parseInt(parts[1], 10) - 1; // Convierte el mes en un número y resta 1
+            const year = parseInt(parts[2], 10); // Convierte el año en un número
+
+            // Crea el objeto Date
+            return new Date(year, month, day);
+        },
         setActivitysForProject(){
             for (let i = 0; i < this.projects.length; i++) {
                 new ActivitiesService().getActivitiesByProjectId(this.token,this.projects[i].id).then(response=>{
@@ -178,23 +206,25 @@ export default {
         },
         updateActivity(activity){
             //update activity by service
-            if(activity.completed){
-                console.log("Actividad pendiente")
-                this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)-1
-            }else {
-                console.log("Actividad completa")
-                this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)+1
-            }
-            this.updateProjectInProjectsById(this.currentProjectForActivities)
+            new ActivitiesService().setActivityCompleted(activity.id).then(res=>{
+                if(activity.completed){
+                    console.log("Actividad pendiente")
+                    this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)-1
+                }else {
+                    console.log("Actividad completa")
+                    this.currentProjectForActivities.activitiesDone=parseInt(this.currentProjectForActivities.activitiesDone)+1
+                }
+                this.updateProjectInProjectsById(this.currentProjectForActivities)
+            })
+
         },
         updateProjectInProjectsById(project) {
-            this.projects = this.projects.map((p) => {
-                if (p.id === project.id) {
-                    return project; // Reemplaza el proyecto con el mismo ID
-                } else {
-                    return p; // Mantén los demás proyectos sin cambios
-                }
-            });
+            new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(response=>{
+                this.projects=response.data
+                console.log(this.projects)
+                this.setDurationDayToProject()
+                this.setActivitysForProject()
+            })
         },
         getSeverity(status) {
             switch (status) {

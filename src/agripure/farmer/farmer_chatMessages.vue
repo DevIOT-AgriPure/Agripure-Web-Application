@@ -53,6 +53,7 @@ export default {
     },
     created() {
         new ChatServices().getChatByContactId(this.id).then(response=>{
+            console.log(response.data)
             this.rawMessages=response.data
         })
         new ContactServices().getContactById(this.id).then(response=>{
@@ -63,6 +64,7 @@ export default {
         })
         setInterval(() => {
             new ChatServices().getChatByContactId(this.id).then(response=>{
+                console.log(response.data)
                 this.rawMessages=response.data
             })
             console.log("ImplementarWebSocket")
