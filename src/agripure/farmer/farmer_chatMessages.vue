@@ -95,12 +95,13 @@ export default {
             newMessage.hour=this.formatTimeWithAmPm(new Date())
             new ChatServices().sendMessage(newMessage).then(res=>{
                 this.rawMessages.push(newMessage)
+                this.message=""
+                setTimeout(this.scrollBottom,100)
             })
 
             //Enviar el mensaje en el service
 
-            this.message=""
-            setTimeout(this.scrollBottom,100)
+
 
         },
         scrollBottom(){

@@ -14,7 +14,7 @@
             </div>
             <div class="message-content" >
                 <div v-for="rawMessage in rawMessages"  >
-                    <div v-if="rawMessage.AutorId === userId" class="bubble-right">
+                    <div v-if="rawMessage.authorId === userId" class="bubble-right">
                         <p class="bubble">{{ rawMessage.message }}</p>
                     </div>
                     <div v-else class="bubble-left">
@@ -63,6 +63,9 @@ export default {
         })
         setInterval(() => {
             // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+            new ChatServices().getChatByContactId(this.id).then(response=>{
+                this.rawMessages=response.data
+            })
             console.log("ImplementarWebSocket")
         }, 5000);
     },
@@ -88,14 +91,18 @@ export default {
         sendMessage(){
             let newMessage={}
             newMessage.contactId=this.id
-            newMessage.AutorId=parseInt(sessionStorage.getItem("id").toString())
+            newMessage.authorId=parseInt(sessionStorage.getItem("id").toString())
             newMessage.message=this.message
             newMessage.order=this.rawMessages.length+1
             newMessage.hour=this.formatTimeWithAmPm(new Date())
-            this.rawMessages.push(newMessage)
-            //Enviar el mensaje en el service
-            this.message=""
-            setTimeout(this.scrollBottom,100)
+
+            new ChatServices().sendMessage(newMessage).then(res=>{
+                this.rawMessages.push(newMessage)
+                //Enviar el mensaje en el service
+                this.message=""
+                setTimeout(this.scrollBottom,100)
+            })
+
 
         },
         scrollBottom(){
