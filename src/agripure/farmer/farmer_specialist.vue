@@ -81,7 +81,7 @@
                   </div>
               </div>
             <div class="button-row" style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
-                <pv-button class="red-button" style="height: 2.5rem;" @click="deleteSpecialist">Delete contact</pv-button>
+                <pv-button :disabled="deleteContactDisableButton" class="red-button" style="height: 2.5rem;" @click="deleteSpecialist">Delete contact</pv-button>
                 <pv-button class="green-button" @click="contactSpecialist">Open Chat</pv-button>
             </div>
           </div>
@@ -177,6 +177,7 @@ import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {SpecialistServices} from "@/services/specialists-service";
 import {NotificationService} from "@/services/notification-service";
+import {ProjectService} from "@/services/project-service";
 
 export default {
   name: "Farmer_specialist",
@@ -198,7 +199,8 @@ export default {
       currentResultsSpecialists:[],
       currentSpecialistInSearch:{},
       currentContactResultsSpecialists:[],
-        isAddContactDisable:true
+        isAddContactDisable:true,
+        deleteContactDisableButton:false,
     };
   },
   created() {
@@ -274,7 +276,14 @@ export default {
       })
     },
     showSpecialistDetails(contact) {
-        console.log(contact)
+        new ProjectService().getProjectsBySpecialistId(contact.accountId).then(res=>{
+            let project=res.data
+            if(project!==null){
+                this.deleteContactDisableButton=true
+            }else {
+                this.deleteContactDisableButton=false
+            }
+        })
       this.loadContactDetails(contact.accountId)
       this.contactDetailsVisible=!this.contactDetailsVisible
       this.currentContact= contact;

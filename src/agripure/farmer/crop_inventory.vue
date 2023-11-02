@@ -156,7 +156,7 @@
                           <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
                               <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
                           </pv-button>
-                          <pv-button severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
+                          <pv-button :disabled="deleteCropButtonDisable" severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
                           </pv-button>
                       </div>
@@ -171,6 +171,7 @@
 import {CropServices} from "../../services/crop-service"
 import {PlantServices} from "../../services/plant-service"
 import { ref } from "vue";
+import {ProjectService} from "@/services/project-service";
 export default {
     name: "crop_inventory",
     data(){
@@ -192,8 +193,8 @@ export default {
             cropDetailsVisible :false,
             showDetailsForSearch:false,
             currentResultsPlants:[],
-            currentInventoryResultsPlants:[]
-
+            currentInventoryResultsPlants:[],
+            deleteCropButtonDisable:false,
 
         }
     },
@@ -259,8 +260,11 @@ export default {
         },
         getDisplayableCrops(rawCrop){
             for (let i = 0; i < rawCrop.length; i++) {
+                let tempDisplayableCrop={}
                 new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
-                    this.displayableCrops.push(response.data)
+                    tempDisplayableCrop=response.data
+                    tempDisplayableCrop.cropId=rawCrop[i].id
+                    this.displayableCrops.push(tempDisplayableCrop)
                 })
                 this.currentInventoryResultsPlants=this.displayableCrops
             }
@@ -278,6 +282,16 @@ export default {
             })
         },
         showCropDetails(crop) {
+            new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(res=>{
+                let projects=res.data
+                for (let i = 0; i < projects.length; i++) {
+                    if(projects[i].cropId===crop.cropId){
+                        this.deleteCropButtonDisable=true
+                    }else{
+                        this.deleteCropButtonDisable=false
+                    }
+                }
+            })
             this.cropDetailsVisible=!this.cropDetailsVisible
             this.currentCrop= crop;
         },

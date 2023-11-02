@@ -71,7 +71,7 @@
                             </div>
                         </div>
                         <div style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
-                            <pv-button  class="red-button" @click="deleteFarmer()">Delete contact</pv-button>
+                            <pv-button :disabled="deleteContactDisableButton" class="red-button" @click="deleteFarmer()">Delete contact</pv-button>
                             <pv-button class="green-button" @click="contactFarmer()">Open Chat</pv-button>
                         </div>
                     </div>
@@ -86,6 +86,7 @@
 import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
+import {ProjectService} from "@/services/project-service";
 
 export default {
     name: "Specialist_farmers",
@@ -102,6 +103,7 @@ export default {
             showDetailsForSearch:false,
             currentSpecialistInSearch:{},
             currentContactResultsFarmers:[],
+            deleteContactDisableButton:false,
         };
     },
     created() {
@@ -155,8 +157,18 @@ export default {
             }
         },
         showFarmerDetails(contact) {
-            this.contactDetailsVisible=!this.contactDetailsVisible
             this.currentContact= contact;
+            new ProjectService().getProjectByFarmerId(this.currentContact.accountId).then(res=>{
+                let project=res.data
+                console.log(project)
+                if(project!==null){
+                    this.deleteContactDisableButton=true
+                }else {
+                    this.deleteContactDisableButton=false
+                }
+            })
+            this.contactDetailsVisible=!this.contactDetailsVisible
+
         },
         contactFarmer() {
             this.$router.push("/specialist/chat/" + this.currentContact.contactId)

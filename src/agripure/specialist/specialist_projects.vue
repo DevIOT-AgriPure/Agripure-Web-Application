@@ -51,7 +51,7 @@
                     </pv-column >
                     <pv-column  header="" style="min-width: 1rem">
                         <template #body="{ data }">
-                            <pv-button v-if="!data.projectStarted" label="Details" severity="success" @click="showProjectDetail(data)"  />
+                            <pv-button label="Details" severity="success" @click="showProjectDetail(data)"  />
                         </template>
                     </pv-column >
                 </pv-dataTable>
@@ -430,16 +430,16 @@ export default {
                 this.dateStep = true
             }
             if(this.selectionStep){
-                if(this.selectedContact)
                 if(this.stepContactSelected){
                     if(this.projectName !== ""&&this.projectDescription!== ""){
                         this.isNextButtonDisable=false
                     }
                     this.selectionStep=false
                     this.informationStep=true
-                }else{
+                }
+                else{
                     if(this.selectedContact!==null){
-                        this.isNextButtonDisable=false
+                        this.isNextButtonDisable=true
                     }
                     this.stepContactSelected=true
 
@@ -533,12 +533,20 @@ export default {
             new CropServices().getCropsByFarmerId(this.token,this.selectedContact.accountId).then(response=>{
                 let cropsForFarmer=response.data
                 for (let i = 0; i < cropsForFarmer.length; i++) {
-                    let storableCropAndPlantInfo={}
-                    new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
-                        storableCropAndPlantInfo=res.data
-                        storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
-                        this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                    new ProjectService().getProjectByFarmerId(this.selectedContact.accountId).then(res=>{
+                        let projects=res.data
+                        for (let j = 0; j < projects.length; j++) {
+                            if(projects[j].cropId!==cropsForFarmer[i].id){
+                                let storableCropAndPlantInfo={}
+                                new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                    storableCropAndPlantInfo=res.data
+                                    storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                    this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                })
+                            }
+                        }
                     })
+
                 }
             })
         },
