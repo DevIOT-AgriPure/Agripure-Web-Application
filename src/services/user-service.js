@@ -7,8 +7,11 @@ export class UserServices{
     getUserById(id){
         return http.get(""+id);
     }
-    getAllUsersSpecialists(){
-        return http.get("?type=specialist");
+    getUserByEmail(token,email){
+        return http.get("api/v1/profiles/getProfileByEmail/"+email,{ headers: {"Authorization" : `Bearer ${token}`} });
+    }
+    getAllUsersSpecialists(token){
+        return http.get("api/v1/profiles/getSpecialists",{ headers: {"Authorization" : `Bearer ${token}`} });
     }
 
     login(email,password){

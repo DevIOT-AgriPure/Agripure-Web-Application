@@ -232,8 +232,6 @@ export default {
           }).catch(error=>{
               this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
           })
-
-        console.log(newUser)
       },
       nextPath(){
         if(this.selectedUserType==="farmer"){
