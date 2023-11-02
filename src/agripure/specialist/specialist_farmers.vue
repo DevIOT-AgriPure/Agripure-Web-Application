@@ -86,7 +86,6 @@
 import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
-import {SpecialistServices} from "@/services/specialists-service";
 
 export default {
     name: "Specialist_farmers",
@@ -113,9 +112,12 @@ export default {
     methods: {
         deleteFarmer(){
             // add delete specialist service
-            this.displayableContacts = this.currentContactResultsFarmers.filter(specialist => specialist.id !== this.currentContact.id);
-            this.currentContactResultsFarmers=this.displayableContacts
-            this.contactDetailsVisible=false
+            new ContactServices().deleteContactById(this.currentContact.contactId).then(res=>{
+                this.displayableContacts = this.currentContactResultsFarmers.filter(specialist => specialist.id !== this.currentContact.id);
+                this.currentContactResultsFarmers=this.displayableContacts
+                this.contactDetailsVisible=false
+            })
+
         },
         resetContacts(){
             this.currentContactResultsFarmers=this.displayableContacts
@@ -152,16 +154,7 @@ export default {
                 this.currentContactResultsFarmers=this.displayableContacts
             }
         },
-        loadContactDetails(id) {
-            new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
-                this.currentContact.expertise=response.data[0].expertise
-                this.currentContact.contactEmail = response.data[0].contactEmail
-                this.currentContact.areasOfFocus= response.data[0].areasOfFocus
-                this.currentContact.specialistId=response.data[0].id
-            })
-        },
         showFarmerDetails(contact) {
-            this.loadContactDetails(contact.id)
             this.contactDetailsVisible=!this.contactDetailsVisible
             this.currentContact= contact;
         },

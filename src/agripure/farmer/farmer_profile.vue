@@ -19,7 +19,7 @@
                     <h3 >Email: {{ userEmail }}</h3>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
-                    <p>Hola, soy Huell y amo las lechugas. Estoy emocionado de unirme a agripure para aprender y compartir sobre el cultivo de lechugas. ¡Juntos cultivaremos de manera más inteligente y saludable!</p>
+                    <p>{{userDescription}}</p>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin: 2rem 0 0rem 0">
                     <h2>Plan</h2>
@@ -178,6 +178,7 @@
     data(){
       return{
         userName:sessionStorage.getItem("name"),
+          userDescription:sessionStorage.getItem("description"),
         userEmail:sessionStorage.getItem("email"),
         imageUrl:sessionStorage.getItem("imageUrl"),
       }
