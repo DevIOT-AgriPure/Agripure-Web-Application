@@ -166,7 +166,7 @@
               </div>
               <div class="footer">
                 <div class="buttons" >
-                  <router-link to="/sign-in" class="rw" ><pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Iniciar subscripcion</pv-button ></router-link>
+                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Iniciar subscripcion</pv-button >
                 </div>
               </div>
             </div>
@@ -178,6 +178,8 @@
 
 </template>
 <script>
+import {UserServices} from "@/services/user-service";
+
 export default {
     name: "sign-up-plans",
     components: {},
@@ -217,14 +219,20 @@ export default {
     },
     methods:{
       register(){
-        let newUser={}
-        newUser.name=this.user.name
-        newUser.email=this.user.email
-        newUser.password=this.user.password
-        newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
-        newUser.location="Lima, Peru"
-        newUser.type=this.selectedUserType
-        newUser.plan=this.userPlanSelected
+          let newUser={}
+          newUser.name=this.user.name
+          newUser.email=this.user.email
+          newUser.password=this.user.password
+          newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
+          newUser.location="Lima, Peru"
+          newUser.type=this.selectedUserType.toUpperCase()
+          newUser.plan=this.userPlanSelected
+          new UserServices().register(newUser).then(response=>{
+              this.$router.push("/sign-in")
+          }).catch(error=>{
+              this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+          })
+
         console.log(newUser)
       },
       nextPath(){
