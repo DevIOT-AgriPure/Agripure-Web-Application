@@ -1,7 +1,7 @@
 import axios from "axios";
 import {PlantServices} from "@/services/plant-service";
 const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/",
+    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/",
     headers: { "Content-type": "application/json" },
 })
 export class CropServices{

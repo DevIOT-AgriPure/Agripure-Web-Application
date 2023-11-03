@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"http://localhost:8080/",
+    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/",
     headers: { "Content-type": "application/json" },
 })
 export class UserServices{
@@ -29,7 +29,7 @@ export class UserServices{
             "imageUrl": newUser.imageUrl,
             "location": "Lima, Peru",
             "type": newUser.type,
-            "planId": newUser.plan,
+            "planId": newUser.plan
         })
     }
     registerSpecialist(newUser){
@@ -44,7 +44,7 @@ export class UserServices{
             "expertise": newUser.expertise,
             "contactEmail": newUser.contactEmail,
             "areasOfFocus": newUser.areasOfFocus,
-            "planId": 0,
+            "planId": 0
         })
     }
 }

@@ -269,7 +269,6 @@ export default {
           newUser.location="Lima, Peru"
           newUser.type=this.selectedUserType.toUpperCase()
           newUser.plan=parseInt(this.userPlanSelected)
-          console.log(newUser)
           if(this.selectedUserType==="specialist"){
               newUser.contactEmail=this.user.contactEmail
               newUser.areasOfFocus=this.user.areasOfFocus
