@@ -260,6 +260,7 @@ export default {
       }
     },
     getDisplayableContacts(rawContacts){
+        this.displayableContacts=[]
       for (let i = 0; i < rawContacts.length; i++) {
         new UserServices().getUserById(rawContacts[i].specialistId).then(response=>{
             let temp=response.data
@@ -278,7 +279,7 @@ export default {
     showSpecialistDetails(contact) {
         new ProjectService().getProjectsBySpecialistId(contact.accountId).then(res=>{
             let project=res.data
-            if(project!==null){
+            if(project.length>0){
                 this.deleteContactDisableButton=true
             }else {
                 this.deleteContactDisableButton=false
@@ -308,7 +309,6 @@ export default {
     },
       deleteSpecialist(){
         // add delete specialist service
-          console.log(this.currentContact)
           new ContactServices().deleteContactById(this.currentContact.contactId).then(response=>{
               this.displayableContacts = this.currentContactResultsSpecialists.filter(specialist => specialist.id !== this.currentContact.id);
               this.currentContactResultsSpecialists=this.displayableContacts
@@ -341,31 +341,28 @@ export default {
       },
     sendRequestToSpecialist(){
         new ContactServices().addContact(parseInt(sessionStorage.getItem("id").toString()),this.currentSpecialistInSearch.accountId).then(response=>{
+            new ContactServices().getContactsForFarmer(this.token,sessionStorage.getItem("id")).then(response=>{
+                this.getDisplayableContacts(response.data)
+                this.addSpecialistVisible=!this.addSpecialistVisible
+                this.showDetailsForSearch=false
+            })
+            //Aqui envio una solicitud pormedio del service
+            //creo una notificacion
+            let requestNotification={}
+            requestNotification.message=(sessionStorage.getItem("name")+" just sent you a request!").toString()
+            requestNotification.notificationType="request"
+            requestNotification.date=this.formatDate(new Date()).toString()
+            requestNotification.imageUrl=sessionStorage.getItem("imageUrl").toString()
+            requestNotification.toUserId=this.currentSpecialistInSearch.accountId
+            requestNotification.plantId=0
+            requestNotification.fromUserId=parseInt(sessionStorage.getItem("id").toString())
+            requestNotification.seen=false
+            new NotificationService().sendNotification(requestNotification).then(res=>{
 
+            })
+            //envio la notificacion pormedio del service
+            //si acepta la solicitud automaticamente se crea un chat
         })
-        //Aqui envio una solicitud pormedio del service
-        //creo una notificacion
-        let requestNotification={}
-        requestNotification.message=(sessionStorage.getItem("name")+" just sent you a request!").toString()
-        requestNotification.notificationType="request"
-        requestNotification.date=this.formatDate(new Date()).toString()
-        requestNotification.imageUrl=sessionStorage.getItem("imageUrl").toString()
-        requestNotification.toUserId=this.currentSpecialistInSearch.accountId
-        requestNotification.plantId=0
-        requestNotification.fromUserId=parseInt(sessionStorage.getItem("id").toString())
-        requestNotification.seen=false
-        new NotificationService().sendNotification(requestNotification).then(res=>{
-
-        })
-        //envio la notificacion pormedio del service
-        //si acepta la solicitud automaticamente se crea un chat
-
-        let newSpecialist=this.currentSpecialistInSearch
-        newSpecialist.accountId=this.displayableContacts.length+1//solucion temporal
-        this.displayableContacts.push(newSpecialist)
-        console.log(this.displayableContacts)
-      this.addSpecialistVisible=!this.addSpecialistVisible
-      this.showDetailsForSearch=false
     },
       isContactRepeated() {
           if(this.displayableContacts.some(contact => contact.email === this.currentSpecialistInSearch.email)){
@@ -384,7 +381,9 @@ export default {
   margin-top: 20px;
   margin-left: 20px;
   margin-bottom: 20px;
+    border-radius: 15px; /* Agregar bordes redondeados */
   width: 100%;
+
 }
 
 .container {

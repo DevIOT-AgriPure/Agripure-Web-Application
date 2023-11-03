@@ -70,12 +70,12 @@
                           <div class="visible">
                             <template v-if="plan.name==='Premium'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">Allows you to have projects and devices</p>
+                                <p style="margin-top: 15px">{{ plan.description }}</p>
                               </div>
                             </template>
                             <template v-if="plan.name==='Free'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">Allows you to manage unlimited crops</p>
+                                <p style="margin-top: 15px">{{ plan.description }}</p>
                               </div>
                             </template>
                           </div>
@@ -221,6 +221,7 @@
 </template>
 <script>
 import {UserServices} from "@/services/user-service";
+import {PlansServices} from "@/services/plans-service";
 
 export default {
     name: "sign-up-plans",
@@ -252,16 +253,9 @@ export default {
     },
     created()
     {   this.currentPath="Types"
-        var planFree={} ;
-        var planPremium={} ;
-      planFree.id=1
-      planFree.name="Free"
-      planFree.price=20
-        planPremium.id=2
-        planPremium.name="Premium"
-        planPremium.price=20
-        this.plans.push(planFree)
-        this.plans.push(planPremium)
+        new PlansServices().getPlans().then(res=>{
+            this.plans=res.data
+        })
 
     },
     methods:{
@@ -274,7 +268,8 @@ export default {
           newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
           newUser.location="Lima, Peru"
           newUser.type=this.selectedUserType.toUpperCase()
-          newUser.plan=this.userPlanSelected
+          newUser.plan=parseInt(this.userPlanSelected)
+          console.log(newUser)
           if(this.selectedUserType==="specialist"){
               newUser.contactEmail=this.user.contactEmail
               newUser.areasOfFocus=this.user.areasOfFocus
@@ -358,6 +353,8 @@ export default {
         },
         addTemporaryPlan(plan){
             this.userPlanSelected=plan
+            console.log(this.userPlanSelected)
+
         }
     }
 }

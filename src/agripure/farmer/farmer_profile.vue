@@ -30,10 +30,10 @@
                     </div>
                     <div class="chat-content" >
                         <div class="chat-header">
-                            <h3 style="margin-bottom: 0.5rem">Premium</h3>
+                            <h3 style="margin-bottom: 0.5rem">{{ plan.name }}</h3>
                             <pv-button label="UPDATE" />
                         </div>
-                        <p style="width: 30%">S/. 50</p>
+                        <p style="width: 30%">S/. {{ plan.price }}</p>
                     </div>
                 </div>
             </div>
@@ -62,6 +62,8 @@
     </div>
 </template>
 <script >
+import {PlansServices} from "@/services/plans-service";
+
 export default {
     data(){
         return{
@@ -69,7 +71,14 @@ export default {
             userDescription:sessionStorage.getItem("description"),
             userEmail:sessionStorage.getItem("email"),
             imageUrl:sessionStorage.getItem("imageUrl"),
+            planId:sessionStorage.getItem("planId"),
+            plan: {}
         }
+    },
+    created() {
+        new PlansServices().getPlanById(this.planId).then(res=>{
+            this.plan=res.data
+        })
     },
     methods:{
         logOut(){

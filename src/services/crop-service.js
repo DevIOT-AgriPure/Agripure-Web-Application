@@ -19,5 +19,10 @@ export class CropServices{
         return http.get("crops/getCrop/"+id,);
 
     }
+    deleteCropById(token,id){
+        console.log(id)
+        return http.delete("crops/deleteCrop/"+id);
+
+    }
  
 }

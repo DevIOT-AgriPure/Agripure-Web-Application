@@ -1,5 +1,8 @@
 <template>
   <div class="background" >
+      <div class="container">
+
+      </div>
       <div class="header" style="display: flex;justify-content: left;">
           <h1>Good morning {{ userName }}!</h1>
           <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
@@ -259,6 +262,7 @@ export default {
             })
         },
         getDisplayableCrops(rawCrop){
+            this.displayableCrops=[]
             for (let i = 0; i < rawCrop.length; i++) {
                 let tempDisplayableCrop={}
                 new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
@@ -271,9 +275,12 @@ export default {
         },
         deleteCrop(){
             // delete plant in service
-            this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
-            this.currentInventoryResultsPlants=this.displayableCrops
-            this.cropDetailsVisible=!this.cropDetailsVisible
+            new CropServices().deleteCropById(this.token,this.currentCrop.cropId).then(res=>{
+                this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
+                this.currentInventoryResultsPlants=this.displayableCrops
+                this.cropDetailsVisible=!this.cropDetailsVisible
+            })
+
         },
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
@@ -313,12 +320,11 @@ export default {
         addPlantToCrop(){
             //add plant in service
             new CropServices().addCrop(this.token,parseInt(sessionStorage.getItem("id").toString()),parseInt(this.currentPlantInSearch.id)).then(response=>{
-                let newPlantForInventory=this.currentPlantInSearch
-                newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
-                this.displayableCrops.push(newPlantForInventory)
+                new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
+                    this.getDisplayableCrops(response.data)
+                })
                 this.visible=!this.visible
                 this.showDetailsForSearch=false
-                this.getAllPlants()
             })
 
         },
@@ -348,10 +354,11 @@ export default {
 .background {
     background-color: #242424;
     color: white; /* Cambiar el color del texto si es necesario */
-    margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
-    padding-bottom: 3rem;
 }
 .addplantbackground {
     color: white; /* Cambiar el color del texto si es necesario */

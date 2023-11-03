@@ -530,21 +530,35 @@ export default {
         getCropForProject(){
             this.currentCropsForFarmer=[]
             this.isNextButtonDisable=false
+
             new CropServices().getCropsByFarmerId(this.token,this.selectedContact.accountId).then(response=>{
                 let cropsForFarmer=response.data
                 for (let i = 0; i < cropsForFarmer.length; i++) {
                     new ProjectService().getProjectByFarmerId(this.selectedContact.accountId).then(res=>{
                         let projects=res.data
-                        for (let j = 0; j < projects.length; j++) {
-                            if(projects[j].cropId!==cropsForFarmer[i].id){
-                                let storableCropAndPlantInfo={}
-                                new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
-                                    storableCropAndPlantInfo=res.data
-                                    storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
-                                    this.currentCropsForFarmer.push(storableCropAndPlantInfo)
-                                })
+                        if(projects.length>0){
+                            for (let j = 0; j < projects.length; j++) {
+                                console.log("a")
+                                if(projects[j].cropId!==cropsForFarmer[i].id){
+                                    let storableCropAndPlantInfo={}
+                                    new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                        storableCropAndPlantInfo=res.data
+                                        storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                        this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                        console.log(this.currentCropsForFarmer)
+                                    })
+                                }
                             }
+                        }else {
+                            let storableCropAndPlantInfo={}
+                            new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                storableCropAndPlantInfo=res.data
+                                storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                console.log(this.currentCropsForFarmer)
+                            })
                         }
+
                     })
 
                 }

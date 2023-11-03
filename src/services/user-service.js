@@ -29,7 +29,7 @@ export class UserServices{
             "imageUrl": newUser.imageUrl,
             "location": "Lima, Peru",
             "type": newUser.type,
-            "planId": 0,
+            "planId": newUser.plan,
         })
     }
     registerSpecialist(newUser){

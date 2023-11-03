@@ -162,7 +162,7 @@ export default {
             new ProjectService().getProjectByFarmerId(this.currentContact.accountId).then(res=>{
                 let project=res.data
                 console.log(project)
-                if(project!==null){
+                if(project.length>0){
                     this.deleteContactDisableButton=true
                 }else {
                     this.deleteContactDisableButton=false
@@ -184,6 +184,7 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     margin-bottom: 20px;
+    border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
 }
 
