@@ -14,8 +14,8 @@
             </div>
         </div>
         <div style="margin: 0 2rem 0 2rem" >
-            <p v-if="currentContacts !== displayableContacts" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
-            <div v-for="contact in currentContacts"
+            <p v-if="currentContacts.length !== displayableContacts.length" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
+            <div v-if="currentContacts.length>=1" v-for="contact in currentContacts"
                  :key="contact.id">
                 <div class="chat-card" @click="irAChat(contact.contactId)">
                     <div class="profile-image">
@@ -30,6 +30,9 @@
                     </div>
                 </div>
             </div>
+            <div v-else>
+                <h3>You have no chats at the moment</h3>
+            </div>
         </div>
 
     </div>
@@ -41,11 +44,13 @@ import {ref} from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "specialist_chat",
     data(){
         return{
+            route: null,
           userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
@@ -56,12 +61,18 @@ export default {
         }
     },
     created() {
+        this.route = useRoute(); // Obtener la ruta actual
         new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
         setInterval(() => {
-            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path===("/specialist/chat")){
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
         }, 5000);
     },
     methods:{
@@ -105,19 +116,25 @@ export default {
             })
         },
         getDisplayableContacts(rawContacts){
-            for (let i = 0; i < rawContacts.length; i++) {
-                new UserServices().getUserById(rawContacts[i].farmerId).then(response=>{
-                    let displayableContact=response.data
-                    displayableContact.contactId=rawContacts[i].id
-                    this.displayableContacts.push(displayableContact)
-                    this.displayableContacts[this.displayableContacts.length-1].message="Envia un mensaje !"
-                    this.displayableContacts[this.displayableContacts.length-1].hour=" "
-                    if(rawContacts[i].isChatStarted===true){
-                        this.getLastMessageFromChat(rawContacts[i].id,this.displayableContacts.length-1)
-                    }
-                })
-                this.currentContacts=this.displayableContacts
+            if(rawContacts.length>0){
+                for (let i = 0; i < rawContacts.length; i++) {
+                    new UserServices().getUserById(rawContacts[i].farmerId).then(response=>{
+                        let displayableContact=response.data
+                        displayableContact.contactId=rawContacts[i].id
+                        this.displayableContacts.push(displayableContact)
+                        this.displayableContacts[this.displayableContacts.length-1].message="Envia un mensaje !"
+                        this.displayableContacts[this.displayableContacts.length-1].hour=" "
+                        if(rawContacts[i].isChatStarted===true){
+                            this.getLastMessageFromChat(rawContacts[i].id,this.displayableContacts.length-1)
+                        }
+                    })
+                    this.currentContacts=this.displayableContacts
+                }
+            }else {
+                this.currentContacts=[]
+                this.displayableContacts=[]
             }
+
         }
     }
 }

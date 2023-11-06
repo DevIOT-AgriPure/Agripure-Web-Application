@@ -1,10 +1,21 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"https://my-json-server.typicode.com/DevIOT-AgriPure/agripure-jsondos/Activities/",
+    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/activities",
     headers: { "Content-type": "application/json" },
 })
 export class ActivitiesService{
-    getActivitiesByProjectId(id){
-        return http.get("?projectId="+id);
+    setActivityCompleted(id){
+        return http.put("/completeActivity/"+id);
+    }
+    getActivitiesByProjectId(token,id){
+        return http.get("/activityByProjectId/"+id,);
+    }
+    addActivity(activity){
+        return http.post("",{
+            "projectId": activity.projectId,
+            "title": activity.title,
+            "description": activity.description,
+            "date": activity.date
+        })
     }
 }

@@ -3,7 +3,7 @@
         <div style="margin: 2rem 2rem 2rem 2rem" >
           <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
 
-          <div v-for="notification in notifications"
+          <div v-if="notifications.length>=1" v-for="notification in notifications"
                  :key="notification.id">
                 <div class="chat-card">
                     <div class="profile-image" @click="redirectTo(notification.notificationType)">
@@ -25,6 +25,9 @@
                     </div>
                 </div>
             </div>
+            <div v-else>
+                <h3>You have no notifications at the moment</h3>
+            </div>
         </div>
     </div>
 </template>
@@ -33,23 +36,53 @@
 <script>
 import {FilterMatchMode} from "primevue/api";
 import {NotificationService} from "@/services/notification-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "specialist_notifications",
     data(){
         return {
-          userName: sessionStorage.getItem("name"),
+            route: null,
+
+            userName: sessionStorage.getItem("name"),
             token: sessionStorage.getItem("jwt"),
             notifications:{},
         };
     },
     created(){
+        this.route = useRoute(); // Obtener la ruta actual
+
         new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
-            this.notifications=response.data
-            const fecha = new Date(); // Obtiene la fecha y hora actual
-            this.getFormatDay(fecha)
+            if(response.data!==null){
+                this.notifications=response.data
+                const fecha = new Date(); // Obtiene la fecha y hora actual
+                this.getFormatDay(fecha)
+            }
+            else {
+                this.notifications=[]
+            }
 
         })
+        setInterval(() => {
+            if (this.route) {
+                const path = this.route.path;
+                if(path==="/specialist/notifications"){
+                    new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
+                        if(response.data!==null){
+                            this.notifications=response.data
+                            const fecha = new Date(); // Obtiene la fecha y hora actual
+                            this.getFormatDay(fecha)
+                        }
+                        else {
+                            this.notifications=[]
+                        }
+
+                    })
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
+        }, 5000);
 
     },
     methods:{
@@ -106,10 +139,13 @@ export default {
         },
         deleteNotification(notification) {
             //delete notifications with notification service
-            const index = this.notifications.findIndex(item => item.id === notification.id);
-            if (index !== -1) {
-                this.notifications.splice(index, 1); // Elimina la notificación del arreglo
-            }
+            new NotificationService().deleteNotification(notification.id).then(res=>{
+                const index = this.notifications.findIndex(item => item.id === notification.id);
+                if (index !== -1) {
+                    this.notifications.splice(index, 1); // Elimina la notificación del arreglo
+                }
+            })
+
         }
     }
 }

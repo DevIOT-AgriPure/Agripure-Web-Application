@@ -50,43 +50,25 @@ export default {
     },
     methods:{
         signIn(){
-          if(this.email==="farmer"){
-              sessionStorage.setItem("id","1")
-              sessionStorage.setItem("name","Diego Talledo")
-              sessionStorage.setItem("email","diego@gmail.com")
-              sessionStorage.setItem("imageUrl","https://static.educalingo.com/img/en/800/farmer.jpg")
-              sessionStorage.setItem("type","farmer")
-              sessionStorage.setItem("plan","premium")
-            sessionStorage.setItem("type","farmer")
-            this.$router.push("/farmer/cropInventory")
-
-          }else {
-              sessionStorage.setItem("id","2")
-              sessionStorage.setItem("name","Alonso Sanchez")
-              sessionStorage.setItem("email","alonso@gmail.com")
-              sessionStorage.setItem("imageUrl","https://iica.int/sites/default/files/2020-01/Depositphotos_76015093_s-2019.jpg")
-            sessionStorage.setItem("type","specialist")
-            this.$router.push("/specialist/farmers")
-          }
-            /*new UserServices().login(this.email,this.password).then(response=>{
-                    sessionStorage.setItem("jwt",response.data.jwt)
-                    sessionStorage.setItem("id",response.data.id)
-                    sessionStorage.setItem("name",response.data.name)
-                    sessionStorage.setItem("email",response.data.email)
-                    sessionStorage.setItem("type",response.data.type)
-                    sessionStorage.setItem("plan",response.data.plan)
-                    if(response.data.type==="manager"){
-                        this.sendMessage("manager",response.data.name)
-                        this.$router.push("/rooms")
+            new UserServices().login(this.email,this.password).then(response=>{
+                sessionStorage.setItem("jwt",response.data.token)
+                new UserServices().getUserByEmail(response.data.token,this.email).then(resp=>{
+                    sessionStorage.setItem("id",resp.data.accountId)
+                    sessionStorage.setItem("name",resp.data.name)
+                    sessionStorage.setItem("email",resp.data.email)
+                    sessionStorage.setItem("imageUrl",resp.data.imageUrl)
+                    sessionStorage.setItem("description",resp.data.description)
+                    sessionStorage.setItem("type",resp.data.type.toString().toLowerCase())
+                    sessionStorage.setItem("planId",resp.data.planId)
+                    if(resp.data.type==="FARMER"){
+                        this.$router.push("/farmer/cropInventory")
+                    }else {
+                        this.$router.push("/specialist/farmers")
                     }
-                    else{
-                        this.sendMessage("guest",response.data.name)
-                        this.$router.push("/services")
-                    }
-                }
-            ).catch(reason => {
-                this.$toast.add({severity:'error', summary: 'Credenciales invalidad', detail:'Correo o contraseña incorrecta', life: 3000});
-            })*/
+                }).catch(reason => {
+                    this.$toast.add({severity:'error', summary: 'Credenciales invalidad', detail:'Correo o contraseña incorrecta', life: 3000});
+                })
+            })
         },
         sendMessage(type,name){
             let obj={

@@ -1,5 +1,8 @@
 <template>
   <div class="background" >
+      <div class="container">
+
+      </div>
       <div class="header" style="display: flex;justify-content: left;">
           <h1>Good morning {{ userName }}!</h1>
           <div style="width: 40%; display: flex;justify-content: center;margin:  2rem 0 2rem 0">
@@ -18,7 +21,7 @@
       <div class="inventory">
           <div style="margin-left: 1rem">
                 <h2>Your plants:</h2>
-                <p v-if="currentInventoryResultsPlants !== displayableCrops" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+                <p v-if="currentInventoryResultsPlants.length !== displayableCrops.length" @click="resetInventory()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
           </div>
           <div class="cards" style="margin-top: 2rem">
               <div v-for="crop in currentInventoryResultsPlants" :key="crop.id">
@@ -156,7 +159,7 @@
                           <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
                               <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
                           </pv-button>
-                          <pv-button severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
+                          <pv-button :disabled="deleteCropButtonDisable" severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
                           </pv-button>
                       </div>
@@ -171,6 +174,7 @@
 import {CropServices} from "../../services/crop-service"
 import {PlantServices} from "../../services/plant-service"
 import { ref } from "vue";
+import {ProjectService} from "@/services/project-service";
 export default {
     name: "crop_inventory",
     data(){
@@ -192,13 +196,13 @@ export default {
             cropDetailsVisible :false,
             showDetailsForSearch:false,
             currentResultsPlants:[],
-            currentInventoryResultsPlants:[]
-
+            currentInventoryResultsPlants:[],
+            deleteCropButtonDisable:false,
 
         }
     },
     created(){
-        new CropServices().getCropsByFarmerId(sessionStorage.getItem("id")).then(response=>{
+        new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableCrops(response.data)
         })
 
@@ -242,7 +246,6 @@ export default {
             }
         },
         newPlantSearch(event){
-            console.log("Busque: "+this.searchNewPlantValue)
             new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
                 this.newPlantsSearchOptions=response.data
                 let options=[]
@@ -259,18 +262,25 @@ export default {
             })
         },
         getDisplayableCrops(rawCrop){
+            this.displayableCrops=[]
             for (let i = 0; i < rawCrop.length; i++) {
+                let tempDisplayableCrop={}
                 new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
-                    this.displayableCrops.push(response.data)
+                    tempDisplayableCrop=response.data
+                    tempDisplayableCrop.cropId=rawCrop[i].id
+                    this.displayableCrops.push(tempDisplayableCrop)
                 })
                 this.currentInventoryResultsPlants=this.displayableCrops
             }
         },
         deleteCrop(){
             // delete plant in service
-            this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
-            this.currentInventoryResultsPlants=this.displayableCrops
-            this.cropDetailsVisible=!this.cropDetailsVisible
+            new CropServices().deleteCropById(this.token,this.currentCrop.cropId).then(res=>{
+                this.displayableCrops = this.currentInventoryResultsPlants.filter(crop => crop.id !== this.currentCrop.id);
+                this.currentInventoryResultsPlants=this.displayableCrops
+                this.cropDetailsVisible=!this.cropDetailsVisible
+            })
+
         },
         getAllPlants(){
             new PlantServices().getAllPlants().then(response=>{
@@ -279,6 +289,16 @@ export default {
             })
         },
         showCropDetails(crop) {
+            new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(res=>{
+                let projects=res.data
+                for (let i = 0; i < projects.length; i++) {
+                    if(projects[i].cropId===crop.cropId){
+                        this.deleteCropButtonDisable=true
+                    }else{
+                        this.deleteCropButtonDisable=false
+                    }
+                }
+            })
             this.cropDetailsVisible=!this.cropDetailsVisible
             this.currentCrop= crop;
         },
@@ -299,12 +319,14 @@ export default {
         },
         addPlantToCrop(){
             //add plant in service
-            let newPlantForInventory=this.currentPlantInSearch
-            newPlantForInventory.id=this.displayableCrops.length+1//solucion temporal
-            this.displayableCrops.push(newPlantForInventory)
-            this.visible=!this.visible
-            this.showDetailsForSearch=false
-            this.getAllPlants()
+            new CropServices().addCrop(this.token,parseInt(sessionStorage.getItem("id").toString()),parseInt(this.currentPlantInSearch.id)).then(response=>{
+                new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
+                    this.getDisplayableCrops(response.data)
+                })
+                this.visible=!this.visible
+                this.showDetailsForSearch=false
+            })
+
         },
         isPlantRepeated() {
             if(this.displayableCrops.some(plant => plant.name === this.currentPlantInSearch.name)){
@@ -332,10 +354,11 @@ export default {
 .background {
     background-color: #242424;
     color: white; /* Cambiar el color del texto si es necesario */
-    margin: 15px 20px 15px 20px; /* Agregar el relleno deseado */
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
     border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
-    padding-bottom: 3rem;
 }
 .addplantbackground {
     color: white; /* Cambiar el color del texto si es necesario */

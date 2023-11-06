@@ -41,18 +41,17 @@
                     </pv-column>
                     <pv-column field="totalActivities" header="Activities" style="min-width: 7rem">
                         <template #body="{ data }">
-                            <pv-button severity="secondary" rounded size="small" @click="openActivities(data.id)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
+                            <pv-button severity="secondary" rounded size="small" @click="openActivities(data)">{{ data.activitiesDone }}/{{ data.totalActivities }}</pv-button>
                         </template>
                     </pv-column>
-                    <pv-column field="isProjectStarted" header="Status" style="min-width: 1rem">
+                    <pv-column field="projectStarted" header="Status" style="min-width: 1rem">
                         <template #body="{ data }">
-                            <pv-tag :value="getStatusProject(data.isProjectStarted)" :severity="getSeverity(data.isProjectStarted)" />
+                            <pv-tag :value="getStatusProject(data.projectStarted)" :severity="getSeverity(data.projectStarted)" />
                         </template>
                     </pv-column >
                     <pv-column  header="" style="min-width: 1rem">
                         <template #body="{ data }">
-                            <pv-button v-if="data.isProjectStarted" label="Details" severity="success" @click="showProjectDetail(data)"  />
-                            <pv-button v-if="!data.isProjectStarted" label="Start" severity="success"   />
+                            <pv-button label="Details" severity="success" @click="showProjectDetail(data)"  />
                         </template>
                     </pv-column >
                 </pv-dataTable>
@@ -94,7 +93,7 @@
                         <h1>{{currentProjectDetail.name}}</h1>
                         <h4>{{currentProjectDetail.description}}</h4>
                         <h5>Farmer: {{currentProjectDetail.farmerName}}</h5>
-                        <h5>Status: {{getStatusProject(currentProjectDetail.isProjectStarted)}}</h5>
+                        <h5>Status: {{getStatusProject(currentProjectDetail.projectStarted)}}</h5>
                         <h5>Crop: {{currentCropForProject.name}}</h5>
                         <h5>Duration: {{currentProjectDetail.durationDays}} days</h5>
                         <h5>Activities: {{ currentProjectDetail.activitiesDone }} of {{ currentProjectDetail.totalActivities }} done</h5>
@@ -119,7 +118,8 @@
                                 <h2 style="margin: 0 2rem 2rem 0">SELECT A CROP</h2>
                             </div>
                             <div style="display:flex; justify-content: center">
-                                <pv-dropdown style="width: 90%" :disabled="selectedContact===null" v-model="selectedCrop" @change="this.isNextButtonDisable=false" editable :options="currentCropsForFarmer"
+                                <pv-dropdown style="width: 90%" :disabled="selectedContact===null" v-model="selectedCrop"
+                                             @change="this.isNextButtonDisable=false" editable :options="currentCropsForFarmer"
                                              optionLabel="name" placeholder="Select a crop" />
                             </div>
                         </div>
@@ -215,7 +215,6 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
-import {SpecialistServices} from "@/services/specialists-service";
 import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
@@ -225,6 +224,7 @@ export default {
     name: "farmer_projects",
     data(){
         return{
+            token: sessionStorage.getItem("jwt"),
             selectionStep:true,
             informationStep:false,
             dateStep:false,
@@ -240,7 +240,7 @@ export default {
                 name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 description: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
                 weeks: { value: null, matchMode: FilterMatchMode.IN },
-                isProjectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
+                projectStarted: { value: null, matchMode: FilterMatchMode.EQUALS },
                 verified: { value: null, matchMode: FilterMatchMode.EQUALS }
             },
             activitiesDialogVisible:false,
@@ -269,6 +269,7 @@ export default {
         new ProjectService().getProjectsBySpecialistId(sessionStorage.getItem("id")).then(response=>{
             this.projects=response.data
             console.log(this.projects)
+
             this.setFarmerDataToProject()
             this.setDurationDayToProject()
             this.setActivitysForProject()
@@ -277,7 +278,7 @@ export default {
     methods:{
         setActivitysForProject(){
             for (let i = 0; i < this.projects.length; i++) {
-                new ActivitiesService().getActivitiesByProjectId(this.projects[i].id).then(response=>{
+                new ActivitiesService().getActivitiesByProjectId(this.token,this.projects[i].id).then(response=>{
                     let activities=response.data
                     let activitiesDone=0
                     for (let i = 0; i < activities.length; i++) {
@@ -345,47 +346,65 @@ export default {
             newProject.id=this.projects.length+1//solucion temporal
             newProject.name=this.projectName
             newProject.description=this.projectDescription
-            newProject.farmerId=this.selectedContact.id
+            newProject.farmerId=this.selectedContact.accountId
             newProject.farmerName=this.selectedContact.name
             newProject.farmerImageUrl=this.selectedContact.imageUrl
-            newProject.cropId=this.selectedCrop.id
+            newProject.cropId=this.selectedCrop.cropId
             newProject.startDate=this.formatPeruvianDate(this.startProjectDate)
             newProject.endDate=this.formatPeruvianDate(this.finishProjectDate)
             newProject.specialistId=parseInt(sessionStorage.getItem("id").toString())
             newProject.durationDays=this.calculateDurationDay(this.formatPeruvianDate(this.startProjectDate),this.formatPeruvianDate(this.finishProjectDate))
             newProject.totalActivities=this.taskForProject.length
             newProject.activitiesDone=0
-            newProject.isProjectStarted=this.isProjectStarted()
-            //add project by service
+            newProject.projectStarted=this.isProjectStarted()
+            new ProjectService().createProject(newProject).then(res=>{
+                new ProjectService().getProjectsBySpecialistId(newProject.specialistId).then(response=>{
+                  for (let i = 0; i < response.data.length; i++){
+                      if(newProject.name===response.data[i].name){
+                          newProject.id=response.data[i].id
+                          this.projects.push(newProject)
+                          //add task as activities
+                          this.createStorableTaskForProject()
+                          this.createProjectVisible=false
+                          this.taskStep=false
+                          this.selectionStep=true
+                          this.cleanProjectData()
+                      }
+                  }
+                })
 
-            console.log(newProject)
-            this.projects.push(newProject)
-
-            //add task as activities
-            this.createStorableTaskForProject(newProject)
-
-            this.createProjectVisible=false
-            this.taskStep=false
-            this.selectionStep=true
-            this.cleanProjectData()
+            })
         },
-        createStorableTaskForProject(project){
-            let storableTasks=[]
+        createStorableTaskForProject(){
+            console.log("projects")
+            console.log(this.projects)
+            console.log("projectId")
+            console.log(this.projects[this.projects.length-1].id)
+            let tempStorableTaskList=[]
+            console.log("taskForProject")
+            console.log(this.taskForProject)
             for (let i = 0; i < this.taskForProject.length; i++) {
                 let tempStorableTask={}
                 tempStorableTask.id=i+1
-                tempStorableTask.projectId=this.projects.length//project.id
+                tempStorableTask.projectId=this.projects[this.projects.length-1].id//project.id
                 tempStorableTask.title=this.taskForProject[i].name
                 tempStorableTask.description=this.taskForProject[i].description
                 tempStorableTask.date=this.formatPeruvianDate(this.taskForProject[i].date)
                 tempStorableTask.completed=false
-                storableTasks.push(tempStorableTask)
+                tempStorableTaskList.push(tempStorableTask)
             }
-            console.log(storableTasks)
-            this.uploadTaskAsActivities(storableTasks)
+            this.uploadTaskAsActivities(tempStorableTaskList)
         },
-        uploadTaskAsActivities(storableTasks){
-            // use activities service for
+        uploadTaskAsActivities(tempStorableTaskList){
+            console.log("uploadTaskAsActivities")
+            console.log(tempStorableTaskList)
+            for (let i = 0; i < tempStorableTaskList.length; i++) {
+                console.log(tempStorableTaskList[i])
+                new ActivitiesService().addActivity(tempStorableTaskList[i]).then(res=>{
+                    console.log("subi task")
+                })
+            }
+
         },
         isProjectStarted() {
             // Obtiene la fecha actual
@@ -411,16 +430,16 @@ export default {
                 this.dateStep = true
             }
             if(this.selectionStep){
-                if(this.selectedContact)
                 if(this.stepContactSelected){
                     if(this.projectName !== ""&&this.projectDescription!== ""){
                         this.isNextButtonDisable=false
                     }
                     this.selectionStep=false
                     this.informationStep=true
-                }else{
+                }
+                else{
                     if(this.selectedContact!==null){
-                        this.isNextButtonDisable=false
+                        this.isNextButtonDisable=true
                     }
                     this.stepContactSelected=true
 
@@ -479,6 +498,8 @@ export default {
             newTask.description=this.taskDescription
             newTask.date=this.activityProjectDate
             if(this.isTaskUnique(newTask)){
+                console.log("newTask  added")
+                console.log(this.taskForProject)
                 this.taskForProject.push(newTask)
             }else {
                 console.log("tarea repetida")
@@ -509,12 +530,37 @@ export default {
         getCropForProject(){
             this.currentCropsForFarmer=[]
             this.isNextButtonDisable=false
-            new CropServices().getCropsByFarmerId(this.selectedContact.id).then(response=>{
+
+            new CropServices().getCropsByFarmerId(this.token,this.selectedContact.accountId).then(response=>{
                 let cropsForFarmer=response.data
                 for (let i = 0; i < cropsForFarmer.length; i++) {
-                    new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
-                        this.currentCropsForFarmer.push(res.data)
+                    new ProjectService().getProjectByFarmerId(this.selectedContact.accountId).then(res=>{
+                        let projects=res.data
+                        if(projects.length>0){
+                            for (let j = 0; j < projects.length; j++) {
+                                console.log("a")
+                                if(projects[j].cropId!==cropsForFarmer[i].id){
+                                    let storableCropAndPlantInfo={}
+                                    new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                        storableCropAndPlantInfo=res.data
+                                        storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                        this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                        console.log(this.currentCropsForFarmer)
+                                    })
+                                }
+                            }
+                        }else {
+                            let storableCropAndPlantInfo={}
+                            new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                storableCropAndPlantInfo=res.data
+                                storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                console.log(this.currentCropsForFarmer)
+                            })
+                        }
+
                     })
+
                 }
             })
         },
@@ -550,7 +596,6 @@ export default {
                 }
                 this.createProjectVisible=!this.createProjectVisible
             })
-
         },
         getSeverity(status) {
             switch (status) {
@@ -571,7 +616,6 @@ export default {
 
         },
         showProjectDetail(project){
-            this.getSpecialistInfo(project.specialistId)
             this.getCropInfo(project.cropId)
             this.currentProjectDetail=project
             this.projectDetailsDialogVisible=!this.projectDetailsDialogVisible
@@ -585,19 +629,15 @@ export default {
                     return 'Pending';
             }
         },
-        openActivities(id){
+        openActivities(project){
+            console.log(project)
             this.activitiesDialogVisible=!this.activitiesDialogVisible
-            new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
+            new ActivitiesService().getActivitiesByProjectId(this.token,project.id).then(response=>{
                 this.currentActivities=response.data
             })
         },
-        getSpecialistInfo(id){
-            new UserServices().getUserById(id).then(res=>{
-                this.currentSpecialistForProject=res.data
-            })
-        },
         getCropInfo(cropId){
-            new CropServices().getCropInfoById(cropId).then(response=>{
+            new CropServices().getCropInfoById(this.token,cropId).then(response=>{
                 new PlantServices().getPlantInfoById(response.data.plantId).then(resp=>{
                     this.currentCropForProject=resp.data
                 })

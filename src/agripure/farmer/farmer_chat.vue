@@ -13,8 +13,8 @@
             </div>
         </div>
         <div style="margin: 0 2rem 0 2rem" >
-            <p v-if="currentContacts !== displayableContacts" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
-            <div v-for="contact in currentContacts"
+            <p v-if="currentContacts.length !== displayableContacts.length" @click="reset()" style="text-decoration: underline; cursor: pointer;margin: 1.5rem 0">Reset search</p>
+            <div v-if="currentContacts.length" v-for="contact in currentContacts"
                  :key="contact.id">
                 <div class="chat-card" @click="irAChat(contact.contactId)">
                     <div class="profile-image">
@@ -29,6 +29,9 @@
                     </div>
                 </div>
             </div>
+            <div v-else>
+                <h3>You have no chats at the moment</h3>
+            </div>
         </div>
 
     </div>
@@ -40,11 +43,13 @@ import {ref} from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
 import {ChatServices} from "@/services/chat-service";
+import {useRoute} from "vue-router";
 
 export default {
     name: "farmer_chat",
     data(){
         return{
+            route: null,
             token: sessionStorage.getItem("jwt"),
             value : ref(""),
             items : ref([]),
@@ -54,12 +59,19 @@ export default {
         }
     },
     created() {
-        new ContactServices().getContactsForFarmer(sessionStorage.getItem("id")).then(response=>{
+        this.route = useRoute(); // Obtener la ruta actual
+        new ContactServices().getContactsForFarmer(this.token,parseInt(sessionStorage.getItem("id").toString())).then(response=>{
             this.getDisplayableContacts(response.data)
         })
         setInterval(() => {
-            // Realiza una solicitud GET al servidor para verificar nuevos mensajes
-            console.log("ImplementarWebSocket")
+            if (this.route) {
+                const path = this.route.path;
+                if(path==="/farmer/chat"){
+                    // Realiza una solicitud GET al servidor para verificar nuevos mensajes
+                    console.log("ImplementarWebSocket")
+                }
+            }
+
         }, 5000);
     },
     methods:{

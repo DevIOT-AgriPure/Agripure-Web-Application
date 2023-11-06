@@ -17,10 +17,11 @@
                 </div>
             </div>
             <div class="inventory" style="margin-bottom: 20px;">
-                <h2 style="margin: 2rem 0 2rem 0">Contacts:</h2>
-                <p v-if="currentContactResultsFarmers !== displayableContacts" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
+                <h2 v-if="currentContactResultsFarmers.length>=1" style="margin: 2rem 0 2rem 0">Contacts:</h2>
+                <h2 v-else="currentContactResultsFarmers.length>=1" style="margin: 2rem 0 2rem 0">You have no contacts</h2>
+                <p v-if="currentContactResultsFarmers.length !== displayableContacts.length" @click="resetContacts()" style="text-decoration: underline; cursor: pointer;margin-top: 1.5rem">Reset search</p>
                 <div class="cards">
-                    <div v-for="contact in currentContactResultsFarmers" :key="contact.id">
+                    <div v-if="currentContactResultsFarmers.length>=1" v-for="contact in currentContactResultsFarmers" :key="contact.id">
                         <pv-card style="width: 17em; border-radius: 15px;">
                             <template #header>
                                 <img
@@ -71,7 +72,7 @@
                             </div>
                         </div>
                         <div style="display: flex;justify-content: space-evenly;  margin-top: 1.5rem;">
-                            <pv-button  class="red-button" @click="deleteFarmer()">Delete contact</pv-button>
+                            <pv-button :disabled="deleteContactDisableButton" class="red-button" @click="deleteFarmer()">Delete contact</pv-button>
                             <pv-button class="green-button" @click="contactFarmer()">Open Chat</pv-button>
                         </div>
                     </div>
@@ -86,7 +87,7 @@
 import { ref } from "vue";
 import {ContactServices} from "../../services/contacts-service"
 import {UserServices} from "../../services/user-service"
-import {SpecialistServices} from "@/services/specialists-service";
+import {ProjectService} from "@/services/project-service";
 
 export default {
     name: "Specialist_farmers",
@@ -103,6 +104,7 @@ export default {
             showDetailsForSearch:false,
             currentSpecialistInSearch:{},
             currentContactResultsFarmers:[],
+            deleteContactDisableButton:false,
         };
     },
     created() {
@@ -113,9 +115,12 @@ export default {
     methods: {
         deleteFarmer(){
             // add delete specialist service
-            this.displayableContacts = this.currentContactResultsFarmers.filter(specialist => specialist.id !== this.currentContact.id);
-            this.currentContactResultsFarmers=this.displayableContacts
-            this.contactDetailsVisible=false
+            new ContactServices().deleteContactById(this.currentContact.contactId).then(res=>{
+                this.displayableContacts = this.currentContactResultsFarmers.filter(specialist => specialist.id !== this.currentContact.id);
+                this.currentContactResultsFarmers=this.displayableContacts
+                this.contactDetailsVisible=false
+            })
+
         },
         resetContacts(){
             this.currentContactResultsFarmers=this.displayableContacts
@@ -152,18 +157,19 @@ export default {
                 this.currentContactResultsFarmers=this.displayableContacts
             }
         },
-        loadContactDetails(id) {
-            new SpecialistServices().getSpecialistInformationByUserId(id).then(response=>{
-                this.currentContact.expertise=response.data[0].expertise
-                this.currentContact.contactEmail = response.data[0].contactEmail
-                this.currentContact.areasOfFocus= response.data[0].areasOfFocus
-                this.currentContact.specialistId=response.data[0].id
-            })
-        },
         showFarmerDetails(contact) {
-            this.loadContactDetails(contact.id)
-            this.contactDetailsVisible=!this.contactDetailsVisible
             this.currentContact= contact;
+            new ProjectService().getProjectByFarmerId(this.currentContact.accountId).then(res=>{
+                let project=res.data
+                console.log(project)
+                if(project.length>0){
+                    this.deleteContactDisableButton=true
+                }else {
+                    this.deleteContactDisableButton=false
+                }
+            })
+            this.contactDetailsVisible=!this.contactDetailsVisible
+
         },
         contactFarmer() {
             this.$router.push("/specialist/chat/" + this.currentContact.contactId)
@@ -178,6 +184,7 @@ export default {
     margin-top: 20px;
     margin-left: 20px;
     margin-bottom: 20px;
+    border-radius: 15px; /* Agregar bordes redondeados */
     width: 100%;
 }
 

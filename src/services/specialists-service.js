@@ -1,14 +1,11 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"https://my-json-server.typicode.com/DevIOT-AgriPure/agripure-json/Specialist/",
+    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/profiles/",
     headers: { "Content-type": "application/json" },
 })
 export class SpecialistServices{
     getSpecialistInformationByUserId(id){
-        return http.get("?userId="+id);
-    }
-    getSpecialistInformationById(id){
-        return http.get(""+id);
+        return http.get("getSpecialistInfoByAccountId/"+id);
     }
 
 }

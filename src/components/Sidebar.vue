@@ -52,9 +52,8 @@
                     <pv-avatar
                         :image="imageUrl"
                         class="footer-img" shape="circle" />
-                    <div class="footer-text">
+                    <div class="footer-text" style="display: flex;align-items: center">
                         <p class="text" style="color: white;font-weight: bold">{{ userName }}</p>
-                        <p class="text" style="color: #939393;">{{ userEmail }}</p>
                     </div>
                 </div>
             </router-link>
@@ -63,9 +62,8 @@
                     <pv-avatar
                             :image="imageUrl"
                             class="footer-img" shape="circle" />
-                    <div class="footer-text">
+                    <div class="footer-text" style="display: flex;align-items: center">
                         <p class="text" style="color: white;font-weight: bold">{{ userName }}</p>
-                        <p class="text" style="color: #939393;">{{ userEmail }}</p>
                     </div>
                 </div>
             </router-link>

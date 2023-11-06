@@ -2,7 +2,7 @@
   <div class="background">
     <div style="margin: 2rem 2rem 2rem 2rem" >
       <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
-      <div v-for="notification in notifications"
+      <div v-if="notification" v-for="notification in notifications"
            :key="notification.id">
         <div class="chat-card">
           <div class="profile-image" @click="redirectTo(notification.notificationType)">
@@ -24,6 +24,9 @@
           </div>
         </div>
       </div>
+        <div v-else>
+            <h3>You have no notifications at the moment</h3>
+        </div>
     </div>
   </div>
 </template>
@@ -32,23 +35,41 @@
 <script>
 import {FilterMatchMode} from "primevue/api";
 import {NotificationService} from "@/services/notification-service";
+import {useRoute} from "vue-router";
 
 export default {
   name: "farmer_devices",
   data(){
     return {
+        route: null,
       userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
       notifications:[],
     };
   },
   created(){
+      this.route = useRoute(); // Obtener la ruta actual
     new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
       this.notifications=response.data
         const fecha = new Date(); // Obtiene la fecha y hora actual
         this.getFormatDay(fecha)
 
     })
+      setInterval(() => {
+          if (this.route) {
+              const path = this.route.path;
+              if(path==="/farmer/notifications"){
+                  new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
+                      this.notifications=response.data
+                      const fecha = new Date(); // Obtiene la fecha y hora actual
+                      this.getFormatDay(fecha)
+
+                  })
+                  console.log("ImplementarWebSocket")
+              }
+          }
+
+      }, 5000);
 
   },
   methods:{

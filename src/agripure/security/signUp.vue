@@ -21,7 +21,6 @@
                 </div>
               </template>
             </pv-card>
-
             <pv-card
                 class="type-card"
                 :class="{ selected: selectedUserType === 'specialist' }"
@@ -52,7 +51,6 @@
               <p style="margin-left:2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Types')" >
                 Go back
               </p>
-              <h4 style="margin-left: 2rem;margin-top: 1rem;margin-bottom: 2rem">Step 1 of 3</h4>
             </div>
             <div class="phrase" style="margin-bottom: 3rem; display: flex; justify-content: center; text-align: center">
               <h1>Select your plan in Agripure</h1>
@@ -72,12 +70,12 @@
                           <div class="visible">
                             <template v-if="plan.name==='Premium'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">Allows you to have projects and devices</p>
+                                <p style="margin-top: 15px">{{ plan.description }}</p>
                               </div>
                             </template>
                             <template v-if="plan.name==='Free'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">Allows you to manage unlimited crops</p>
+                                <p style="margin-top: 15px">{{ plan.description }}</p>
                               </div>
                             </template>
                           </div>
@@ -89,8 +87,8 @@
                               <p style="margin: 0;padding: 0 0 0.45rem 0.1rem ;align-items: end ;display: table-cell;vertical-align: bottom; color: darkgrey" v-if="plan.name==='Free'">‎ </p>
                             </div>
                           </div>
-                          <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected('Free')">Elegir</pv-button>
-                          <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected('Premium')">Elegir</pv-button>
+                          <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Elegir</pv-button>
+                          <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected(2)">Elegir</pv-button>
                         </div>
                       </template>
                     </pv-card >
@@ -111,7 +109,6 @@
                 Go back
               </p>
               <div class="steps" >
-                <h4 style="margin: 0 0 0 2rem">Step 2 of 3</h4>
               </div>
               <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                 <h1>Create an account</h1>
@@ -128,14 +125,18 @@
                     <div class="password" style="display: flex; justify-content: center; margin: 1rem 0">
                       <pv-input id="password" type="password" class="form-input" @input="actualizarEstadoBoton()" placeholder="Password" style="border-radius: 1rem" v-model="user.password"></pv-input>
                     </div>
+                      <div class="Description" style="display: flex; justify-content: center; margin: 1rem 0">
+                          <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 1rem" maxlength="600" v-model="user.description"></pv-textArea>
+                      </div>
                   </div>
                   <div class="footer">
-                    <div class="form-Text" style="margin: 3rem 0">
+                    <div v-if="selectedUserType==='farmer'" class="form-Text" style="margin: 3rem 0">
                       By creating my account I accept the terms of service and policy of
                       <br>Agripure
                     </div>
                     <div class="buttons" >
-                      <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Create account</pv-button >
+                        <pv-button v-if="selectedUserType==='farmer'" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Create account</pv-button >
+                      <pv-button v-if="selectedUserType==='specialist'" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Next</pv-button >
                     </div>
                   </div>
                 </div>
@@ -145,6 +146,48 @@
         </pv-card>
       </div>
     </div>
+      <div v-if="currentPath==='SpecialistForm'">
+          <div class="card" style="height: 98vh ">
+              <pv-card style=" border-radius: 1rem;justify-content: center;">
+                  <template #content>
+                      <div class="content" style="width: 50vw">
+                          <p style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Form')"  >
+                              Go back
+                          </p>
+                          <div class="steps" >
+                          </div>
+                          <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                              <h1>Add your information</h1>
+                          </div>
+                          <div class="card" style="justify-content: center;">
+                              <div class="register" style="width: 30vw">
+                                  <div class="form" >
+                                      <div class="ContactEmail" style="display: flex; justify-content: center; margin: 1rem 0">
+                                          <pv-input id="contactEmail" class="form-input" @input="actualizarEstadoBotonSpecialistForm()" placeholder="Contact Email" style="border-radius: 1rem" maxlength="256" v-model="user.contactEmail"></pv-input>
+                                      </div>
+                                      <div class="Expertise" style="display: flex; justify-content: center; margin: 1rem 0">
+                                          <pv-textArea id="expertise" class="form-input" @input="actualizarEstadoBotonSpecialistForm()" placeholder="Expertise" style="border-radius: 1rem" maxlength="600" v-model="user.expertise"></pv-textArea>
+                                      </div>
+                                      <div class="AreaOfFocus" style="display: flex; justify-content: center; margin: 1rem 0">
+                                          <pv-textArea id="areaOfFocus" class="form-input" @input="actualizarEstadoBotonSpecialistForm()" placeholder="Area Of Focus" style="border-radius: 1rem" maxlength="600" v-model="user.areasOfFocus"></pv-textArea>
+                                      </div>
+                                  </div>
+                                  <div class="footer">
+                                      <div class="form-Text" style="margin: 3rem 0">
+                                          By creating my account I accept the terms of service and policy of
+                                          <br>Agripure
+                                      </div>
+                                      <div class="buttons" >
+                                          <pv-button :disabled="!esSpecialistFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Create account</pv-button >
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </template>
+              </pv-card>
+          </div>
+      </div>
     <div v-if="currentPath==='Payment'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
@@ -154,7 +197,6 @@
                 Go back
               </p>
               <div class="steps" >
-                <h4 style="margin: 0 0 0 2rem">Step 3 of 3</h4>
               </div>
               <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                 <h1>Payment method</h1>
@@ -166,7 +208,7 @@
               </div>
               <div class="footer">
                 <div class="buttons" >
-                  <router-link to="/sign-in" class="rw" ><pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Iniciar subscripcion</pv-button ></router-link>
+                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Iniciar subscripcion</pv-button >
                 </div>
               </div>
             </div>
@@ -178,6 +220,9 @@
 
 </template>
 <script>
+import {UserServices} from "@/services/user-service";
+import {PlansServices} from "@/services/plans-service";
+
 export default {
     name: "sign-up-plans",
     components: {},
@@ -194,8 +239,13 @@ export default {
             name:null,
             email:null,
             password:null,
+              description: null,
+              contactEmail:null,
+              areasOfFocus:null,
+              expertise:null,
           },
           esFormularioCompleto: false,
+            esSpecialistFormularioCompleto:false,
           isUserTypeSelected:false,
           selectedUserType: null,
           userPlanSelected:"none",
@@ -203,29 +253,41 @@ export default {
     },
     created()
     {   this.currentPath="Types"
-        var planFree={} ;
-        var planPremium={} ;
-      planFree.id=1
-      planFree.name="Free"
-      planFree.price=20
-        planPremium.id=2
-        planPremium.name="Premium"
-        planPremium.price=20
-        this.plans.push(planFree)
-        this.plans.push(planPremium)
+        new PlansServices().getPlans().then(res=>{
+            this.plans=res.data
+        })
 
     },
     methods:{
       register(){
-        let newUser={}
-        newUser.name=this.user.name
-        newUser.email=this.user.email
-        newUser.password=this.user.password
-        newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
-        newUser.location="Lima, Peru"
-        newUser.type=this.selectedUserType
-        newUser.plan=this.userPlanSelected
-        console.log(newUser)
+          let newUser={}
+          newUser.name=this.user.name
+          newUser.email=this.user.email
+          newUser.password=this.user.password
+          newUser.description=this.user.description
+          newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
+          newUser.location="Lima, Peru"
+          newUser.type=this.selectedUserType.toUpperCase()
+          newUser.plan=parseInt(this.userPlanSelected)
+          if(this.selectedUserType==="specialist"){
+              newUser.contactEmail=this.user.contactEmail
+              newUser.areasOfFocus=this.user.areasOfFocus
+              newUser.expertise=this.user.expertise
+          }
+          if(this.selectedUserType==="farmer"){
+              new UserServices().registerFarmer(newUser).then(response=>{
+                  this.$router.push("/sign-in")
+              }).catch(error=>{
+                  this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+              })
+          }else {
+              new UserServices().registerSpecialist(newUser).then(response=>{
+                  this.$router.push("/sign-in")
+              }).catch(error=>{
+                  this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+              })
+          }
+
       },
       nextPath(){
         if(this.selectedUserType==="farmer"){
@@ -244,19 +306,32 @@ export default {
         if(path==="sign-in"){
           this.$router.push("/sign-in")
         }
-        this.currentPath=path
+        console.log(this.selectedUserType)
+          console.log(path)
+        if(this.selectedUserType==="specialist"&&path==="Plans"){
+            this.currentPath="Types"
+        }else {
+            this.currentPath=path
+        }
       },
+        actualizarEstadoBotonSpecialistForm(){
+            this.esSpecialistFormularioCompleto = (this.user.areasOfFocus.length>0 && this.user.contactEmail.length >0 && this.user.expertise.length >0);
+        },
       actualizarEstadoBoton() {
-        this.esFormularioCompleto = (this.user.name.length>0 && this.user.email.length >0 && this.user.password.length >0);
+        this.esFormularioCompleto = (this.user.name.length>0 && this.user.email.length >0 && this.user.password.length >0 && this.user.description.length >0);
       },
       addTemporaryUser(){
-        this.currentPath="Payment"
-        /*if (this.user.email.includes('@') && this.user.email.toString().includes('.')) {
-          localStorage.setItem("user",JSON.stringify(this.user))
-          this.$router.push("/sign-up-payment")
-        } else {
-          this.$toast.add({severity:'info', summary: 'Email invalido', detail:'Se debe ingresar un correo valido', life: 3000});
-        }*/
+          if(this.currentPath==="SpecialistForm"){
+              console.log("go crazy")
+              this.currentPath="Payment"
+          }
+          else {
+              if(this.selectedUserType==="specialist"){
+                  this.currentPath="SpecialistForm"
+              }else {
+                  this.currentPath="Payment"
+              }
+          }
 
       },
       validarNombre(evento) {
@@ -277,6 +352,8 @@ export default {
         },
         addTemporaryPlan(plan){
             this.userPlanSelected=plan
+            console.log(this.userPlanSelected)
+
         }
     }
 }

@@ -1,16 +1,27 @@
 import axios from "axios";
 import {PlantServices} from "@/services/plant-service";
 const http = axios.create({
-    baseURL:"https://my-json-server.typicode.com/DevIOT-AgriPure/agripure-json/farmerCrop/",
+    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/",
     headers: { "Content-type": "application/json" },
 })
 export class CropServices{
-    getCropsByFarmerId(id){        
-        return http.get("?farmerId="+id);
+    addCrop(token,farmerId,plantId){
+        return http.post("crops",{
+            "farmerId": farmerId,
+            "plantId": plantId
+        },{ headers: {"Authorization" : `Bearer ${token}`} })
+    }
+    getCropsByFarmerId(token,id){
+        return http.get("crops/"+id,{ headers: {"Authorization" : `Bearer ${token}`} });
         
     }
-    getCropInfoById(id){
-        return http.get(""+id);
+    getCropInfoById(token,id){
+        return http.get("crops/getCrop/"+id,);
+
+    }
+    deleteCropById(token,id){
+        console.log(id)
+        return http.delete("crops/deleteCrop/"+id);
 
     }
  
