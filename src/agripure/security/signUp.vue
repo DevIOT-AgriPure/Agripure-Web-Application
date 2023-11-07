@@ -129,10 +129,12 @@
                           <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 1rem" maxlength="600" v-model="user.description"></pv-textArea>
                       </div>
                       <div>
-                          <form enctype="multipart/form-data">
-                              <input type="file" accept="image/">
-                              <input type="submit" value="Subir imagen">
-                          </form>
+                        <form @submit.prevent="registerUser">
+                          <label for="profilePicture">Imagen de perfil:</label>
+                          <input type="file" id="profilePicture" @change="handleFileUpload" accept="image/*" required>
+
+                          <button type="submit">Registrarse</button>
+                        </form>
                       </div>
                   </div>
                   <div class="footer">
@@ -228,6 +230,8 @@
 <script>
 import {UserServices} from "@/services/user-service";
 import {PlansServices} from "@/services/plans-service";
+import { ref, getDownloadURL, uploadBytes } from 'firebase/storage'
+import { storage } from '../firebaseConfig' // Importa la configuración de Firebase Storage
 
 export default {
     name: "sign-up-plans",
@@ -236,6 +240,8 @@ export default {
         return{
             images:[],
             profileImage:null,
+          profilePictureFile: null,
+          profilePictureURL: null,
             value1: 'Nuestros Planes',
             options: ['Nuestros Planes', 'Plan personalizado'],
             defaultPlan: true,
@@ -267,6 +273,25 @@ export default {
 
     },
     methods:{
+      async handleFileUpload(event) {
+        this.profilePictureFile = event.target.files[0]
+      },
+      async registerUser() {
+        // Subir la imagen de perfil a Firebase Storage
+        if (this.profilePictureFile) {
+          const storageRef = ref(storage, 'profile_pictures/' + this.profilePictureFile.name);
+
+          // Luego, puedes continuar con la carga de la imagen y la obtención de la URL de descarga
+          await uploadBytes(storageRef, this.profilePictureFile);
+          this.profilePictureURL = await getDownloadURL(storageRef);
+        }
+
+        // El valor de this.profilePictureURL ahora contiene la URL de descarga de la imagen
+        console.log('URL de la imagen de perfil:', this.profilePictureURL)
+
+        // Luego, puedes registrar al usuario en tu sistema de autenticación (Firebase Authentication) y almacenar el this.profilePictureURL como una cadena junto con otros datos del usuario.
+        // Implementa tu lógica de registro aquí.
+      },
       register(){
           let newUser={}
           newUser.name=this.user.name
