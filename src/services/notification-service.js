@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/notifications",
+    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/api/v1/notifications",
     headers: { "Content-type": "application/json" },
 })
 export class NotificationService{

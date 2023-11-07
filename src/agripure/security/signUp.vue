@@ -128,6 +128,12 @@
                       <div class="Description" style="display: flex; justify-content: center; margin: 1rem 0">
                           <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 1rem" maxlength="600" v-model="user.description"></pv-textArea>
                       </div>
+                      <div>
+                          <form enctype="multipart/form-data">
+                              <input type="file" accept="image/">
+                              <input type="submit" value="Subir imagen">
+                          </form>
+                      </div>
                   </div>
                   <div class="footer">
                     <div v-if="selectedUserType==='farmer'" class="form-Text" style="margin: 3rem 0">
@@ -228,6 +234,8 @@ export default {
     components: {},
     data(){
         return{
+            images:[],
+            profileImage:null,
             value1: 'Nuestros Planes',
             options: ['Nuestros Planes', 'Plan personalizado'],
             defaultPlan: true,

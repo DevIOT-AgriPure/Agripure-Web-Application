@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/contacts",
+    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/api/v1/contacts",
     headers: { "Content-type": "application/json" },
 })
 export class ContactServices{
