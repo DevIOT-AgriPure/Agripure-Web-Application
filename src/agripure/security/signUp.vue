@@ -133,7 +133,7 @@
                           <label for="profilePicture">Imagen de perfil:</label>
                           <input type="file" id="profilePicture" @change="handleFileUpload" accept="image/*" required>
 
-                          <button type="submit">Registrarse</button>
+                          <button type="submit">Subir imagen</button>
                         </form>
                       </div>
                   </div>
@@ -231,7 +231,7 @@
 import {UserServices} from "@/services/user-service";
 import {PlansServices} from "@/services/plans-service";
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage'
-import { storage } from '../firebaseConfig' // Importa la configuración de Firebase Storage
+import { storage } from '../../firebaseConfig' // Importa la configuración de Firebase Storage
 
 export default {
     name: "sign-up-plans",

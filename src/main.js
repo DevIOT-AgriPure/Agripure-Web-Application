@@ -3,18 +3,7 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue'
 import App from './App.vue'
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyBPfL4bzcymVX-2Sj1puDBEZAMg3h2wiI0",
-    authDomain: "agripure-678b4.firebaseapp.com",
-    projectId: "agripure-678b4",
-    storageBucket: "agripure-678b4.appspot.com",
-    messagingSenderId: "231712564171",
-    appId: "1:231712564171:web:b0507723031a58eedb8c4e",
-    measurementId: "G-CCCV7VB3E0"
-};
 
 //PrimeVue Styles
 import "primevue/resources/themes/arya-green/theme.css"       //theme
@@ -50,7 +39,7 @@ import Toast from 'primevue/toast';
 
 
 const vueApp  = createApp(App)
-vueApp.mount('#app')
+
 vueApp.use(PrimeVue);
 vueApp.use(router)
 vueApp.use(ToastService);
@@ -78,5 +67,3 @@ vueApp.component("pv-toast",Toast)
 
 
 vueApp.mount('#app')
-const firebaseApp = initializeApp(firebaseConfig)
-const analytics = getAnalytics(firebaseApp)
