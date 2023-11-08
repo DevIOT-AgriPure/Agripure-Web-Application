@@ -129,12 +129,13 @@
                           <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 1rem" maxlength="600" v-model="user.description"></pv-textArea>
                       </div>
                       <div>
-                        <form @submit.prevent="registerUser">
+                          <form @submit.prevent="UploadFile">
                           <label for="profilePicture">Imagen de perfil:</label>
                           <input type="file" id="profilePicture" @change="handleFileUpload" accept="image/*" required>
-
                           <button type="submit">Subir imagen</button>
                         </form>
+                          <img :src="this.profilePictureURL" alt="" style="height: 200px;width: 200px">
+                          <pv-button @click="deleteImage">Delete image</pv-button>
                       </div>
                   </div>
                   <div class="footer">
@@ -230,12 +231,11 @@
 <script>
 import {UserServices} from "@/services/user-service";
 import {PlansServices} from "@/services/plans-service";
-import { ref, getDownloadURL, uploadBytes } from 'firebase/storage'
+import { ref, getDownloadURL, uploadBytes,deleteObject } from 'firebase/storage'
 import { storage } from '../../firebaseConfig' // Importa la configuración de Firebase Storage
 
 export default {
     name: "sign-up-plans",
-    components: {},
     data(){
         return{
             images:[],
@@ -276,7 +276,7 @@ export default {
       async handleFileUpload(event) {
         this.profilePictureFile = event.target.files[0]
       },
-      async registerUser() {
+      async UploadFile() {
         // Subir la imagen de perfil a Firebase Storage
         if (this.profilePictureFile) {
           const storageRef = ref(storage, 'profile_pictures/' + this.profilePictureFile.name);
@@ -285,13 +285,26 @@ export default {
           await uploadBytes(storageRef, this.profilePictureFile);
           this.profilePictureURL = await getDownloadURL(storageRef);
         }
-
         // El valor de this.profilePictureURL ahora contiene la URL de descarga de la imagen
         console.log('URL de la imagen de perfil:', this.profilePictureURL)
 
         // Luego, puedes registrar al usuario en tu sistema de autenticación (Firebase Authentication) y almacenar el this.profilePictureURL como una cadena junto con otros datos del usuario.
         // Implementa tu lógica de registro aquí.
       },
+        async deleteImage() { // Cambia el nombre de la función a algo diferente de "delete"
+            // Parsea la URL de la imagen para obtener el nombre del archivo
+
+            // Crea una referencia al archivo que deseas eliminar
+            const imageRef = ref(storage, "2.ANAKIN"); //remplazar con el nombre del archivo y su extencion
+
+            try {
+                // Elimina el archivo
+                await deleteObject(imageRef);
+                console.log('Imagen eliminada con éxito');
+            } catch (error) {
+                console.error('Error al eliminar la imagen:', error);
+            }
+        },
       register(){
           let newUser={}
           newUser.name=this.user.name
