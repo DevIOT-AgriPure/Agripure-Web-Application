@@ -31,7 +31,7 @@ import InputSwitch from 'primevue/inputswitch';
 import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar';
 import Toast from 'primevue/toast';
-
+import FileUpload from 'primevue/fileupload';
 
 
 
@@ -64,6 +64,7 @@ vueApp.component("pv-inputSwitch",InputSwitch)
 vueApp.component("pv-textArea",Textarea)
 vueApp.component("pv-calendar",Calendar)
 vueApp.component("pv-toast",Toast)
+vueApp.component("pv-fileUpload",FileUpload)
 
 
 vueApp.mount('#app')

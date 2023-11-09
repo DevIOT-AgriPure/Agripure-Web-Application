@@ -7,34 +7,40 @@
             <h1 style="color: white;">SELECT USER TYPE</h1>
           </div>
           <div class="plan-cards">
-            <pv-card
-                class="type-card"
-                :class="{ selected: selectedUserType === 'farmer' }"
-                @click="selectUserType('farmer')"
-            >
-              <template #content>
-                <div style="display: flex;justify-content: center;margin: 2rem 0">
-                  <img src="../../assets/farmer_logo.png" alt="" style="height: 150px;">
-                </div>
-                <div style="display: flex;justify-content: center">
-                  <h2 style="color: white">Farmer</h2>
-                </div>
-              </template>
-            </pv-card>
-            <pv-card
-                class="type-card"
-                :class="{ selected: selectedUserType === 'specialist' }"
-                @click="selectUserType('specialist')"
-            >
-              <template #content>
-                <div style="display: flex;justify-content: center;margin: 2rem 0">
-                  <img src="../../assets/specialist_logo.png" alt="" style="height: 150px;">
-                </div>
-                <div style="display: flex;justify-content: center">
-                  <h2 style="color: white">Specialist</h2>
-                </div>
-              </template>
-            </pv-card>
+              <div style="width: 100%;display: flex;justify-content: center">
+                  <pv-card
+                          class="type-card"
+                          :class="{ selected: selectedUserType === 'farmer' }"
+                          @click="selectUserType('farmer')"
+                  >
+                      <template #content>
+                          <div style="display: flex;justify-content: center;margin: 2rem 0">
+                              <img src="../../assets/farmer_logo.png" alt="" style="height: 150px;">
+                          </div>
+                          <div style="display: flex;justify-content: center">
+                              <h2 style="color: white">Farmer</h2>
+                          </div>
+                      </template>
+                  </pv-card>
+              </div>
+              <div style="width: 100%;display: flex;justify-content: center">
+                  <pv-card
+                          class="type-card"
+                          :class="{ selected: selectedUserType === 'specialist' }"
+                          @click="selectUserType('specialist')"
+                  >
+                      <template #content>
+                          <div style="display: flex;justify-content: center;margin: 2rem 0">
+                              <img src="../../assets/specialist_logo.png" alt="" style="height: 150px;">
+                          </div>
+                          <div style="display: flex;justify-content: center">
+                              <h2 style="color: white">Specialist</h2>
+                          </div>
+                      </template>
+                  </pv-card>
+              </div>
+
+
           </div>
           <div style="display: flex;justify-content: space-evenly">
             <pv-button style="border-radius: 1rem;color: white;background-color: #131313;border-color: #131313" @click="goBack('sign-in')" label="Back"/>
@@ -115,7 +121,7 @@
               </div>
               <div class="card" style="justify-content: center;">
                 <div class="register" style="width: 30vw">
-                  <div class="form" >
+                  <div class="form">
                     <div class="nombre" style="display: flex; justify-content: center; margin: 1rem 0">
                       <pv-input id="name" class="form-input" @input="actualizarEstadoBoton()" placeholder="Name" style="border-radius: 1rem" v-model="user.name" maxlength="56" @keypress="validarNombre($event)"></pv-input>
                     </div>
@@ -128,15 +134,6 @@
                       <div class="Description" style="display: flex; justify-content: center; margin: 1rem 0">
                           <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 1rem" maxlength="600" v-model="user.description"></pv-textArea>
                       </div>
-                      <div>
-                          <form @submit.prevent="UploadFile">
-                          <label for="profilePicture">Imagen de perfil:</label>
-                          <input type="file" id="profilePicture" @change="handleFileUpload" accept="image/*" required>
-                          <button type="submit">Subir imagen</button>
-                        </form>
-                          <img :src="this.profilePictureURL" alt="" style="height: 200px;width: 200px">
-                          <pv-button @click="deleteImage">Delete image</pv-button>
-                      </div>
                   </div>
                   <div class="footer">
                     <div v-if="selectedUserType==='farmer'" class="form-Text" style="margin: 3rem 0">
@@ -144,8 +141,7 @@
                       <br>Agripure
                     </div>
                     <div class="buttons" >
-                        <pv-button v-if="selectedUserType==='farmer'" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Create account</pv-button >
-                      <pv-button v-if="selectedUserType==='specialist'" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Next</pv-button >
+                      <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Next</pv-button >
                     </div>
                   </div>
                 </div>
@@ -187,7 +183,7 @@
                                           <br>Agripure
                                       </div>
                                       <div class="buttons" >
-                                          <pv-button :disabled="!esSpecialistFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Create account</pv-button >
+                                          <pv-button :disabled="!esSpecialistFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="addTemporaryUser()">Next</pv-button >
                                       </div>
                                   </div>
                               </div>
@@ -197,12 +193,69 @@
               </pv-card>
           </div>
       </div>
+      <div v-if="currentPath==='ProfilePicture'">
+          <div class="card" style="height: 98vh ">
+              <pv-card style=" border-radius: 1rem;justify-content: center;">
+                  <template #content>
+                      <div class="content" style="width: 50vw">
+                          <p v-if="selectedUserType==='farmer'" style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Form')"  >
+                              Go back
+                          </p>
+                          <p v-else style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('SpecialistForm')"  >
+                              Go back
+                          </p>
+
+                          <div class="card" style="justify-content: center;">
+                              <div class="profile">
+                                  <div v-if="this.profilePictureUploaded===false">
+                                      <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                          <h1>Upload a Profile Picture</h1>
+                                      </div>
+                                      <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                          <h2>Uploading a Profile Picture</h2>
+                                      </div>
+                                      <div>
+                                          <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                              <template #empty>
+                                                  <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                                      <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
+                                                      <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                                  </div>
+                                              </template>
+                                          </pv-fileUpload>
+                                          <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                              <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div v-else>
+                                      <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                          <h2>This is your profile picture</h2>
+                                      </div>
+                                      <div style="width: 100%; display:flex;justify-content: center">
+                                          <img :src="this.profilePictureURL" alt="Image" height="250" style="border-radius: 1rem" />
+                                      </div>
+                                      <h2 style="margin: 2rem">¿Do you want to continue?</h2>
+                                      <div class="buttons" >
+                                          <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
+                                          <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+
+                      </div>
+                  </template>
+              </pv-card>
+          </div>
+
+      </div>
     <div v-if="currentPath==='Payment'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
           <template #content>
             <div class="content" style="width: 50vw">
-              <p style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Form')"  >
+              <p style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('ProfilePicture')"  >
                 Go back
               </p>
               <div class="steps" >
@@ -217,7 +270,7 @@
               </div>
               <div class="footer">
                 <div class="buttons" >
-                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Iniciar subscripcion</pv-button >
+                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Start subscription</pv-button >
                 </div>
               </div>
             </div>
@@ -238,8 +291,8 @@ export default {
     name: "sign-up-plans",
     data(){
         return{
-            images:[],
-            profileImage:null,
+            loading:false,
+            profilePictureUploaded:false,
           profilePictureFile: null,
           profilePictureURL: null,
             value1: 'Nuestros Planes',
@@ -265,45 +318,53 @@ export default {
           userPlanSelected:"none",
         }
     },
-    created()
-    {   this.currentPath="Types"
+    created(){   this.currentPath="Types"
         new PlansServices().getPlans().then(res=>{
             this.plans=res.data
         })
 
     },
     methods:{
-      async handleFileUpload(event) {
-        this.profilePictureFile = event.target.files[0]
-      },
-      async UploadFile() {
-        // Subir la imagen de perfil a Firebase Storage
-        if (this.profilePictureFile) {
-          const storageRef = ref(storage, 'profile_pictures/' + this.profilePictureFile.name);
+        async customBase64Uploader(event){
+            this.loading=true
+            this.profilePictureFile = event.files[0];
+            //this.profilePictureFile = event.target.files[0]
+            // Subir la imagen de perfil a Firebase Storage
+            if (this.profilePictureFile) {
+                const storageRef = ref(storage, 'profile_pictures/' + this.profilePictureFile.name);
+                console.log(this.profilePictureFile.name)
+                // Luego, puedes continuar con la carga de la imagen y la obtención de la URL de descarga
+                await uploadBytes(storageRef, this.profilePictureFile);
+                this.profilePictureURL = await getDownloadURL(storageRef);
+                this.profilePictureUploaded=true
+                this.loading=false
+            }
+            // El valor de this.profilePictureURL ahora contiene la URL de descarga de la imagen
+            console.log('URL de la imagen de perfil:', this.profilePictureURL)
 
-          // Luego, puedes continuar con la carga de la imagen y la obtención de la URL de descarga
-          await uploadBytes(storageRef, this.profilePictureFile);
-          this.profilePictureURL = await getDownloadURL(storageRef);
-        }
-        // El valor de this.profilePictureURL ahora contiene la URL de descarga de la imagen
-        console.log('URL de la imagen de perfil:', this.profilePictureURL)
-
-        // Luego, puedes registrar al usuario en tu sistema de autenticación (Firebase Authentication) y almacenar el this.profilePictureURL como una cadena junto con otros datos del usuario.
-        // Implementa tu lógica de registro aquí.
-      },
-        async deleteImage() { // Cambia el nombre de la función a algo diferente de "delete"
+            // Luego, puedes registrar al usuario en tu sistema de autenticación (Firebase Authentication) y almacenar el this.profilePictureURL como una cadena junto con otros datos del usuario.
+            // Implementa tu lógica de registro aquí.
+        },
+        async deleteImage() {
+          // Cambia el nombre de la función a algo diferente de "delete"
             // Parsea la URL de la imagen para obtener el nombre del archivo
 
             // Crea una referencia al archivo que deseas eliminar
-            const imageRef = ref(storage, "2.ANAKIN"); //remplazar con el nombre del archivo y su extencion
+            const imageRef = ref(storage, "/profile_pictures/"+this.profilePictureFile.name); //remplazar con el nombre del archivo y su extencion
 
             try {
                 // Elimina el archivo
                 await deleteObject(imageRef);
+                this.profilePictureUploaded=false
+                this.profilePictureFile=null
+                this.profilePictureURL=null
                 console.log('Imagen eliminada con éxito');
             } catch (error) {
                 console.error('Error al eliminar la imagen:', error);
             }
+        },
+        uploadPhotoNext(){
+          this.currentPath="Payment"
         },
       register(){
           let newUser={}
@@ -311,7 +372,8 @@ export default {
           newUser.email=this.user.email
           newUser.password=this.user.password
           newUser.description=this.user.description
-          newUser.imageUrl="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
+          newUser.imageUrl=this.profilePictureURL
+          newUser.imageName=this.profilePictureFile.name
           newUser.location="Lima, Peru"
           newUser.type=this.selectedUserType.toUpperCase()
           newUser.plan=parseInt(this.userPlanSelected)
@@ -368,14 +430,13 @@ export default {
       },
       addTemporaryUser(){
           if(this.currentPath==="SpecialistForm"){
-              console.log("go crazy")
-              this.currentPath="Payment"
+              this.currentPath="ProfilePicture"
           }
           else {
               if(this.selectedUserType==="specialist"){
                   this.currentPath="SpecialistForm"
               }else {
-                  this.currentPath="Payment"
+                  this.currentPath="ProfilePicture"
               }
           }
 
@@ -472,7 +533,6 @@ p {
     display: flex;
 }
 .plan-cards{
-
     margin-bottom: 3rem;
     display: flex;
     justify-content: space-evenly;
@@ -481,6 +541,15 @@ p {
     margin-top: .5em;
 }
 @media (max-width:1280px){
+    .type-card{
+        cursor: pointer;
+        border-color: white;
+        border-radius: 1rem;
+        background-color: #111111;
+        color: black;
+        margin-top: 0;
+        width: 13em;
+    }
     .plan-cards{
         margin-bottom: 3rem;
         display: flex;
@@ -512,6 +581,15 @@ p {
     }
 }
 @media (max-width:1054px){
+    .type-card{
+        cursor: pointer;
+        border-color: white;
+        border-radius: 1rem;
+        background-color: #111111;
+        color: black;
+        margin-top: 0;
+        width: 11em;
+    }
     .plan-cards{
         margin-bottom: 3rem;
         display: flex;
@@ -549,6 +627,15 @@ p {
     }
 }
 @media (max-width:700px){
+    .type-card{
+        cursor: pointer;
+        border-color: white;
+        border-radius: 1rem;
+        background-color: #111111;
+        color: black;
+        margin-top: 0;
+        width: 10em;
+    }
     .default{
         display: flex;
         justify-content: center;
@@ -578,6 +665,15 @@ p {
     }
 }
 @media (max-width:559px){
+    .type-card{
+        cursor: pointer;
+        border-color: white;
+        border-radius: 1rem;
+        background-color: #111111;
+        color: black;
+        margin-top: 0;
+        width: 10em;
+    }
     .default{
         display: flex;
         justify-content: center;
