@@ -148,6 +148,7 @@
 </template>
 <script >
 import {PlansServices} from "@/services/plans-service";
+import {UserServices} from "@/services/user-service";
 
 export default {
     data(){
@@ -173,6 +174,22 @@ export default {
     },
     methods:{
         updateProfile(){
+            let farmer={}
+            farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+            farmer.name=this.editUserName
+            farmer.description=this.editUserDescription
+            farmer.imageUrl=sessionStorage.getItem("imageUrl")
+            farmer.imageName=sessionStorage.getItem("imageName")
+            farmer.location="Lima, Peru"
+            new UserServices().updateFarmer(farmer).then(resp=>{
+                this.editProfileDialogVisible=false
+                sessionStorage.setItem("name",farmer.name)
+                sessionStorage.setItem("imageUrl",farmer.imageUrl)
+                sessionStorage.setItem("imageName",farmer.imageName)
+                sessionStorage.setItem("description",farmer.description)
+                this.userName= farmer.name
+                this.userDescription= farmer.description
+            })
 
         },
         showEditProfileDialog(){

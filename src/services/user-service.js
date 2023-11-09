@@ -4,6 +4,16 @@ const http = axios.create({
     headers: { "Content-type": "application/json" },
 })
 export class UserServices{
+    updateFarmer(farmer){
+        return http.put("api/v1/profiles/updateFarmer",{
+            "accountId": farmer.accountId,
+            "name": farmer.name,
+            "description": farmer.description,
+            "imageUrl": farmer.imageUrl,
+            "imageName": farmer.imageName,
+            "location": farmer.location,
+        });
+    }
     getUserById(id){
         return http.get("api/v1/profiles/getProfile/"+id);
     }
