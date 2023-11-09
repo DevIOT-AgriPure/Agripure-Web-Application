@@ -51,7 +51,7 @@
                     </div>
                     <div class="action-buttons">
                         <div class="acb" style="">
-                            <pv-button icon="pi pi-pencil" label="Edit profile" text rounded aria-label="update" />
+                            <pv-button icon="pi pi-pencil" label="Edit profile" @click="showEditProfileDialog()" text rounded aria-label="update" />
                             <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
                             <pv-button icon="pi pi-sign-out" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
                         </div>
@@ -59,6 +59,91 @@
                 </div>
             </div>
         </div>
+        <pv-dialog v-model:visible="editProfileDialogVisible" maximizable modal header="Edit Profile" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="crop-details">
+                    <div v-if="currentPath==='Form'" style="margin: 1rem 1rem; display: flex;justify-content: center">
+                        <div style="width: 90%">
+                            <div style="margin: 2rem 0rem">
+                                <span class="p-float-label">
+                               <pv-input id="username" @input="actualizarEstadoBoton()" style="border-radius: 0.5rem;width: 100%" v-model="editUserName" maxlength="56" @keypress="validarNombre($event)"/>
+                                <label for="username">Name</label>
+                            </span>
+                            </div>
+                            <div style="margin: 2rem 0rem">
+                                <span class="p-float-label">
+                                                <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 0.5rem;width: 100%" maxlength="600" v-model="editUserDescription"></pv-textArea>
+                                                <label for="description">Description</label>
+                                            </span>
+                            </div>
+                            <div style="width: 100%;display: flex;justify-content: space-between">
+                                <pv-button style="border-radius: 1rem;color: white;" severity="secondary" @click="editProfileDialogVisible=false">Cancel</pv-button >
+                                <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="updateProfile()">Update</pv-button >
+                            </div>
+
+                        </div>
+                    </div>
+                    <div v-if="currentPath==='ProfilePicture'">
+                        <div class="card" style="height: 98vh ">
+                            <pv-card style=" border-radius: 1rem;justify-content: center;">
+                                <template #content>
+                                    <div class="content" style="width: 50vw">
+                                        <p v-if="selectedUserType==='farmer'" style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Form')"  >
+                                            Go back
+                                        </p>
+                                        <p v-else style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('SpecialistForm')"  >
+                                            Go back
+                                        </p>
+
+                                        <div class="card" style="justify-content: center;">
+                                            <div class="profile">
+                                                <div v-if="this.profilePictureUploaded===false">
+                                                    <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                                        <h1>Upload a Profile Picture</h1>
+                                                    </div>
+                                                    <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                                        <h2>Uploading a Profile Picture</h2>
+                                                    </div>
+                                                    <div>
+                                                        <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                                            <template #empty>
+                                                                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                                                    <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
+                                                                    <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                                                </div>
+                                                            </template>
+                                                        </pv-fileUpload>
+                                                        <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                                            <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div v-else>
+                                                    <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                                        <h2>This is your profile picture</h2>
+                                                    </div>
+                                                    <div style="width: 100%; display:flex;justify-content: center">
+                                                        <img :src="this.profilePictureURL" alt="Image" height="250" style="border-radius: 1rem" />
+                                                    </div>
+                                                    <h2 style="margin: 2rem">¿Do you want to continue?</h2>
+                                                    <div class="buttons" >
+                                                        <pv-button  style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
+                                                        <pv-button  style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </template>
+                            </pv-card>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+
     </div>
 </template>
 <script >
@@ -67,9 +152,15 @@ import {PlansServices} from "@/services/plans-service";
 export default {
     data(){
         return{
+            esFormularioCompleto:false,
+            currentPath:"Form",
+            editProfileDialogVisible:false,
             userName:sessionStorage.getItem("name"),
             userDescription:sessionStorage.getItem("description"),
             userEmail:sessionStorage.getItem("email"),
+            editUserName:"",
+            editUserDescription:"",
+            editUserEmail:"",
             imageUrl:sessionStorage.getItem("imageUrl"),
             planId:sessionStorage.getItem("planId"),
             plan: {}
@@ -81,6 +172,30 @@ export default {
         })
     },
     methods:{
+        updateProfile(){
+
+        },
+        showEditProfileDialog(){
+            this.editUserName=this.userName
+            this.editUserDescription=this.userDescription
+            this.esFormularioCompleto = (this.editUserName.length>0  && this.editUserDescription.length >0);
+            this.editProfileDialogVisible=true
+        },
+        validarNombre(evento) {
+            const codigo = evento.keyCode || evento.which;
+            const caracter = String.fromCharCode(codigo);
+            const patron = /^[a-zA-Z\s]*$/; // Patrón para permitir solo letras y espacios
+
+            if (caracter.match(patron)) {
+                return true;
+            } else {
+                evento.preventDefault();
+                return false;
+            }
+        },
+        actualizarEstadoBoton() {
+            this.esFormularioCompleto = (this.editUserName.length>0  && this.editUserDescription.length >0);
+        },
         logOut(){
             this.$router.push("/sign-in")
         }
@@ -89,6 +204,14 @@ export default {
 </script>
 <style scoped>
 @media (max-width: 1200px) {
+    .card-edit{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .content h2{
+        margin-bottom: 0.5rem;
+    }
     .chat-card-first {
         display: flex;
         align-items: center;
@@ -199,6 +322,9 @@ export default {
     }
 }
 @media (min-width: 1200px) {
+    .content h2{
+        margin-bottom: 0.5rem;
+    }
     .chat-card-sec {
         visibility: hidden;
         display: flex;
