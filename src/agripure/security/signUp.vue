@@ -7,14 +7,14 @@
             <h1 style="color: white;">SELECT USER TYPE</h1>
           </div>
           <div class="plan-cards">
-              <div style="width: 100%;display: flex;justify-content: center">
+              <div style="width: 100%;display: flex;justify-content: center;">
                   <pv-card
                           class="type-card"
                           :class="{ selected: selectedUserType === 'farmer' }"
                           @click="selectUserType('farmer')"
                   >
                       <template #content>
-                          <div style="display: flex;justify-content: center;margin: 2rem 0">
+                          <div style="display: flex;justify-content: center;margin-bottom: 1rem">
                               <img src="../../assets/farmer_logo.png" alt="" style="height: 150px;">
                           </div>
                           <div style="display: flex;justify-content: center">
@@ -27,10 +27,9 @@
                   <pv-card
                           class="type-card"
                           :class="{ selected: selectedUserType === 'specialist' }"
-                          @click="selectUserType('specialist')"
-                  >
+                          @click="selectUserType('specialist')">
                       <template #content>
-                          <div style="display: flex;justify-content: center;margin: 2rem 0">
+                          <div style="display: flex;justify-content: center;margin-bottom: 1rem">
                               <img src="../../assets/specialist_logo.png" alt="" style="height: 150px;">
                           </div>
                           <div style="display: flex;justify-content: center">
@@ -328,40 +327,21 @@ export default {
         async customBase64Uploader(event){
             this.loading=true
             this.profilePictureFile = event.files[0];
-            //this.profilePictureFile = event.target.files[0]
-            // Subir la imagen de perfil a Firebase Storage
             if (this.profilePictureFile) {
-                const storageRef = ref(storage, 'profile_pictures/' + this.profilePictureFile.name);
+                this.profilePictureFile.name
+                const storageRef = ref(storage, 'profile_pictures/' + this.user.email);
                 console.log(this.profilePictureFile.name)
-                // Luego, puedes continuar con la carga de la imagen y la obtención de la URL de descarga
                 await uploadBytes(storageRef, this.profilePictureFile);
                 this.profilePictureURL = await getDownloadURL(storageRef);
                 this.profilePictureUploaded=true
                 this.loading=false
             }
-            // El valor de this.profilePictureURL ahora contiene la URL de descarga de la imagen
-            console.log('URL de la imagen de perfil:', this.profilePictureURL)
-
-            // Luego, puedes registrar al usuario en tu sistema de autenticación (Firebase Authentication) y almacenar el this.profilePictureURL como una cadena junto con otros datos del usuario.
-            // Implementa tu lógica de registro aquí.
+            console.log('URL:', this.profilePictureURL)
         },
         async deleteImage() {
-          // Cambia el nombre de la función a algo diferente de "delete"
-            // Parsea la URL de la imagen para obtener el nombre del archivo
-
-            // Crea una referencia al archivo que deseas eliminar
-            const imageRef = ref(storage, "/profile_pictures/"+this.profilePictureFile.name); //remplazar con el nombre del archivo y su extencion
-
-            try {
-                // Elimina el archivo
-                await deleteObject(imageRef);
-                this.profilePictureUploaded=false
-                this.profilePictureFile=null
-                this.profilePictureURL=null
-                console.log('Imagen eliminada con éxito');
-            } catch (error) {
-                console.error('Error al eliminar la imagen:', error);
-            }
+            this.profilePictureUploaded=false
+            this.profilePictureFile=null
+            this.profilePictureURL=null
         },
         uploadPhotoNext(){
           this.currentPath="Payment"
@@ -373,7 +353,6 @@ export default {
           newUser.password=this.user.password
           newUser.description=this.user.description
           newUser.imageUrl=this.profilePictureURL
-          newUser.imageName=this.profilePictureFile.name
           newUser.location="Lima, Peru"
           newUser.type=this.selectedUserType.toUpperCase()
           newUser.plan=parseInt(this.userPlanSelected)

@@ -10,8 +10,8 @@ export class UserServices{
             "name": farmer.name,
             "description": farmer.description,
             "imageUrl": farmer.imageUrl,
-            "imageName": farmer.imageName,
             "location": farmer.location,
+            "planId": farmer.planId
         });
     }
     getUserById(id){
@@ -37,7 +37,6 @@ export class UserServices{
             "name": newUser.name,
             "description": newUser.description,
             "imageUrl": newUser.imageUrl,
-            "imageName": newUser.imageName,
             "location": "Lima, Peru",
             "type": newUser.type,
             "planId": newUser.plan
@@ -50,7 +49,6 @@ export class UserServices{
             "name": newUser.name,
             "description": newUser.description,
             "imageUrl": newUser.imageUrl,
-            "imageName": newUser.imageName,
             "location": "Lima, Peru",
             "type": newUser.type,
             "expertise": newUser.expertise,

@@ -31,15 +31,15 @@
                     <div class="chat-content" >
                         <div class="chat-header">
                             <h3 style="margin-bottom: 0.5rem">{{ plan.name }}</h3>
-                            <pv-button label="UPDATE" />
+                            <pv-button label="UPDATE" @click="showUpdatePlanDialog" />
                         </div>
-                        <p style="width: 30%">S/. {{ plan.price }}</p>
+                        <p v-if="planId!=='1'" style="width: 30%">S/. {{ plan.price }}</p>
                     </div>
                 </div>
             </div>
             <div class="profilePicture">
                 <div style="display: inline;justify-content: center">
-                    <div class="profile-container">
+                    <div class="profile-container" @click="openEditProfilePictureDialog">
                         <img
                             :src="imageUrl"
                             style=""
@@ -62,7 +62,7 @@
         <pv-dialog v-model:visible="editProfileDialogVisible" maximizable modal header="Edit Profile" :style="{ width: '700px' }">
             <div class="addplantbackground">
                 <div class="crop-details">
-                    <div v-if="currentPath==='Form'" style="margin: 1rem 1rem; display: flex;justify-content: center">
+                    <div style="margin: 1rem 1rem; display: flex;justify-content: center">
                         <div style="width: 90%">
                             <div style="margin: 2rem 0rem">
                                 <span class="p-float-label">
@@ -83,62 +83,81 @@
 
                         </div>
                     </div>
-                    <div v-if="currentPath==='ProfilePicture'">
-                        <div class="card" style="height: 98vh ">
-                            <pv-card style=" border-radius: 1rem;justify-content: center;">
-                                <template #content>
-                                    <div class="content" style="width: 50vw">
-                                        <p v-if="selectedUserType==='farmer'" style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('Form')"  >
-                                            Go back
-                                        </p>
-                                        <p v-else style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('SpecialistForm')"  >
-                                            Go back
-                                        </p>
-
-                                        <div class="card" style="justify-content: center;">
-                                            <div class="profile">
-                                                <div v-if="this.profilePictureUploaded===false">
-                                                    <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
-                                                        <h1>Upload a Profile Picture</h1>
-                                                    </div>
-                                                    <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
-                                                        <h2>Uploading a Profile Picture</h2>
-                                                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="updateProfileDialogVisible" maximizable modal header="Edit Profile Picture" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="profile">
+                    <div>
+                        <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                            <h1>Upload a Profile Picture</h1>
+                        </div>
+                        <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                            <h2>Uploading a Profile Picture</h2>
+                        </div>
+                        <div>
+                            <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                <template #empty>
+                                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                        <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
+                                        <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                    </div>
+                                </template>
+                            </pv-fileUpload>
+                            <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="updatePlanDialogVisible" maximizable modal header="Change Plan" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="content" >
+                    <div class="phrase" style="margin-bottom: 3rem; display: flex; justify-content: center; text-align: center">
+                        <h1>Select a new plan</h1>
+                    </div>
+                    <div class="plans">
+                        <div class="default">
+                            <div class="plan-cards">
+                                <div v-for="plan in plans">
+                                    <pv-card class="plan-card">
+                                        <template #content>
+                                            <div class="content">
+                                                <div style="display: flex;justify-content: space-between;height: 100%;align-items: center;justify-items: center;">
                                                     <div>
-                                                        <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
-                                                            <template #empty>
-                                                                <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                                                    <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
-                                                                    <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                                        <h2>{{plan.name}}</h2>
+                                                        <div class="visible">
+                                                            <template v-if="plan.name==='Premium'">
+                                                                <div class="usherVisible">
+                                                                    <p style="margin-top: 15px">{{ plan.description }}</p>
                                                                 </div>
                                                             </template>
-                                                        </pv-fileUpload>
-                                                        <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
-                                                            <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
+                                                            <template v-if="plan.name==='Free'">
+                                                                <div class="usherVisible">
+                                                                    <p style="margin-top: 15px">{{ plan.description }}</p>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <div class="price" v-if="plan.name!=='Free'" STYLE="display: flex; justify-content: left;margin: 0.5rem 0">
+                                                            <p style="font-weight: bold; margin-top: 8px;" v-if="plan.name!=='Free'">{{ plan.price }} S/ mo*</p>
+                                                        </div>
+                                                        <div v-if="plan.name==='Free'" style="margin-bottom: 1rem">
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div v-else>
-                                                    <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
-                                                        <h2>This is your profile picture</h2>
-                                                    </div>
-                                                    <div style="width: 100%; display:flex;justify-content: center">
-                                                        <img :src="this.profilePictureURL" alt="Image" height="250" style="border-radius: 1rem" />
-                                                    </div>
-                                                    <h2 style="margin: 2rem">¿Do you want to continue?</h2>
-                                                    <div class="buttons" >
-                                                        <pv-button  style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
-                                                        <pv-button  style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
+                                                    <div>
+                                                        <pv-button class="planButton" :disabled="this.planId===1" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Select</pv-button>
+                                                        <pv-button class="planButton" :disabled="this.planId===2" v-if="plan.name==='Premium'" style="background-color: darkgreen;border-color: darkgreen; color:white" @click="planSelected(2)">Select</pv-button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                    </div>
-                                </template>
-                            </pv-card>
+                                        </template>
+                                    </pv-card >
+                                </div>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -149,13 +168,20 @@
 <script >
 import {PlansServices} from "@/services/plans-service";
 import {UserServices} from "@/services/user-service";
+import {deleteObject, getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "@/firebaseConfig";
 
 export default {
     data(){
         return{
+            plans:[],
+            loading:false,
+            profilePictureFile: null,
+            profilePictureURL: null,
             esFormularioCompleto:false,
-            currentPath:"Form",
             editProfileDialogVisible:false,
+            updatePlanDialogVisible:false,
+            updateProfileDialogVisible:false,
             userName:sessionStorage.getItem("name"),
             userDescription:sessionStorage.getItem("description"),
             userEmail:sessionStorage.getItem("email"),
@@ -163,16 +189,70 @@ export default {
             editUserDescription:"",
             editUserEmail:"",
             imageUrl:sessionStorage.getItem("imageUrl"),
-            planId:sessionStorage.getItem("planId"),
+            planId:parseInt(sessionStorage.getItem("planId").toString()),
             plan: {}
         }
     },
     created() {
+        new PlansServices().getPlans().then(res=>{
+            this.plans=res.data
+        })
         new PlansServices().getPlanById(this.planId).then(res=>{
             this.plan=res.data
+            console.log(this.plan)
         })
     },
     methods:{
+        planSelected(planId){
+            let farmer={}
+            farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+            farmer.name=this.userName
+            farmer.description=this.userDescription
+            farmer.imageUrl=this.profilePictureURL
+            farmer.location="Lima, Peru"
+            farmer.planId=planId
+            new UserServices().updateFarmer(farmer).then(resp=>{
+                this.editProfileDialogVisible=false
+                sessionStorage.setItem("planId",farmer.planId)
+                this.planId=planId
+                new PlansServices().getPlanById(this.planId).then(res=>{
+                    this.plan=res.data
+                    console.log(this.plan)
+                })
+                this.updatePlanDialogVisible=false
+            })
+        },
+        showUpdatePlanDialog(){
+          this.updatePlanDialogVisible=true
+        },
+        async customBase64Uploader(event){
+            this.loading=true
+            this.profilePictureFile = event.files[0];
+            if (this.profilePictureFile) {
+                const storageRef = ref(storage, 'profile_pictures/' + this.userEmail);
+                console.log(this.profilePictureFile.name)
+                await uploadBytes(storageRef, this.profilePictureFile);
+                this.profilePictureURL = await getDownloadURL(storageRef);
+                let farmer={}
+                farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+                farmer.name=this.userName
+                farmer.description=this.userDescription
+                farmer.imageUrl=this.profilePictureURL
+                farmer.location="Lima, Peru"
+                farmer.planId=parseInt(sessionStorage.getItem("planId").toString())
+                new UserServices().updateFarmer(farmer).then(resp=>{
+                    this.editProfileDialogVisible=false
+                    sessionStorage.setItem("imageUrl",farmer.imageUrl)
+                    this.imageUrl=this.profilePictureURL
+                    this.updateProfileDialogVisible=false
+                    this.loading=false
+                })
+            }
+            console.log('URL:', this.profilePictureURL)
+        },
+        openEditProfilePictureDialog(){
+            this.updateProfileDialogVisible=true
+        },
         updateProfile(){
             let farmer={}
             farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
@@ -220,6 +300,12 @@ export default {
 }
 </script>
 <style scoped>
+.plan-card{
+    border-radius: 1rem;
+    background-color: #171717;
+    color: white;
+    margin-top: 1rem;
+}
 @media (max-width: 1200px) {
     .card-edit{
         display: flex;

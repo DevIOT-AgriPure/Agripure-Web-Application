@@ -57,7 +57,6 @@ export default {
                     sessionStorage.setItem("name",resp.data.name)
                     sessionStorage.setItem("email",resp.data.email)
                     sessionStorage.setItem("imageUrl",resp.data.imageUrl)
-                    sessionStorage.setItem("imageName",resp.data.imageName)
                     sessionStorage.setItem("description",resp.data.description)
                     sessionStorage.setItem("type",resp.data.type.toString().toLowerCase())
                     sessionStorage.setItem("planId",resp.data.planId)
