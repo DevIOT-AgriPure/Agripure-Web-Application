@@ -18,6 +18,7 @@
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <h3 >Email: {{ userEmail }}</h3>
                 </div>
+                <h4>Description:</h4>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <p>{{userDescription}}</p>
                 </div>
@@ -26,20 +27,21 @@
                 </div>
                 <div class="chat-card-first">
                     <div class="plan-image">
-                        <i class="pi pi-bolt" style="font-size: 2.5rem"></i>
+                        <i v-if="planId!==1" class="pi pi-bolt" style="font-size: 2.5rem"></i>
+                        <i v-if="planId===1" class="pi pi-lock" style="font-size: 2.5rem"></i>
                     </div>
                     <div class="chat-content" >
                         <div class="chat-header">
                             <h3 style="margin-bottom: 0.5rem">{{ plan.name }}</h3>
-                            <pv-button label="UPDATE" />
+                            <pv-button label="UPDATE" @click="showUpdatePlanDialog" />
                         </div>
-                        <p style="width: 30%">S/. {{ plan.price }}</p>
+                        <p v-if="planId!==1" style="width: 30%">S/. {{ plan.price }}</p>
                     </div>
                 </div>
             </div>
             <div class="profilePicture">
                 <div style="display: inline;justify-content: center">
-                    <div class="profile-container">
+                    <div class="profile-container" @click="openEditProfilePictureDialog">
                         <img
                             :src="imageUrl"
                             style=""
@@ -51,7 +53,7 @@
                     </div>
                     <div class="action-buttons">
                         <div class="acb" style="">
-                            <pv-button icon="pi pi-pencil" label="Edit profile" text rounded aria-label="update" />
+                            <pv-button icon="pi pi-pencil" label="Edit profile" @click="showEditProfileDialog()" text rounded aria-label="update" />
                             <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
                             <pv-button icon="pi pi-sign-out" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
                         </div>
@@ -59,36 +61,269 @@
                 </div>
             </div>
         </div>
+        <pv-dialog v-model:visible="editProfileDialogVisible" maximizable modal header="Edit Profile" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="crop-details">
+                    <div style="margin: 1rem 1rem; display: flex;justify-content: center">
+                        <div style="width: 90%">
+                            <div style="margin: 2rem 0rem">
+                                <span class="p-float-label">
+                               <pv-input id="username" @input="actualizarEstadoBoton()" style="border-radius: 0.5rem;width: 100%" v-model="editUserName" maxlength="56" @keypress="validarNombre($event)"/>
+                                <label for="username">Name</label>
+                            </span>
+                            </div>
+                            <div style="margin: 2rem 0rem">
+                                <span class="p-float-label">
+                                                <pv-textArea id="description" class="form-input" @input="actualizarEstadoBoton()" placeholder="Description" style="border-radius: 0.5rem;width: 100%" maxlength="600" v-model="editUserDescription"></pv-textArea>
+                                                <label for="description">Description</label>
+                                            </span>
+                            </div>
+                            <div style="width: 100%;display: flex;justify-content: space-between">
+                                <pv-button style="border-radius: 1rem;color: white;" severity="secondary" @click="editProfileDialogVisible=false">Cancel</pv-button >
+                                <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="updateProfile()">Update</pv-button >
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="updateProfileDialogVisible" maximizable modal header="Edit Profile Picture" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="profile">
+                    <div>
+                        <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                            <h1>Upload a Profile Picture</h1>
+                        </div>
+                        <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                            <h2>Uploading a Profile Picture</h2>
+                        </div>
+                        <div>
+                            <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                <template #empty>
+                                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                        <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
+                                        <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                    </div>
+                                </template>
+                            </pv-fileUpload>
+                            <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="updatePlanDialogVisible" maximizable modal header="Change Plan" :style="{ width: '700px' }">
+            <div class="addplantbackground">
+                <div class="content" >
+                    <div class="phrase" style="margin-bottom: 3rem; display: flex; justify-content: center; text-align: center">
+                        <h1>Select a new plan</h1>
+                    </div>
+                    <div class="plans">
+                        <div class="default">
+                            <div class="plan-cards">
+                                <div v-for="plan in plans">
+                                    <pv-card class="plan-card">
+                                        <template #content>
+                                            <div class="content">
+                                                <div style="display: flex;justify-content: space-between;height: 100%;align-items: center;justify-items: center;">
+                                                    <div>
+                                                        <h2>{{plan.name}}</h2>
+                                                        <div class="visible">
+                                                            <template v-if="plan.name==='Premium'">
+                                                                <div class="usherVisible">
+                                                                    <p style="margin-top: 15px">{{ plan.description }}</p>
+                                                                </div>
+                                                            </template>
+                                                            <template v-if="plan.name==='Free'">
+                                                                <div class="usherVisible">
+                                                                    <p style="margin-top: 15px">{{ plan.description }}</p>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <div class="price" v-if="plan.name!=='Free'" STYLE="display: flex; justify-content: left;margin: 0.5rem 0">
+                                                            <p style="font-weight: bold; margin-top: 8px;" v-if="plan.name!=='Free'">{{ plan.price }} S/ mo*</p>
+                                                        </div>
+                                                        <div v-if="plan.name==='Free'" style="margin-bottom: 1rem">
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <pv-button class="planButton" :disabled="this.planId===1" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Select</pv-button>
+                                                        <pv-button class="planButton" :disabled="this.planId===2" v-if="plan.name==='Premium'" style="background-color: darkgreen;border-color: darkgreen; color:white" @click="planSelected(2)">Select</pv-button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </pv-card >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+
     </div>
 </template>
 <script >
 import {PlansServices} from "@/services/plans-service";
+import {UserServices} from "@/services/user-service";
+import {deleteObject, getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {storage} from "@/firebaseConfig";
 
 export default {
     data(){
         return{
+            plans:[],
+            loading:false,
+            profilePictureFile: null,
+            profilePictureURL: null,
+            esFormularioCompleto:false,
+            editProfileDialogVisible:false,
+            updatePlanDialogVisible:false,
+            updateProfileDialogVisible:false,
             userName:sessionStorage.getItem("name"),
             userDescription:sessionStorage.getItem("description"),
             userEmail:sessionStorage.getItem("email"),
+            editUserName:"",
+            editUserDescription:"",
+            editUserEmail:"",
             imageUrl:sessionStorage.getItem("imageUrl"),
-            planId:sessionStorage.getItem("planId"),
+            planId:parseInt(sessionStorage.getItem("planId").toString()),
             plan: {}
         }
     },
     created() {
+        new PlansServices().getPlans().then(res=>{
+            this.plans=res.data
+        })
         new PlansServices().getPlanById(this.planId).then(res=>{
             this.plan=res.data
         })
     },
     methods:{
+        planSelected(planId){
+            let farmer={}
+            farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+            farmer.name=this.userName
+            farmer.description=this.userDescription
+            farmer.imageUrl=sessionStorage.getItem("imageUrl")
+            farmer.location="Lima, Peru"
+            farmer.planId=planId
+            new UserServices().updateFarmer(farmer).then(resp=>{
+                this.editProfileDialogVisible=false
+                sessionStorage.setItem("planId",farmer.planId)
+                this.planId=planId
+                new PlansServices().getPlanById(this.planId).then(res=>{
+                    this.plan=res.data
+                    console.log(this.plan)
+                })
+                this.updatePlanDialogVisible=false
+            })
+        },
+        showUpdatePlanDialog(){
+          this.updatePlanDialogVisible=true
+        },
+        async customBase64Uploader(event){
+            this.loading=true
+            this.profilePictureFile = event.files[0];
+            if (this.profilePictureFile) {
+                const storageRef = ref(storage, 'profile_pictures/' + this.userEmail);
+                console.log(this.profilePictureFile.name)
+                await uploadBytes(storageRef, this.profilePictureFile);
+                this.profilePictureURL = await getDownloadURL(storageRef);
+                let farmer={}
+                farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+                farmer.name=this.userName
+                farmer.description=this.userDescription
+                farmer.imageUrl=this.profilePictureURL
+                farmer.location="Lima, Peru"
+                farmer.planId=parseInt(sessionStorage.getItem("planId").toString())
+                new UserServices().updateFarmer(farmer).then(resp=>{
+                    this.editProfileDialogVisible=false
+                    sessionStorage.setItem("imageUrl",farmer.imageUrl)
+                    this.imageUrl=this.profilePictureURL
+                    this.updateProfileDialogVisible=false
+                    this.loading=false
+                })
+            }
+            console.log('URL:', this.profilePictureURL)
+        },
+        openEditProfilePictureDialog(){
+            this.updateProfileDialogVisible=true
+        },
+        updateProfile(){
+            let farmer={}
+            farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
+            farmer.name=this.editUserName
+            farmer.description=this.editUserDescription
+            farmer.imageUrl=sessionStorage.getItem("imageUrl")
+            farmer.location="Lima, Peru"
+            farmer.planId=parseInt(sessionStorage.getItem("planId").toString())
+            new UserServices().updateFarmer(farmer).then(resp=>{
+                this.editProfileDialogVisible=false
+                sessionStorage.setItem("name",farmer.name)
+                sessionStorage.setItem("imageUrl",farmer.imageUrl)
+                sessionStorage.setItem("description",farmer.description)
+                this.userName= farmer.name
+                this.userDescription= farmer.description
+            })
+
+        },
+        showEditProfileDialog(){
+            this.editUserName=this.userName
+            this.editUserDescription=this.userDescription
+            this.esFormularioCompleto = (this.editUserName.length>0  && this.editUserDescription.length >0);
+            this.editProfileDialogVisible=true
+        },
+        validarNombre(evento) {
+            const codigo = evento.keyCode || evento.which;
+            const caracter = String.fromCharCode(codigo);
+            const patron = /^[a-zA-Z\s]*$/; // Patrón para permitir solo letras y espacios
+
+            if (caracter.match(patron)) {
+                return true;
+            } else {
+                evento.preventDefault();
+                return false;
+            }
+        },
+        actualizarEstadoBoton() {
+            this.esFormularioCompleto = (this.editUserName.length>0  && this.editUserDescription.length >0);
+        },
         logOut(){
+            sessionStorage.removeItem("jwt")
+            sessionStorage.removeItem("id")
+            sessionStorage.removeItem("description")
+            sessionStorage.removeItem("email")
+            sessionStorage.removeItem("name")
+            sessionStorage.removeItem("imageUrl")
+            sessionStorage.removeItem("type")
+            sessionStorage.removeItem("planId")
+
             this.$router.push("/sign-in")
         }
     }
 }
 </script>
 <style scoped>
+.plan-card{
+    border-radius: 1rem;
+    background-color: #171717;
+    color: white;
+    margin-top: 1rem;
+}
 @media (max-width: 1200px) {
+    .card-edit{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .content h2{
+        margin-bottom: 0.5rem;
+    }
     .chat-card-first {
         display: flex;
         align-items: center;
@@ -123,11 +358,12 @@ export default {
         width: 100%;
     }
     .content-container {
-        display: inline;
-        justify-content: center;
-        align-items: flex-start;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        justify-items: center;
+        align-items: center;
         flex-wrap: wrap;
-        width: 100%;
     }
     .profilePicture {
         width: 100%;
@@ -199,6 +435,9 @@ export default {
     }
 }
 @media (min-width: 1200px) {
+    .content h2{
+        margin-bottom: 0.5rem;
+    }
     .chat-card-sec {
         visibility: hidden;
         display: flex;
@@ -222,9 +461,11 @@ export default {
         justify-content: center;
     }
     .content-container {
+        height: 100%;
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        justify-items: center;
+        align-items: center;
         flex-wrap: wrap;
     }
 

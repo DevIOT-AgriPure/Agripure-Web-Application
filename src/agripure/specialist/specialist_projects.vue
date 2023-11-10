@@ -538,7 +538,6 @@ export default {
                         let projects=res.data
                         if(projects.length>0){
                             for (let j = 0; j < projects.length; j++) {
-                                console.log("a")
                                 if(projects[j].cropId!==cropsForFarmer[i].id){
                                     let storableCropAndPlantInfo={}
                                     new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{

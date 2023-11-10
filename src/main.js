@@ -4,6 +4,7 @@ import ToastService from 'primevue/toastservice';
 import { createApp } from 'vue'
 import App from './App.vue'
 
+
 //PrimeVue Styles
 import "primevue/resources/themes/arya-green/theme.css"       //theme
 import "primevue/resources/primevue.min.css"                //core css
@@ -30,38 +31,40 @@ import InputSwitch from 'primevue/inputswitch';
 import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar';
 import Toast from 'primevue/toast';
+import FileUpload from 'primevue/fileupload';
 
 
 
 
 
 
+const vueApp  = createApp(App)
 
-const app = createApp(App)
-app.use(PrimeVue);
-app.use(router)
-app.use(ToastService);
-app.component("pv-button",Button)
-app.component("pv-avatar",Avatar)
-app.component("pv-autoComplete",AutoComplete)
-app.component("pv-card",Card)
-app.component("pv-input",InputText)
-app.component("pv-dropdown",Dropdown)
-app.component("pv-dialog",Dialog)
-app.component("pv-dataTable",DataTable)
-app.component("pv-column",Column)
-app.component("pv-columnGroup",ColumnGroup)
-app.component("pv-row",Row)
-app.component("pv-tag",Tag)
-app.component("pv-slider",Slider)
-app.component("pv-progressBar",ProgressBar)
-app.component("pv-checkbox",Checkbox)
-app.component("pv-accordion",Accordion)
-app.component("pv-accordionTab",AccordionTab)
-app.component("pv-inputSwitch",InputSwitch)
-app.component("pv-textArea",Textarea)
-app.component("pv-calendar",Calendar)
-app.component("pv-toast",Toast)
+vueApp.use(PrimeVue);
+vueApp.use(router)
+vueApp.use(ToastService);
+vueApp.component("pv-button",Button)
+vueApp.component("pv-avatar",Avatar)
+vueApp.component("pv-autoComplete",AutoComplete)
+vueApp.component("pv-card",Card)
+vueApp.component("pv-input",InputText)
+vueApp.component("pv-dropdown",Dropdown)
+vueApp.component("pv-dialog",Dialog)
+vueApp.component("pv-dataTable",DataTable)
+vueApp.component("pv-column",Column)
+vueApp.component("pv-columnGroup",ColumnGroup)
+vueApp.component("pv-row",Row)
+vueApp.component("pv-tag",Tag)
+vueApp.component("pv-slider",Slider)
+vueApp.component("pv-progressBar",ProgressBar)
+vueApp.component("pv-checkbox",Checkbox)
+vueApp.component("pv-accordion",Accordion)
+vueApp.component("pv-accordionTab",AccordionTab)
+vueApp.component("pv-inputSwitch",InputSwitch)
+vueApp.component("pv-textArea",Textarea)
+vueApp.component("pv-calendar",Calendar)
+vueApp.component("pv-toast",Toast)
+vueApp.component("pv-fileUpload",FileUpload)
 
 
-app.mount('#app')
+vueApp.mount('#app')

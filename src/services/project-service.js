@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"http://nifty-jet-404014.rj.r.appspot.com/api/v1/projects",
+    baseURL:"http://localhost:8080/api/v1/projects",
     headers: { "Content-type": "application/json" },
 })
 export class ProjectService{

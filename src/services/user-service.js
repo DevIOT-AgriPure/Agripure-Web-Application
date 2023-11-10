@@ -1,9 +1,32 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/",
+    baseURL:"http://localhost:8080/",
     headers: { "Content-type": "application/json" },
 })
 export class UserServices{
+    updateSpecialist(specialist){
+        return http.put("api/v1/profiles/updateSpecialist",{
+            "accountId": specialist.accountId,
+            "name": specialist.name,
+            "description": specialist.description,
+            "imageUrl": specialist.imageUrl,
+            "location": specialist.location,
+            "expertise": specialist.expertise,
+            "contactEmail": specialist.contactEmail,
+            "areasOfFocus": specialist.areasOfFocus,
+            "planId": specialist.planId
+        });
+    }
+    updateFarmer(farmer){
+        return http.put("api/v1/profiles/updateFarmer",{
+            "accountId": farmer.accountId,
+            "name": farmer.name,
+            "description": farmer.description,
+            "imageUrl": farmer.imageUrl,
+            "location": farmer.location,
+            "planId": farmer.planId
+        });
+    }
     getUserById(id){
         return http.get("api/v1/profiles/getProfile/"+id);
     }
