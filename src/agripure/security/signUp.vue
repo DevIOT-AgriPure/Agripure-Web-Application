@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh;width: 100%;  display:flex; justify-content: center; align-content: center;align-items: center">
-    <div v-if="currentPath==='Types'">
+      <div v-if="currentPath==='Types'">
       <pv-card style=" border-radius: 1rem;justify-content: center;width: 50vw;">
         <template #content>
           <div style="display: flex;justify-content: center;margin: 2rem 0">
@@ -38,8 +38,6 @@
                       </template>
                   </pv-card>
               </div>
-
-
           </div>
           <div style="display: flex;justify-content: space-evenly">
             <pv-button style="border-radius: 1rem;color: white;background-color: #131313;border-color: #131313" @click="goBack('sign-in')" label="Back"/>
@@ -48,7 +46,7 @@
         </template>
       </pv-card>
     </div>
-    <div v-if="currentPath==='Plans'">
+      <div v-if="currentPath==='Plans'">
       <pv-card style=" border-radius: 1rem;justify-content: center;width: 50vw;">
         <template #content>
           <div class="content" >
@@ -105,7 +103,7 @@
         </template>
       </pv-card>
     </div>
-    <div v-if="currentPath==='Form'">
+      <div v-if="currentPath==='Form'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
           <template #content>
@@ -207,14 +205,14 @@
                           <div class="card" style="justify-content: center;">
                               <div class="profile">
                                   <div v-if="this.profilePictureUploaded===false">
-                                      <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                      <div v-if="loadingPhoto===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                                           <h1>Upload a Profile Picture</h1>
                                       </div>
-                                      <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                      <div v-if="loadingPhoto===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                                           <h2>Uploading a Profile Picture</h2>
                                       </div>
                                       <div>
-                                          <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                          <pv-fileUpload v-if="loadingPhoto===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
                                               <template #empty>
                                                   <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                                                       <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
@@ -222,7 +220,7 @@
                                                   </div>
                                               </template>
                                           </pv-fileUpload>
-                                          <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                          <div v-if="loadingPhoto===true" style="display: flex;justify-content: center;margin: 3rem">
                                               <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
                                           </div>
                                       </div>
@@ -263,9 +261,18 @@
                 <h1>Payment method</h1>
               </div>
               <div style=" display: flex; justify-content: center;align-content: center">
-                <div>
-
-                </div>
+                  <div>
+                      <stripe-checkout
+                              ref="checkoutRef"
+                              mode="payment"
+                              :pk="publishableKey"
+                              :line-items="lineItems"
+                              :success-url="successURL"
+                              :cancel-url="cancelURL"
+                              @loading="v => loading = v"
+                      />
+                      <button class="button button4"  @click="submit">Buy now</button>
+                  </div>
               </div>
               <div class="footer">
                 <div class="buttons" >
@@ -284,16 +291,29 @@
 import {UserServices} from "@/services/user-service";
 import {PlansServices} from "@/services/plans-service";
 import { ref, getDownloadURL, uploadBytes,deleteObject } from 'firebase/storage'
-import { storage } from '../../firebaseConfig' // Importa la configuración de Firebase Storage
-
+import { storage } from '../../firebaseConfig'
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
 export default {
     name: "sign-up-plans",
+    components: {
+        StripeCheckout,
+    },
     data(){
         return{
-            loading:false,
+            publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
+            successURL:'http://localhost:5173/sign-in',
+            cancelURL:'http://localhost:5173/sign-up',
+            loading: false,
+            lineItems: [
+                {
+                    price: 'price_1OB0vHHe6cIQ9MTkbD9RYUzw',
+                    quantity: 1,
+                },
+            ],
+            loadingPhoto:false,
             profilePictureUploaded:false,
-          profilePictureFile: null,
-          profilePictureURL: null,
+            profilePictureFile: null,
+            profilePictureURL: null,
             value1: 'Nuestros Planes',
             options: ['Nuestros Planes', 'Plan personalizado'],
             defaultPlan: true,
@@ -325,7 +345,7 @@ export default {
     },
     methods:{
         async customBase64Uploader(event){
-            this.loading=true
+            this.loadingPhoto=true
             this.profilePictureFile = event.files[0];
             if (this.profilePictureFile) {
                 this.profilePictureFile.name
@@ -334,7 +354,7 @@ export default {
                 await uploadBytes(storageRef, this.profilePictureFile);
                 this.profilePictureURL = await getDownloadURL(storageRef);
                 this.profilePictureUploaded=true
-                this.loading=false
+                this.loadingPhoto=false
             }
             console.log('URL:', this.profilePictureURL)
         },
@@ -346,7 +366,12 @@ export default {
         uploadPhotoNext(){
           this.currentPath="Payment"
         },
+        submit () {
+            // You will be redirected to Stripe's secure checkout page
+            this.$refs.checkoutRef.redirectToCheckout();
+        },
       register(){
+            this.payment()
           let newUser={}
           newUser.name=this.user.name
           newUser.email=this.user.email
@@ -526,7 +551,6 @@ p {
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
         width: 13em;
     }
     .plan-cards{
@@ -566,8 +590,7 @@ p {
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
-        width: 11em;
+        width: 13em;
     }
     .plan-cards{
         margin-bottom: 3rem;
@@ -605,14 +628,14 @@ p {
         margin: 0;
     }
 }
-@media (max-width:700px){
+@media (max-width:800px){
     .type-card{
         cursor: pointer;
         border-color: white;
         border-radius: 1rem;
         background-color: #111111;
+        margin-bottom: 1rem;
         color: black;
-        margin-top: 0;
         width: 10em;
     }
     .default{
@@ -643,14 +666,14 @@ p {
         margin-top: 0;
     }
 }
-@media (max-width:559px){
+@media (max-width:750px){
     .type-card{
         cursor: pointer;
         border-color: white;
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
+        margin-bottom: 1rem;
         width: 10em;
     }
     .default{
