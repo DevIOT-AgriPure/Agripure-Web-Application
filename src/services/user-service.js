@@ -4,6 +4,19 @@ const http = axios.create({
     headers: { "Content-type": "application/json" },
 })
 export class UserServices{
+    updateSpecialist(specialist){
+        return http.put("api/v1/profiles/updateSpecialist",{
+            "accountId": specialist.accountId,
+            "name": specialist.name,
+            "description": specialist.description,
+            "imageUrl": specialist.imageUrl,
+            "location": specialist.location,
+            "expertise": specialist.expertise,
+            "contactEmail": specialist.contactEmail,
+            "areasOfFocus": specialist.areasOfFocus,
+            "planId": specialist.planId
+        });
+    }
     updateFarmer(farmer){
         return http.put("api/v1/profiles/updateFarmer",{
             "accountId": farmer.accountId,

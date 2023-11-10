@@ -18,6 +18,7 @@
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <h3 >Email: {{ userEmail }}</h3>
                 </div>
+                <h4>Description:</h4>
                 <div style="display: flex; justify-content: space-between; margin: 1.2rem 0 1.2rem 0">
                     <p>{{userDescription}}</p>
                 </div>
@@ -26,14 +27,15 @@
                 </div>
                 <div class="chat-card-first">
                     <div class="plan-image">
-                        <i class="pi pi-bolt" style="font-size: 2.5rem"></i>
+                        <i v-if="planId!==1" class="pi pi-bolt" style="font-size: 2.5rem"></i>
+                        <i v-if="planId===1" class="pi pi-lock" style="font-size: 2.5rem"></i>
                     </div>
                     <div class="chat-content" >
                         <div class="chat-header">
                             <h3 style="margin-bottom: 0.5rem">{{ plan.name }}</h3>
                             <pv-button label="UPDATE" @click="showUpdatePlanDialog" />
                         </div>
-                        <p v-if="planId!=='1'" style="width: 30%">S/. {{ plan.price }}</p>
+                        <p v-if="planId!==1" style="width: 30%">S/. {{ plan.price }}</p>
                     </div>
                 </div>
             </div>
@@ -199,7 +201,6 @@ export default {
         })
         new PlansServices().getPlanById(this.planId).then(res=>{
             this.plan=res.data
-            console.log(this.plan)
         })
     },
     methods:{
@@ -208,7 +209,7 @@ export default {
             farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
             farmer.name=this.userName
             farmer.description=this.userDescription
-            farmer.imageUrl=this.profilePictureURL
+            farmer.imageUrl=sessionStorage.getItem("imageUrl")
             farmer.location="Lima, Peru"
             farmer.planId=planId
             new UserServices().updateFarmer(farmer).then(resp=>{
@@ -259,13 +260,12 @@ export default {
             farmer.name=this.editUserName
             farmer.description=this.editUserDescription
             farmer.imageUrl=sessionStorage.getItem("imageUrl")
-            farmer.imageName=sessionStorage.getItem("imageName")
             farmer.location="Lima, Peru"
+            farmer.planId=parseInt(sessionStorage.getItem("planId").toString())
             new UserServices().updateFarmer(farmer).then(resp=>{
                 this.editProfileDialogVisible=false
                 sessionStorage.setItem("name",farmer.name)
                 sessionStorage.setItem("imageUrl",farmer.imageUrl)
-                sessionStorage.setItem("imageName",farmer.imageName)
                 sessionStorage.setItem("description",farmer.description)
                 this.userName= farmer.name
                 this.userDescription= farmer.description
@@ -294,6 +294,15 @@ export default {
             this.esFormularioCompleto = (this.editUserName.length>0  && this.editUserDescription.length >0);
         },
         logOut(){
+            sessionStorage.removeItem("jwt")
+            sessionStorage.removeItem("id")
+            sessionStorage.removeItem("description")
+            sessionStorage.removeItem("email")
+            sessionStorage.removeItem("name")
+            sessionStorage.removeItem("imageUrl")
+            sessionStorage.removeItem("type")
+            sessionStorage.removeItem("planId")
+
             this.$router.push("/sign-in")
         }
     }
@@ -349,11 +358,12 @@ export default {
         width: 100%;
     }
     .content-container {
-        display: inline;
-        justify-content: center;
-        align-items: flex-start;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        justify-items: center;
+        align-items: center;
         flex-wrap: wrap;
-        width: 100%;
     }
     .profilePicture {
         width: 100%;
@@ -451,9 +461,11 @@ export default {
         justify-content: center;
     }
     .content-container {
+        height: 100%;
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        justify-items: center;
+        align-items: center;
         flex-wrap: wrap;
     }
 
