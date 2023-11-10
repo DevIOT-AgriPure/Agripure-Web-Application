@@ -69,29 +69,71 @@
                       </template>
                       <template #content>
                         <div class="content">
-                          <h2>{{plan.name}}</h2>
+                            <div style="display: flex;justify-content: center;width: 100%">
+                                <h2>{{plan.name.toUpperCase()}}</h2>
+                            </div>
+                            <div class="price">
+                                <div style="height: 100%;width: 100%">
+                                    <div style="width: 100%; display: flex">
+                                        <div style="width: 100%;display: flex;justify-content: center">
+                                            <h1>S/.{{ plan.price }}</h1>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex;justify-content: center">
+                                        <h3>MONTH</h3>
+                                    </div>
+                                </div>
+                            </div>
                           <div class="visible">
                             <template v-if="plan.name==='Premium'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">{{ plan.description }}</p>
+                                  <div class="margin-feature" >
+                                      <div class="feature-container">
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Add unlimited Crops</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Contact Specialists</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Get unlimited Projects</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Crop monitoring</p>
+                                      </div>
+                                  </div>
                               </div>
                             </template>
                             <template v-if="plan.name==='Free'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">{{ plan.description }}</p>
+                                  <div class="margin-feature" >
+                                      <div class="feature-container">
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Add unlimited Crops</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Contact Specialists</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i style="color: #b70000" class="pi pi-times-circle"></i>
+                                          <p>Get unlimited Project</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i style="color: #b70000" class="pi pi-times-circle"></i>
+                                          <p >Crop monitoring</p>
+                                      </div>
+                                  </div>
                               </div>
                             </template>
                           </div>
-                          <div class="price">
-                            <p style="font-weight: bold; margin-top: 8px" v-if="plan.name!=='Free'">{{ plan.price }} S/</p>
-                            <p style="font-weight: bold; margin-top: 8px" v-if="plan.name==='Free'">‎ </p>
-                            <div style="display: table;">
-                              <p style="margin: 0;padding: 0 0 0.45rem 0.1rem ;align-items: end ;display: table-cell;vertical-align: bottom; color: darkgrey" v-if="plan.name!=='Free'">mo*</p>
-                              <p style="margin: 0;padding: 0 0 0.45rem 0.1rem ;align-items: end ;display: table-cell;vertical-align: bottom; color: darkgrey" v-if="plan.name==='Free'">‎ </p>
-                            </div>
+                          <div style="width: 100%;display: flex;justify-content: center">
+                              <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Select</pv-button>
+                              <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected(2)">Select</pv-button>
                           </div>
-                          <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Elegir</pv-button>
-                          <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected(2)">Elegir</pv-button>
                         </div>
                       </template>
                     </pv-card >
@@ -488,10 +530,6 @@ export default {
 .form-Text{
   text-align: center;
 }
-.rw{
-  color: white;
-  text-decoration: none;
-}
 .card{
   display: flex;
   justify-content: center;
@@ -534,7 +572,28 @@ p {
     margin-bottom: 0.5rem;
 }
 .price{
+
     display: flex;
+}
+.price h1{
+    font-weight: bold;font-size: 50px
+}
+.price h3{
+    margin-top: 0.5rem;
+    color: #888888;
+    font-weight: bold;font-size: 30px
+}
+.margin-feature{
+    margin: 1rem 0 1rem 1rem
+}
+.feature-container{
+    display: flex; height: 30px; justify-content: left; align-items: center;
+}
+.feature-container i{
+    font-size: 1rem; margin-right: 5px; color: darkgreen
+}
+.feature-container p{
+    font-size: 1rem; margin: 0;
 }
 .plan-cards{
     margin-bottom: 3rem;
@@ -542,6 +601,7 @@ p {
     justify-content: space-evenly;
 }
 .planButton{
+    border-radius: 1rem;
     margin-top: .5em;
 }
 @media (max-width:1280px){
@@ -564,8 +624,29 @@ p {
         color: black;
         margin-top: 0;
         width: 14em;
-        height: 18em;
+        height: 19em;
     }
+    .price h1{
+        font-weight: bold;font-size: 25px
+    }
+    .price h3{
+        margin-top: 0.2rem;
+        color: #888888;
+        font-weight: bold;font-size: 15px
+    }
+    .margin-feature{
+        margin: 0.5rem 0 0.5rem 0.5rem
+    }
+    .feature-container{
+        display: flex; height: 20px; justify-content: left; align-items: center;
+    }
+    .feature-container i{
+        font-size: 0.7rem; margin-right: 5px; color: darkgreen
+    }
+    .feature-container p{
+        font-size: 0.7rem; margin: 0;
+    }
+
     .content h2{
         margin-bottom: 0.5rem;
         margin-top: 0;
@@ -573,13 +654,8 @@ p {
     .content p{
         margin-top: 0;
     }
-    .until{
-        visibility: hidden;
-        height: 0;
-        width: 0;
-        margin: 0;
-    }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
 }
@@ -605,6 +681,16 @@ p {
         width: 10em;
         height: 14em;
     }
+    .price h1{
+        font-weight: bold;font-size: 25px
+    }
+    .price h3{
+        visibility: hidden;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        color: #888888;
+        font-weight: bold;font-size: 1px
+    }
     .content h2{
         margin-bottom: 0.5rem;
         margin-top: 0;
@@ -612,13 +698,8 @@ p {
     .content p{
         margin-top: 0;
     }
-    .until{
-        visibility: hidden;
-        height: 0;
-        width: 0;
-        margin: 0;
-    }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
     .visible{
@@ -663,6 +744,7 @@ p {
         margin-top: 0;
     }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
 }
