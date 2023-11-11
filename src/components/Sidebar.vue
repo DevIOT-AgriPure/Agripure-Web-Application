@@ -94,7 +94,7 @@ export default {
             if (this.route) {
                 const path = this.route.path;
                 this.usertype=sessionStorage.getItem("type")
-                return path !== '/sign-in' && path !== '/sign-up';
+                return path !== '/' && path !== '/sign-up' && path !== '/successful-pay' && path !== '/unsuccessful-pay';
             }
             return false;
         }

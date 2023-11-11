@@ -277,7 +277,8 @@
                                       <h2 style="margin: 2rem">¿Do you want to continue?</h2>
                                       <div class="buttons" >
                                           <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
-                                          <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
+                                          <pv-button v-if="parseInt(this.userPlanSelected)===1" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Register</pv-button >
+                                          <pv-button v-if="parseInt(this.userPlanSelected)===2" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
                                       </div>
                                   </div>
                               </div>
@@ -287,38 +288,35 @@
                   </template>
               </pv-card>
           </div>
-
       </div>
-    <div v-if="currentPath==='Payment'">
+      <div v-if="currentPath==='Payment'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
           <template #content>
             <div class="content" style="width: 50vw">
-              <p style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('ProfilePicture')"  >
-                Go back
-              </p>
-              <div class="steps" >
-              </div>
               <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                 <h1>Payment method</h1>
               </div>
               <div style=" display: flex; justify-content: center;align-content: center">
-                  <div>
-                      <stripe-checkout
-                              ref="checkoutRef"
-                              mode="payment"
-                              :pk="publishableKey"
-                              :line-items="lineItems"
-                              :success-url="successURL"
-                              :cancel-url="cancelURL"
-                              @loading="v => loading = v"
-                      />
-                      <button class="button button4"  @click="submit">Buy now</button>
-                  </div>
+
               </div>
               <div class="footer">
                 <div class="buttons" >
-                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Start subscription</pv-button >
+                    <div>
+                        <stripe-checkout
+                                ref="checkoutRef"
+                                mode="payment"
+                                :pk="publishableKey"
+                                :line-items="lineItems"
+                                :success-url="successURL"
+                                :cancel-url="cancelURL"
+                                @loading="v => loading = v"
+                        />
+                    </div>
+                    <div style="display: flex;justify-content: space-around;width: 100%">
+                        <pv-button style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger"  @click="cancelRegister()">Cancel</pv-button>
+                        <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen"  @click="registerAndPayment()">Pay subscription</pv-button>
+                    </div>
                 </div>
               </div>
             </div>
@@ -335,6 +333,7 @@ import {PlansServices} from "@/services/plans-service";
 import { ref, getDownloadURL, uploadBytes,deleteObject } from 'firebase/storage'
 import { storage } from '../../firebaseConfig'
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
+import {SubscriptionService} from "@/services/subscription-service";
 export default {
     name: "sign-up-plans",
     components: {
@@ -343,8 +342,8 @@ export default {
     data(){
         return{
             publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
-            successURL:'http://localhost:5173/sign-in',
-            cancelURL:'http://localhost:5173/sign-up',
+            successURL:'http://localhost:5173/successful-pay',
+            cancelURL:'http://localhost:5173/unsuccessful-pay',
             loading: false,
             lineItems: [
                 {
@@ -383,7 +382,6 @@ export default {
         new PlansServices().getPlans().then(res=>{
             this.plans=res.data
         })
-
     },
     methods:{
         async customBase64Uploader(event){
@@ -406,14 +404,46 @@ export default {
             this.profilePictureURL=null
         },
         uploadPhotoNext(){
-          this.currentPath="Payment"
+            this.currentPath="Payment"
         },
-        submit () {
-            // You will be redirected to Stripe's secure checkout page
-            this.$refs.checkoutRef.redirectToCheckout();
+        cancelRegister(){
+            location.reload();
+        },
+        registerAndPayment(){
+            let newUser={}
+            newUser.name=this.user.name
+            newUser.email=this.user.email
+            newUser.password=this.user.password
+            newUser.description=this.user.description
+            newUser.imageUrl=this.profilePictureURL
+            newUser.location="Lima, Peru"
+            newUser.type=this.selectedUserType.toUpperCase()
+            newUser.plan=parseInt(this.userPlanSelected)
+            new UserServices().registerFarmer(newUser).then(response=>{
+                new UserServices().getUserByEmail("",newUser.email).then(res=>{
+                    let subscription={}
+                    subscription.accountId=parseInt(res.data.accountId.toString())
+                    subscription.validDate=this.getActualDateFormated().toString()
+                    subscription.active=false
+                    console.log(subscription)
+                    new SubscriptionService().createSubscription(subscription).then(r=>{
+                        localStorage.setItem("tempUserAccount",res.data.accountId)
+                        this.$refs.checkoutRef.redirectToCheckout();
+                    })
+                })
+
+            }).catch(error=>{
+                this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+            })
+        },
+        getActualDateFormated() {
+            let fechaActual = new Date();
+            let dia = fechaActual.getDate().toString().padStart(2, '0');
+            let mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
+            let anio = fechaActual.getFullYear();
+            return `${dia}/${mes}/${anio}`;
         },
       register(){
-            this.payment()
           let newUser={}
           newUser.name=this.user.name
           newUser.email=this.user.email
@@ -431,6 +461,7 @@ export default {
           if(this.selectedUserType==="farmer"){
               new UserServices().registerFarmer(newUser).then(response=>{
                   this.$router.push("/sign-in")
+                  //this.$refs.checkoutRef.redirectToCheckout();
               }).catch(error=>{
                   this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
               })
@@ -460,8 +491,6 @@ export default {
         if(path==="sign-in"){
           this.$router.push("/sign-in")
         }
-        console.log(this.selectedUserType)
-          console.log(path)
         if(this.selectedUserType==="specialist"&&path==="Plans"){
             this.currentPath="Types"
         }else {
@@ -475,16 +504,21 @@ export default {
         this.esFormularioCompleto = (this.user.name.length>0 && this.user.email.length >0 && this.user.password.length >0 && this.user.description.length >0);
       },
       addTemporaryUser(){
-          if(this.currentPath==="SpecialistForm"){
-              this.currentPath="ProfilePicture"
-          }
-          else {
-              if(this.selectedUserType==="specialist"){
-                  this.currentPath="SpecialistForm"
-              }else {
+          new UserServices().getUserByEmail("",this.user.email).then(res=>{
+              this.$toast.add({severity:'error', summary: 'Email registered', detail:'Email already registered', life: 3000});
+          }).catch(error=>{
+              if(this.currentPath==="SpecialistForm"){
                   this.currentPath="ProfilePicture"
               }
-          }
+              else {
+                  if(this.selectedUserType==="specialist"){
+                      this.currentPath="SpecialistForm"
+                  }else {
+                      this.currentPath="ProfilePicture"
+                  }
+              }
+          })
+
 
       },
       validarNombre(evento) {
