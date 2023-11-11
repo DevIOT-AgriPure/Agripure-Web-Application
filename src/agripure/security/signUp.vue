@@ -277,7 +277,7 @@
                                       <h2 style="margin: 2rem">¿Do you want to continue?</h2>
                                       <div class="buttons" >
                                           <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
-                                          <pv-button v-if="parseInt(this.userPlanSelected)===1" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Register</pv-button >
+                                          <pv-button v-if="parseInt(this.userPlanSelected)!==2" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Register</pv-button >
                                           <pv-button v-if="parseInt(this.userPlanSelected)===2" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
                                       </div>
                                   </div>
@@ -298,7 +298,7 @@
                 <h1>Payment method</h1>
               </div>
               <div style=" display: flex; justify-content: center;align-content: center">
-
+                <p>To complete the registration, complete the payment of your subscription using stripe</p>
               </div>
               <div class="footer">
                 <div class="buttons" >
@@ -378,7 +378,7 @@ export default {
           userPlanSelected:"none",
         }
     },
-    created(){   this.currentPath="Types"
+    created(){   this.currentPath="Payment"
         new PlansServices().getPlans().then(res=>{
             this.plans=res.data
         })

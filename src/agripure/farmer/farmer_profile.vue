@@ -150,6 +150,7 @@
                                                         </div>
                                                     </div>
                                                     <div>
+
                                                         <pv-button class="planButton" :disabled="this.planId===1" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Select</pv-button>
                                                         <pv-button class="planButton" :disabled="this.planId===2" v-if="plan.name==='Premium'" style="background-color: darkgreen;border-color: darkgreen; color:white" @click="planSelected(2)">Select</pv-button>
                                                     </div>
@@ -172,10 +173,14 @@ import {PlansServices} from "@/services/plans-service";
 import {UserServices} from "@/services/user-service";
 import {deleteObject, getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "@/firebaseConfig";
+import {StripeCheckout} from "@vue-stripe/vue-stripe";
+import {SubscriptionService} from "@/services/subscription-service";
 
 export default {
+    components: {StripeCheckout},
     data(){
         return{
+            id:parseInt(sessionStorage.getItem("id").toString()),
             plans:[],
             loading:false,
             profilePictureFile: null,
@@ -192,7 +197,17 @@ export default {
             editUserEmail:"",
             imageUrl:sessionStorage.getItem("imageUrl"),
             planId:parseInt(sessionStorage.getItem("planId").toString()),
-            plan: {}
+            plan: {},
+            publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
+            successURL:'http://localhost:5173/successful-pay',
+            cancelURL:'http://localhost:5173/unsuccessful-pay',
+            loadingP: false,
+            lineItems: [
+                {
+                    price: 'price_1OB0vHHe6cIQ9MTkbD9RYUzw',
+                    quantity: 1,
+                },
+            ],
         }
     },
     created() {
@@ -219,9 +234,37 @@ export default {
                 new PlansServices().getPlanById(this.planId).then(res=>{
                     this.plan=res.data
                     console.log(this.plan)
+                    if(this.planId===1){
+                        new SubscriptionService().updateSubscription(this.id,false).then(res=>{
+                            console.log(res.data)
+                        })
+                    }
+                    if(this.planId===2){
+                        new SubscriptionService().getSubscriptionById(this.id).then(r=>{
+                            new SubscriptionService().updateSubscription(this.id,true).then(res=>{
+                                console.log(res.data)
+                            })
+                        }).catch(error=>{
+                            let subscription={}
+                            subscription.accountId=parseInt(this.id)
+                            subscription.validDate=this.getActualDateFormated().toString()
+                            subscription.active=false
+                            new SubscriptionService().createSubscription().then(response=>{
+                                localStorage.setItem("tempUserAccount",this.id)
+                                this.$refs.checkoutRef.redirectToCheckout();
+                            })
+                        })
+                    }
                 })
                 this.updatePlanDialogVisible=false
             })
+        },
+        getActualDateFormated() {
+            let fechaActual = new Date();
+            let dia = fechaActual.getDate().toString().padStart(2, '0');
+            let mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
+            let anio = fechaActual.getFullYear();
+            return `${dia}/${mes}/${anio}`;
         },
         showUpdatePlanDialog(){
           this.updatePlanDialogVisible=true

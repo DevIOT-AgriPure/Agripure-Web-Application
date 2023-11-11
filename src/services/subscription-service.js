@@ -11,6 +11,9 @@ export class SubscriptionService{
             "active": false
         })
     }
+    getSubscriptionById(accountId){
+        return http.get("subscriptions/getSubscription/"+accountId,)
+    }
     updateSubscription(accountId,active){
         return http.put("subscriptions",{
             "accountId": accountId,

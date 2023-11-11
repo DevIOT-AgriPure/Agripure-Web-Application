@@ -27,8 +27,8 @@
                             </router-link>
                         </div>
                         <div class="buttons">
-                            <router-link to="/sign-up" class="rw" ><pv-button style="background-color: darkgreen;border-color: darkgreen;color: white" label="Register"/></router-link>
-                            <pv-button @click="signIn" style="background-color: darkgreen;border-color: darkgreen;color: white" label="Log in"></pv-button>
+                            <router-link to="/sign-up" class="rw" ><pv-button style="background-color: #337e21;border-color: #337e21;color: white" label="Register"/></router-link>
+                            <pv-button @click="signIn" style="background-color: #337e21;border-color: #337e21;color: white" label="Login"></pv-button>
                         </div>
                     </div>
                 </template>
