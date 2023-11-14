@@ -66,7 +66,6 @@ export default {
       let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
-              console.log("consulto")
                 if(path==="/farmer/chat"){
                     // Realiza una solicitud GET al servidor para verificar nuevos mensajes
                     console.log("ImplementarWebSocket")
