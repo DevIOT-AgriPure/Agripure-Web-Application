@@ -378,7 +378,7 @@ export default {
           userPlanSelected:"none",
         }
     },
-    created(){   this.currentPath="Payment"
+    created(){   this.currentPath="Types"
         new PlansServices().getPlans().then(res=>{
             this.plans=res.data
         })

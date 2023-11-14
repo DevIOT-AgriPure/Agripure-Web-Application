@@ -234,6 +234,8 @@ export default {
                 new PlansServices().getPlanById(this.planId).then(res=>{
                     this.plan=res.data
                     console.log(this.plan)
+                  console.log(this.planId)
+                  //areglar esta aparte
                     if(this.planId===1){
                         new SubscriptionService().updateSubscription(this.id,false).then(res=>{
                             console.log(res.data)

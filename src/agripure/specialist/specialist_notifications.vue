@@ -63,7 +63,7 @@ export default {
             }
 
         })
-        setInterval(() => {
+      let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
                 if(path==="/specialist/notifications"){
@@ -79,6 +79,8 @@ export default {
 
                     })
                     console.log("ImplementarWebSocket")
+                }else {
+                  clearInterval(intervalId)
                 }
             }
 

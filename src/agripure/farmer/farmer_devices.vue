@@ -39,6 +39,7 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
+                  <pv-button style="margin-right: 1rem" label="Monitoring" severity="warning" aria-label="Information" @click="getDeviceValue(data)"/>
                     <pv-button style="margin-right: 1rem" label="Info" severity="warning" aria-label="Information" @click="openInfoDeviceDialog(data)"/>
                     <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
                 </div>
@@ -55,19 +56,19 @@
           </div>
         </div>
       </pv-dialog>
+      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+        <div class="addplantbackground">
+          <div class="crop-details">
+            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}}</h2>
+            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}}</h2>
+          </div>
+        </div>
+      </pv-dialog>
       <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-              <h1 style="margin: 1rem ">{{currentDeviceForInfo.name}}</h1>
-              <h4 style="margin: 1rem ">Model: {{currentDeviceForInfo.model}}</h4>
-            <h5 style="margin: 1rem ">Crop: {{currentDeviceForInfo.cropName}}</h5>
-            <h5 style="margin: 1rem " v-if="currentDeviceForInfo.projectId!==0">Project: {{currentDeviceForInfo.projectName}}</h5>
-              <div style="margin: 1rem ">
-                  <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
-
-              </div>
-
-
+              <h1 style="margin: 1rem ">{{currentDeviceValue.name}}</h1>
+              <h4 style="margin: 1rem ">Model: {{currentDeviceValue.model}}</h4>
           </div>
         </div>
       </pv-dialog>
@@ -123,19 +124,41 @@ export default {
       deviceDialogVisible:false,
       deleteDeviceDialogVisible:false,
         addDeviceDialogVisible:false,
+      deviceValueDialogVisible:false,
       currentCropForProject:{},
       currentDeviceForDelete:{},
       currentDeviceForInfo:{},
         devicesCataloge:{},
+      currentDeviceValue:{}
     };
   },
   created(){
     new DeviceServices().getAllDevicesByUserId(sessionStorage.getItem("id")).then(response=>{
       this.devices=response.data
+
     })
 
   },
   methods:{
+    getDeviceValue(data){
+      new DeviceServices().getDeviceValueById(data.id).then(res=>{
+        this.currentDeviceValue=res.data
+        console.log(this.currentDeviceValue)
+        this.deviceValueDialogVisible=true
+      })
+
+      let intervalId=setInterval(() => {
+        if (this.deviceValueDialogVisible) {
+          new DeviceServices().getDeviceValueById(data.id).then(res=>{
+            this.currentDeviceValue=res.data
+            console.log(this.currentDeviceValue)
+          })
+        }
+        else {
+          clearInterval(intervalId)
+        }
+      }, 2000);
+    },
       updateActiveDevice(device){
           if(device.active){
               //hacer el update en el service de device

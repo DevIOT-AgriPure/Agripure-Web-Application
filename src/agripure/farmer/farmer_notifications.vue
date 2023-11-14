@@ -55,7 +55,7 @@ export default {
         this.getFormatDay(fecha)
 
     })
-      setInterval(() => {
+    let intervalId=setInterval(() => {
           if (this.route) {
               const path = this.route.path;
               if(path==="/farmer/notifications"){
@@ -66,6 +66,8 @@ export default {
 
                   })
                   console.log("ImplementarWebSocket")
+              }else{
+                clearInterval(intervalId)
               }
           }
 
