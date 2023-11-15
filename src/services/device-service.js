@@ -5,10 +5,10 @@ const http = axios.create({
 })
 export class DeviceServices{
     getAllDevicesByUserId(id){
-        return http.get("Devices/?farmerId_like="+id);
+        return http.get("/getDevicesByFarmerId/"+id);
     }
     getDeviceValueById(id){
-        return http.get("DevicesValue/"+id);
+        return http.get("/temperaturehumidity/"+id);
     }
     postDevice(device){
         return http.post("",{

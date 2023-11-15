@@ -39,8 +39,7 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
-                  <pv-button style="margin-right: 1rem" label="Monitoring" severity="warning" aria-label="Information" @click="getDeviceValue(data)"/>
-                    <pv-button style="margin-right: 1rem" label="Info" severity="warning" aria-label="Information" @click="openInfoDeviceDialog(data)"/>
+                  <pv-button style="margin-right: 1rem" label="Information" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
                     <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
                 </div>
             </template>
@@ -87,25 +86,73 @@
                                 <div style="display: flex; align-items: center;">
                                     <pv-button label="Add" @click="addDevicefromCataloge(device)"/>
                                 </div>
-
                             </div>
                         </div>
                     </div>
-                    <div v-else>
-                        <h1> Before buy it</h1>
-                        <h2> We need some information</h2>
-                        <div style="margin: 2rem 0">
-                                <span style="width: 50%;margin: 1rem" class="p-float-label">
-                                    <pv-input style="width: 100%" v-tooltip="'We recommend a name to differentiate it from other devices'" id="username" v-model="currentDeviceAtributes.name" />
+                    <div v-else style="display: flex;justify-content: space-around">
+                        <div style="width: 50%;">
+                            <div style="margin: 1rem">
+                                <h1> Before buy it</h1>
+                                <h2> We need some information</h2>
+                            </div>
+                            <div style="margin: 2rem 0">
+                                <div style="margin: 1rem">
+                                    <span style="width: 100%" class="p-float-label">
+                                    <pv-input @input="buyButtonDisable" style="width: 100%" v-tooltip="'We recommend a name to differentiate it from other devices'" id="username" v-model="currentDeviceName" />
                                     <label style="width: 100%" for="username">Device Name</label>
                                 </span>
-                            <div style="display:flex; justify-content: left;margin: 1rem">
-                                <pv-dropdown style="width: 50%" v-model="selectedCrop"
-                                             @change="this.isNextButtonDisable=false" editable :options="cropsForFarmer"
-                                             optionLabel="name" placeholder="Select a crop" />
+                                </div>
+
+                                <div style="margin: 1rem">
+                                    <pv-dropdown style="width: 100%" v-model="selectedCrop"
+                                                 @change="buyButtonDisable()" :options="cropsForFarmer"
+                                                 optionLabel="name" placeholder="Crop for your device" />
+                                </div>
+                                <div style="margin: 2rem 1rem 1rem 1rem; display: flex;justify-content: space-around">
+                                    <pv-button style="margin-right: 1rem" label="Cancel"  severity="danger" aria-label="Information" @click="cancelBuyButton()"/>
+                                    <pv-button :disabled="isBuyButtonDisable" severity="success" label="Buy" aria-label="Delete"  @click="buyDevice()"/>
+                                </div>
                             </div>
                         </div>
+                        <div style="width: 50%">
+                            <div style="width: 100%; display: flex;justify-content: center">
+                                <img :src="currentDeviceInBuy.imageUrl" style="width: 200px; height: 200px;border-radius: 0.5rem; " alt="">
+                            </div>
+                            <div style="width: 100%; display: flex;justify-content: center">
+                                <p class="device-specifications">{{currentDeviceInBuy.specifications}}</p>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="proccessingBuyDialogVisible" modal header="Loading payment" :style="{ width: '30vw' }">
+            <div class="crop-details">
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 5rem"></i>
+                </div>
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <p>This process may take a few seconds.</p>
+                </div>
+            </div>
+            <stripe-checkout
+                    ref="checkoutRef"
+                    mode="payment"
+                    :pk="publishableKey"
+                    :line-items="lineItems"
+                    :success-url="successURL"
+                    :cancel-url="cancelURL"
+                    @loading="v => loading = v"
+            />
+        </pv-dialog>
+        <pv-dialog v-model:visible="isDeviceBoughtDialog"  modal header="Payment successfully processed" :style="{ width: '50vw' }">
+            <div class="crop-details">
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <h2>Thank you for your patience.</h2>
+                </div>
+                <div style="display: flex;justify-content: center;margin: 2rem 0 0 0">
+                    <pv-button style="margin-right: 1rem" label="close"  severity="successful" aria-label="Close" @click="isDeviceBoughtDialog=false"/>
                 </div>
             </div>
         </pv-dialog>
@@ -123,40 +170,95 @@ import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
 import {DeviceServices} from "@/services/device-service";
 import {DeviceCatalogeServices} from "@/services/devicesCataloge-service";
+import {StripeCheckout} from "@vue-stripe/vue-stripe";
 
 export default {
   name: "farmer_devices",
+    components: {StripeCheckout},
   data(){
     return{
         id:parseInt(sessionStorage.getItem("id").toString()),
-      devices:[],
-      filters: {
+        devices:[],
+        filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
           cropName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         active: { value: null, matchMode: FilterMatchMode.IN },
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
+        publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
+        successURL:'http://localhost:5173/farmer/devices',
+        cancelURL:'http://localhost:5173/unsuccessful-pay',
+        loading: false,
+        lineItems: [
+            {
+                price: 'price_1OB0vHHe6cIQ9MTkbD9RYUzw',
+                quantity: 1,
+            },
+        ],
         selectedCrop:null,
         cropsForFarmer:[],
-      deviceDialogVisible:false,
-      deleteDeviceDialogVisible:false,
+        proccessingBuyDialogVisible:false,
+        deviceDialogVisible:false,
+        deleteDeviceDialogVisible:false,
         addDeviceDialogVisible:false,
-      deviceValueDialogVisible:false,
-      currentCropForProject:{},
-      currentDeviceForDelete:{},
-      currentDeviceForInfo:{},
+        deviceValueDialogVisible:false,
+        currentCropForProject:{},
+        currentDeviceForDelete:{},
+        currentDeviceForInfo:{},
+        currentDeviceInBuy:{},
         devicesCataloge:{},
-      currentDeviceValue:{},
-        currentDeviceAtributes:{},
+        currentDeviceValue:{},
+        currentDeviceName:"",
         buyMode:false,
+        isBuyButtonDisable:true,
+        isDeviceBoughtDialog:false,
     };
   },
   created(){
-
+      if(localStorage.getItem("deviceId")!==null){
+          this.isDeviceBoughtDialog=true
+          localStorage.removeItem("deviceId")
+      }
+    new DeviceServices().getAllDevicesByUserId(this.id).then(res=>{
+        this.devices=res.data
+    })
     this.getDisplayableCrops()
   },
   methods:{
+      cancelBuyButton(){
+          this.currentDeviceName=null
+          this.selectedCrop=null
+          this.buyMode=false
+      },
+      buyButtonDisable(){
+          if(this.currentDeviceName.length>0 && this.selectedCrop!==null){
+              this.isBuyButtonDisable=false
+          }else {
+              this.isBuyButtonDisable=true
+          }
+      },
+      buyDevice(){
+          this.currentDeviceInBuy.name=this.currentDeviceName
+          this.currentDeviceInBuy.cropName=this.selectedCrop.name
+          this.addDeviceDialogVisible=false
+          this.proccessingBuyDialogVisible=true
+          this.processPurchase()
+      },
+      processPurchase(){
+          if(this.currentDeviceInBuy.model==='DHT22'){
+              this.lineItems[0].price='price_1OCmbGHe6cIQ9MTkGUrgef5y'
+          }
+          if(this.currentDeviceInBuy.model==='DS18B20'){
+              this.lineItems[0].price='price_1OCmcSHe6cIQ9MTkNAakzDBP'
+          }
+        new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
+            console.log(res.data)
+            localStorage.setItem("deviceId",res.data)
+            localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
+            this.$refs.checkoutRef.redirectToCheckout();
+        })
+      },
       getDisplayableCrops(){
           this.cropsForFarmer=[]
           new CropServices().getCropsByFarmerId("",this.id).then(response=>{
@@ -176,19 +278,26 @@ export default {
           })
 
       },
+      getProjectByCropId(){
+        //logica para obtener el projecto por Id del crop
+          return 0
+      },
       addDevicefromCataloge(device){
           this.buyMode=true
           console.log(device)
-          /*let newDevice={}
-          newDevice.name:
-          newDevice.model
-          newDevice.category
-          newDevice.cropName
-          newDevice.farmerId
-          newDevice.projectId
-          new DeviceServices().postDevice()*/
+
+          this.currentDeviceInBuy.model=device.model
+          this.currentDeviceInBuy.category=device.category
+          this.currentDeviceInBuy.farmerId=this.id
+          this.currentDeviceInBuy.projectId=this.getProjectByCropId()
+          this.currentDeviceInBuy.imageUrl=device.imageUrl
+          this.currentDeviceInBuy.specifications=device.specifications
+          this.currentDeviceInBuy.price=device.price
+
+
+          //new DeviceServices().postDevice()
       },
-    getDeviceValue(data){
+      getDeviceValue(data){
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data
         console.log(this.currentDeviceValue)
@@ -215,36 +324,25 @@ export default {
               console.log("apague: "+device.active)
           }
       },
-      returnDisplayableSpecification(specification){
-          if (specification) {
-              return specification.replace(/\$/g, ' - ');
-          } else {
-              return '';
-          }
-      },
-      returnProjectName(id){
-        new ProjectService().getProjectById(id).then(response=>{
-            return response.data.name.toString()
-        })
-      },
       addNewDevice(){
           new DeviceCatalogeServices().getAllDevices().then(response=>{
               this.devicesCataloge=response.data
+              this.buyMode=false
               this.addDeviceDialogVisible=!this.addDeviceDialogVisible
           })
       },
-    openDeleteDeviceDialog(device){
+      openDeleteDeviceDialog(device){
       this.currentDeviceForDelete=device
       this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
-    openInfoDeviceDialog(device){
+      openInfoDeviceDialog(device){
       this.currentDeviceForInfo=device
         new ProjectService().getProjectById(device.projectId).then(response=>{
             this.currentDeviceForInfo.projectName= response.data.name.toString()
         })
       this.deviceDialogVisible=!this.deviceDialogVisible
     },
-    deleteDevice(){
+      deleteDevice(){
           // delete device using device service
         const index = this.devices.findIndex(device => device.id === this.currentDeviceForDelete.id);
         if (index !== -1) {
@@ -252,7 +350,7 @@ export default {
         }
         this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
-    getSeverity(status) {
+      getSeverity(status) {
       switch (status) {
         case true:
           return 'success';
@@ -261,7 +359,7 @@ export default {
           return 'danger';
       }
     },
-    getDeviceStatus(status){
+      getDeviceStatus(status){
       switch (status) {
         case true:
           return 'On';
@@ -270,7 +368,7 @@ export default {
           return 'Off';
       }
     },
-    openActivities(id){
+      openActivities(id){
       this.activitiesDialogVisible=!this.activitiesDialogVisible
       new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
         this.currentActivities=response.data
@@ -281,6 +379,15 @@ export default {
 </script>
 
 <style scoped>
+.device-specifications {
+    width: 60%;
+    display: flex;
+    margin: 1rem;
+    justify-content: center;
+    font-size: 15px;
+    word-wrap: break-word;
+    white-space: pre-line;
+}
 .background {
   background-color: #242424;
   color: white; /* Cambiar el color del texto si es necesario */
@@ -298,38 +405,11 @@ export default {
   padding: 1.5rem;
 }
 
-.chat-card {
-  display: flex;
-  align-items: center;
-  background-color: #1c1c1c; /* Color de fondo negro */
-  color: white; /* Color de texto blanco */
-  border-radius: 10px; /* Bordes redondos */
-  margin-bottom: 10px; /* Espaciado entre tarjetas */
-}
-
-.profile-image {
-  width: 50px; /* Ancho de la imagen de perfil */
-  height: 50px; /* Alto de la imagen de perfil */
-  border-radius: 50%; /* Hace que la imagen sea redonda */
-  overflow: hidden; /* Oculta cualquier parte de la imagen fuera del círculo */
-  margin-right: 10px;
-}
 
 .profile-image img {
   width: 100%; /* Ajusta la imagen de perfil al círculo */
   height: 100%;
   object-fit: cover; /* Mantiene la relación de aspecto de la imagen */
-}
-
-.chat-content {
-  flex-grow: 1;
-}
-
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
 .chat-header h3 {
