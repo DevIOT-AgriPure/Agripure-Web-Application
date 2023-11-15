@@ -75,7 +75,7 @@
         <pv-dialog v-model:visible="addDeviceDialogVisible" maximizable modal header="Add Devices" :style="{ width: '80vw' }">
             <div class="addplantbackground">
                 <div class="crop-details">
-                    <div v-for="device in devicesCataloge">
+                    <div v-if="!buyMode" v-for="device in devicesCataloge">
                         <div style="display: flex;justify-content: left; padding: 1rem">
                             <img :src="device.imageUrl" alt="" style="width: 100px; height: 100px;border-radius: 1rem; margin-right: 1.5rem">
                             <div style="display: flex; width: 100%;justify-content: space-between">
@@ -85,9 +85,24 @@
                                     <h4>S/. {{device.price}}</h4>
                                 </div>
                                 <div style="display: flex; align-items: center;">
-                                    <pv-button label="Add" />
+                                    <pv-button label="Add" @click="addDevicefromCataloge(device)"/>
                                 </div>
 
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <h1> Before buy it</h1>
+                        <h2> We need some information</h2>
+                        <div style="margin: 2rem 0">
+                                <span style="width: 50%;margin: 1rem" class="p-float-label">
+                                    <pv-input style="width: 100%" v-tooltip="'We recommend a name to differentiate it from other devices'" id="username" v-model="currentDeviceAtributes.name" />
+                                    <label style="width: 100%" for="username">Device Name</label>
+                                </span>
+                            <div style="display:flex; justify-content: left;margin: 1rem">
+                                <pv-dropdown style="width: 50%" v-model="selectedCrop"
+                                             @change="this.isNextButtonDisable=false" editable :options="cropsForFarmer"
+                                             optionLabel="name" placeholder="Select a crop" />
                             </div>
                         </div>
                     </div>
@@ -113,6 +128,7 @@ export default {
   name: "farmer_devices",
   data(){
     return{
+        id:parseInt(sessionStorage.getItem("id").toString()),
       devices:[],
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -121,6 +137,8 @@ export default {
         active: { value: null, matchMode: FilterMatchMode.IN },
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
+        selectedCrop:null,
+        cropsForFarmer:[],
       deviceDialogVisible:false,
       deleteDeviceDialogVisible:false,
         addDeviceDialogVisible:false,
@@ -129,17 +147,47 @@ export default {
       currentDeviceForDelete:{},
       currentDeviceForInfo:{},
         devicesCataloge:{},
-      currentDeviceValue:{}
+      currentDeviceValue:{},
+        currentDeviceAtributes:{},
+        buyMode:false,
     };
   },
   created(){
-    new DeviceServices().getAllDevicesByUserId(sessionStorage.getItem("id")).then(response=>{
-      this.devices=response.data
 
-    })
-
+    this.getDisplayableCrops()
   },
   methods:{
+      getDisplayableCrops(){
+          this.cropsForFarmer=[]
+          new CropServices().getCropsByFarmerId("",this.id).then(response=>{
+              let rawCrops=response.data
+                  for (let i = 0; i < rawCrops.length; i++) {
+                      new PlantServices().getPlantInfoById(rawCrops[i].plantId).then(res=>{
+                          let storableCropAndPlantInfo={}
+
+                          storableCropAndPlantInfo=res.data
+                          storableCropAndPlantInfo.cropId=rawCrops[i].id
+
+                          this.cropsForFarmer.push(storableCropAndPlantInfo)
+                      })
+                  }
+              console.log(this.cropsForFarmer)
+
+          })
+
+      },
+      addDevicefromCataloge(device){
+          this.buyMode=true
+          console.log(device)
+          /*let newDevice={}
+          newDevice.name:
+          newDevice.model
+          newDevice.category
+          newDevice.cropName
+          newDevice.farmerId
+          newDevice.projectId
+          new DeviceServices().postDevice()*/
+      },
     getDeviceValue(data){
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data

@@ -32,7 +32,7 @@
                         <p>{{this.user.email}}</p>
                     </div>
                     <div style="display: flex;justify-content: left;width: 100%">
-                        <p>{{this.user.name}}, your subscription is active until {{getEndSubscriptionDate(this.subscription.validDate)}}</p>
+                        <p>{{this.user.name}}, your subscription is active until {{this.subscription.validDate}}</p>
                     </div>
                     <div style="display: flex;justify-content: center;width: 100%;margin-top: 2rem">
                         <pv-button style="background-color: #3da621;border-color: #3DA621FF;color: white;border-radius: 0.5rem" severity="successful" @click="signIn()" label="CONTINUE"/>
@@ -82,24 +82,7 @@ export default {
     methods:{
       signIn(){
           this.$router.push("/")
-      },
-        getEndSubscriptionDate(stringDate) {
-            // Convertir el string de fecha a un objeto Date
-            const fecha = new Date(stringDate);
-
-            // Sumar un mes a la fecha
-            fecha.setMonth(fecha.getMonth() + 1);
-
-            // Obtener los componentes de la fecha (día, mes, año)
-            const dia = fecha.getDate().toString().padStart(2, '0');
-            const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-            const anio = fecha.getFullYear();
-
-            // Formatear la fecha en el formato dd/mm/aaaa
-            const fechaActualizada = `${dia}/${mes}/${anio}`;
-
-            return fechaActualizada;
-        }
+      }
     }
 }
 </script>

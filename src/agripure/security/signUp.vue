@@ -423,7 +423,7 @@ export default {
                 new UserServices().getUserByEmail("",newUser.email).then(res=>{
                     let subscription={}
                     subscription.accountId=parseInt(res.data.accountId.toString())
-                    subscription.validDate=this.getActualDateFormated().toString()
+                    subscription.validDate=this.getActiveDateFormated().toString()
                     subscription.active=false
                     console.log(subscription)
                     new SubscriptionService().createSubscription(subscription).then(r=>{
@@ -436,11 +436,19 @@ export default {
                 this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
             })
         },
-        getActualDateFormated() {
+        getActiveDateFormated() {
+            // Obtener la fecha actual
             let fechaActual = new Date();
+
+            // Sumar un mes a la fecha
+            fechaActual.setMonth(fechaActual.getMonth() + 1);
+
+            // Obtener los componentes de la nueva fecha (día, mes, año)
             let dia = fechaActual.getDate().toString().padStart(2, '0');
             let mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
             let anio = fechaActual.getFullYear();
+
+            // Formatear la fecha en el formato dd/mm/aaaa
             return `${dia}/${mes}/${anio}`;
         },
       register(){
