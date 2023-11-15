@@ -11,10 +11,25 @@ export class DeviceServices{
         return http.get("/temperaturehumidity/"+id);
     }
     setDeviceStatus(device){
-        console.log(device)
         return http.post("/status",{
             "deviceId": device.id,
             "newStatus": !device.active
+        })
+    }
+    updateDeviceById(device){
+        return http.put("/updateDeviceById",{
+            "id": device.id,
+            "name": device.name,
+            "cropName": device.cropName,
+            "projectId": device.projectId,
+            "active": device.active,
+            "activeNotification": device.activeNotification
+        })
+    }
+    setDeviceNotification(device){
+        return http.post("/notification",{
+            "deviceId": device.id,
+            "newStatus": !device.activeNotification
         })
     }
     postDevice(device){

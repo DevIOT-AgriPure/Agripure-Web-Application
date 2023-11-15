@@ -39,8 +39,8 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
-                  <pv-button :disabled="isWatchDisable" style="margin-right: 1rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
-                    <pv-button  icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
+                  <pv-button :disabled="isWatchDisable" style="margin-right: 0.5rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
+                    <pv-button  icon="pi pi-cog" style="margin-right: 0.5rem" severity="warning" rounded aria-label="options" @click="openInfoDeviceDialog(data)"/>
                 </div>
             </template>
           </pv-column >
@@ -50,12 +50,12 @@
         <div class="addplantbackground">
           <h3 style="margin: 0rem 2rem 2rem 2rem">¿ Are you sure you want delete this device ?</h3>
           <div style="display: flex;justify-content: space-around">
-            <pv-button label="Yes" severity="success" @click="deleteDevice()"/>
             <pv-button label="No" severity="danger" @click="deleteDeviceDialogVisible=!deleteDeviceDialogVisible"/>
+              <pv-button label="Yes" severity="success" @click="deleteDevice()"/>
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Monitoring" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
             <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
@@ -63,11 +63,27 @@
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Device Settings" :style="{ width: '30vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-              <h1 style="margin: 1rem ">{{currentDeviceValue.name}}</h1>
-              <h4 style="margin: 1rem ">Model: {{currentDeviceValue.model}}</h4>
+              <div>
+                  <pv-input v-model="currentDeviceForInfoName" style="width: 100%;color: white" placeholder="Disabled" />
+              </div>
+              <h4 style="margin: 1rem ">Model: {{currentDeviceForInfo.model}}</h4>
+              <div style="width: 100%;display: flex;justify-content: space-around ">
+                  <div style="display: flex; align-items: center;margin-left: 1rem">
+                      <pv-inputSwitch v-model="currentDeviceForInfo.activeNotification" />
+                      <p style="margin-left: 0.5rem; margin-bottom: 0;">Send notifications</p>
+                  </div>
+                  <div style="margin: 1rem">
+                      <pv-button outlined severity="danger" label="Delete device" aria-label="Delete" @click="openDeleteDeviceDialog(currentDeviceForInfo)"/>
+                  </div>
+              </div>
+
+              <div style="margin: 2rem 1rem 1rem 1rem;display: flex;justify-content: space-around">
+                  <pv-button icon="pi pi-times" severity="danger" label="close" aria-label="close" @click="deviceDialogVisible=false" />
+                  <pv-button icon="pi pi-save" severity="success" label="save" aria-label="save" @click="saveDeviceSettings(currentDeviceForInfo)"/>
+              </div>
           </div>
         </div>
       </pv-dialog>
@@ -164,10 +180,8 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
-import {SpecialistServices} from "@/services/specialists-service";
 import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
-import {UserServices} from "@/services/user-service";
 import {DeviceServices} from "@/services/device-service";
 import {DeviceCatalogeServices} from "@/services/devicesCataloge-service";
 import {StripeCheckout} from "@vue-stripe/vue-stripe";
@@ -206,6 +220,7 @@ export default {
         currentCropForProject:{},
         currentDeviceForDelete:{},
         currentDeviceForInfo:{},
+        currentDeviceForInfoName:"",
         currentDeviceInBuy:{},
         devicesCataloge:{},
         currentDeviceValue:{},
@@ -249,16 +264,24 @@ export default {
       },
       processPurchase(){
           if(this.currentDeviceInBuy.model==='DHT22'){
+              console.log("entre a "+this.currentDeviceInBuy.model)
               this.lineItems[0].price='price_1OCmbGHe6cIQ9MTkGUrgef5y'
+              new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
+                  localStorage.setItem("deviceId",res.data)
+                  localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
+                  this.$refs.checkoutRef.redirectToCheckout();
+              })
           }
           if(this.currentDeviceInBuy.model==='DS18B20'){
+              console.log("entre a "+this.currentDeviceInBuy.model)
               this.lineItems[0].price='price_1OCmcSHe6cIQ9MTkNAakzDBP'
+              new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
+                  localStorage.setItem("deviceId",res.data)
+                  localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
+                  this.$refs.checkoutRef.redirectToCheckout();
+              })
           }
-        new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
-            localStorage.setItem("deviceId",res.data)
-            localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
-            this.$refs.checkoutRef.redirectToCheckout();
-        })
+
       },
       getDisplayableCrops(){
           this.cropsForFarmer=[]
@@ -320,8 +343,11 @@ export default {
       }, 2000);
     },
       updateActiveDevice(device){
+          console.log(device.id)
           new DeviceServices().setDeviceStatus(device).then(res=>{
+              console.log(res.data)
           })
+
       },
       addNewDevice(){
           new DeviceCatalogeServices().getAllDevices().then(response=>{
@@ -335,11 +361,16 @@ export default {
       this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
       openInfoDeviceDialog(device){
-      this.currentDeviceForInfo=device
-        new ProjectService().getProjectById(device.projectId).then(response=>{
-            this.currentDeviceForInfo.projectName= response.data.name.toString()
-        })
-      this.deviceDialogVisible=!this.deviceDialogVisible
+          this.currentDeviceForInfo={}
+          this.currentDeviceForInfo=device
+          this.currentDeviceForInfoName=""
+          this.currentDeviceForInfoName=device.name
+          if(device.projectId>0){
+              new ProjectService().getProjectById(device.projectId).then(response=>{
+                  this.currentDeviceForInfo.projectName= response.data.name.toString()
+              })
+          }
+          this.deviceDialogVisible=!this.deviceDialogVisible
     },
       deleteDevice(){
           // delete device using device service
@@ -347,8 +378,24 @@ export default {
         if (index !== -1) {
             this.devices.splice(index, 1); // Elimina el dispositivo del arreglo
         }
+        this.deviceDialogVisible=false
         this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
+      saveDeviceSettings(device){
+          device.name=this.currentDeviceForInfoName
+          new DeviceServices().updateDeviceById(device).then(res=>{
+              // Buscar el índice del dispositivo en el array basándose en su ID
+              const index = this.devices.findIndex(d => d.id === device.id);
+
+              // Verificar si se encontró el dispositivo en el array
+              if (index !== -1) {
+                  // Actualizar el dispositivo en el array
+                  this.devices[index] = { ...this.devices[index], ...device };
+              }
+              this.deviceDialogVisible=false
+          })
+
+      },
       getSeverity(status) {
       switch (status) {
         case true:
