@@ -10,6 +10,13 @@ export class DeviceServices{
     getDeviceValueById(id){
         return http.get("/temperaturehumidity/"+id);
     }
+    setDeviceStatus(device){
+        console.log(device)
+        return http.post("/status",{
+            "deviceId": device.id,
+            "newStatus": !device.active
+        })
+    }
     postDevice(device){
         return http.post("",{
             "name": device.name,

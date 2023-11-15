@@ -39,8 +39,8 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
-                  <pv-button style="margin-right: 1rem" label="Information" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
-                    <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
+                  <pv-button :disabled="isWatchDisable" style="margin-right: 1rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
+                    <pv-button  icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
                 </div>
             </template>
           </pv-column >
@@ -58,8 +58,8 @@
       <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}}</h2>
-            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}}</h2>
+            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
+            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
           </div>
         </div>
       </pv-dialog>
@@ -213,12 +213,14 @@ export default {
         buyMode:false,
         isBuyButtonDisable:true,
         isDeviceBoughtDialog:false,
+        isWatchDisable:false,
     };
   },
   created(){
       if(localStorage.getItem("deviceId")!==null){
           this.isDeviceBoughtDialog=true
           localStorage.removeItem("deviceId")
+          localStorage.removeItem("deviceModel")
       }
     new DeviceServices().getAllDevicesByUserId(this.id).then(res=>{
         this.devices=res.data
@@ -253,7 +255,6 @@ export default {
               this.lineItems[0].price='price_1OCmcSHe6cIQ9MTkNAakzDBP'
           }
         new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
-            console.log(res.data)
             localStorage.setItem("deviceId",res.data)
             localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
             this.$refs.checkoutRef.redirectToCheckout();
@@ -273,7 +274,6 @@ export default {
                           this.cropsForFarmer.push(storableCropAndPlantInfo)
                       })
                   }
-              console.log(this.cropsForFarmer)
 
           })
 
@@ -284,7 +284,6 @@ export default {
       },
       addDevicefromCataloge(device){
           this.buyMode=true
-          console.log(device)
 
           this.currentDeviceInBuy.model=device.model
           this.currentDeviceInBuy.category=device.category
@@ -298,6 +297,8 @@ export default {
           //new DeviceServices().postDevice()
       },
       getDeviceValue(data){
+          console.log(data.id)
+          this.isWatchDisable=true
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data
         console.log(this.currentDeviceValue)
@@ -312,17 +313,15 @@ export default {
           })
         }
         else {
+            this.isWatchDisable=false
           clearInterval(intervalId)
+
         }
       }, 2000);
     },
       updateActiveDevice(device){
-          if(device.active){
-              //hacer el update en el service de device
-              console.log("prendi: "+device.active)
-          }else {
-              console.log("apague: "+device.active)
-          }
+          new DeviceServices().setDeviceStatus(device).then(res=>{
+          })
       },
       addNewDevice(){
           new DeviceCatalogeServices().getAllDevices().then(response=>{
