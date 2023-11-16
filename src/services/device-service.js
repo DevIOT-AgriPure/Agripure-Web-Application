@@ -1,6 +1,6 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/devices",
+    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/api/v1/devices",
     headers: { "Content-type": "application/json" },
 })
 export class DeviceServices{

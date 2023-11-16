@@ -234,6 +234,7 @@ export default {
   created(){
       if(localStorage.getItem("deviceId")!==null){
           this.isDeviceBoughtDialog=true
+          console.log("deviceId: "+localStorage.getItem("deviceId"))
           localStorage.removeItem("deviceId")
           localStorage.removeItem("deviceModel")
       }
@@ -264,7 +265,6 @@ export default {
       },
       processPurchase(){
           if(this.currentDeviceInBuy.model==='DHT22'){
-              console.log("entre a "+this.currentDeviceInBuy.model)
               this.lineItems[0].price='price_1OCmbGHe6cIQ9MTkGUrgef5y'
               new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
                   localStorage.setItem("deviceId",res.data)
@@ -273,7 +273,6 @@ export default {
               })
           }
           if(this.currentDeviceInBuy.model==='DS18B20'){
-              console.log("entre a "+this.currentDeviceInBuy.model)
               this.lineItems[0].price='price_1OCmcSHe6cIQ9MTkNAakzDBP'
               new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
                   localStorage.setItem("deviceId",res.data)
@@ -320,11 +319,9 @@ export default {
           //new DeviceServices().postDevice()
       },
       getDeviceValue(data){
-          console.log(data.id)
           this.isWatchDisable=true
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data
-        console.log(this.currentDeviceValue)
         this.deviceValueDialogVisible=true
       })
 
@@ -332,7 +329,6 @@ export default {
         if (this.deviceValueDialogVisible) {
           new DeviceServices().getDeviceValueById(data.id).then(res=>{
             this.currentDeviceValue=res.data
-            console.log(this.currentDeviceValue)
           })
         }
         else {
@@ -343,9 +339,7 @@ export default {
       }, 2000);
     },
       updateActiveDevice(device){
-          console.log(device.id)
           new DeviceServices().setDeviceStatus(device).then(res=>{
-              console.log(res.data)
           })
 
       },

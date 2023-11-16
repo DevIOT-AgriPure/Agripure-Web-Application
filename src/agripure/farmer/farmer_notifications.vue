@@ -2,11 +2,12 @@
   <div class="background">
     <div style="margin: 2rem 2rem 2rem 2rem" >
       <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
-      <div v-if="notification" v-for="notification in notifications"
+      <div v-if="notifications.length>0" v-for="notification in notifications"
            :key="notification.id">
         <div class="chat-card">
           <div class="profile-image" @click="redirectTo(notification.notificationType)">
-            <img :src="notification.imageUrl" alt="Foto de perfil">
+            <img v-if="notification.notificationType!=='string' || notification.notificationType!=='string'" :src="notification.imageUrl" alt="Foto de perfil">
+            <img v-else src="https://media.istockphoto.com/id/1152189152/vector/red-alert-icon.jpg?s=612x612&w=0&k=20&c=Kw_-i314F4cxgn2hmakp-88-O45FSx62c6r-OzKYMw4=" alt="">
           </div>
           <div class="chat-content" >
             <div class="chat-header">
@@ -44,15 +45,16 @@ export default {
         route: null,
       userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
-      notifications:[],
+      notifications:null,
     };
   },
   created(){
       this.route = useRoute(); // Obtener la ruta actual
     new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
       this.notifications=response.data
+      console.log(response.data)
         const fecha = new Date(); // Obtiene la fecha y hora actual
-        this.getFormatDay(fecha)
+        //this.getFormatDay(fecha)
 
     })
     let intervalId=setInterval(() => {
@@ -62,7 +64,7 @@ export default {
                   new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
                       this.notifications=response.data
                       const fecha = new Date(); // Obtiene la fecha y hora actual
-                      this.getFormatDay(fecha)
+                      //this.getFormatDay(fecha)
 
                   })
                   console.log("ImplementarWebSocket")
@@ -103,40 +105,17 @@ export default {
           //console.log(fechaConvertida);
       },
       calculateTime(dateTimeString) {
-          // Convierte la cadena en un objeto Date
-          const [fechaParte, horaParte] = dateTimeString.split(' ');
-          // Divide la fecha en día, mes y año
-          const [dia, mes, año] = fechaParte.split('/');
-          // Divide la hora en horas, minutos y segundos
-          const [hora, minutos, segundos] = horaParte.split(':');
-          // Asegúrate de que JavaScript interprete el mes como 0-indexed (enero=0, febrero=1, etc.)
-          const fechaHora = new Date(Number(año), Number(mes) - 1, Number(dia), Number(hora), Number(minutos), Number(segundos));
 
-          // Calcula la diferencia en milisegundos entre la fecha/hora proporcionada y la fecha/hora actual
-          const diferenciaEnMilisegundos = new Date() - fechaHora;
-
-          // Convierte la diferencia a segundos
-          const segundosTranscurridos = Math.floor(diferenciaEnMilisegundos / 1000);
-
-          if (segundosTranscurridos < 60) {
-              return "Hace un momento";
-          } else if (segundosTranscurridos < 3600) {
-              const minutos = Math.floor(segundosTranscurridos / 60);
-              return `Hace ${minutos} ${minutos === 1 ? "minuto" : "minutos"}`;
-          } else if (segundosTranscurridos < 86400) {
-              const horas = Math.floor(segundosTranscurridos / 3600);
-              return `Hace ${horas} ${horas === 1 ? "hora" : "horas"}`;
-          } else {
-              const dias = Math.floor(segundosTranscurridos / 86400);
-              return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
-          }
       },
       deleteNotification(notification) {
           //delete notifications with notification service
-          const index = this.notifications.findIndex(item => item.id === notification.id);
-          if (index !== -1) {
+          new NotificationService().deleteNotification(notification.id).then(res=>{
+            const index = this.notifications.findIndex(item => item.id === notification.id);
+            if (index !== -1) {
               this.notifications.splice(index, 1); // Elimina la notificación del arreglo
-          }
+            }
+          })
+
       }
   }
 }
