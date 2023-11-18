@@ -155,6 +155,13 @@
                               </div>
                           </div>
                       </div>
+                      <div style="margin: 1rem 1rem 1rem 1rem;width: 100%; display: flex; justify-content: space-around; align-items: center;">
+                          <p >Project specialist:</p>
+                          <pv-dropdown :disabled="deleteCropButtonDisable" style="width: 60%" v-model="selectedContact" :options="currentContactForSpecialist"
+                                       optionLabel="name" placeholder="Select a specialist" />
+                          <pv-button :disabled="deleteCropButtonDisable" severity="secondary" style="color: white; font-weight: bold; text-align: center;" icon="pi pi-save" @click="setSpecialistToProject()"/>
+                      </div>
+
                       <div style="margin-top: 2rem; display: flex; width: 100%;justify-content: space-around">
                           <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
                               <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
@@ -175,6 +182,8 @@ import {CropServices} from "../../services/crop-service"
 import {PlantServices} from "../../services/plant-service"
 import { ref } from "vue";
 import {ProjectService} from "@/services/project-service";
+import {ContactServices} from "@/services/contacts-service";
+import {UserServices} from "@/services/user-service";
 export default {
     name: "crop_inventory",
     data(){
@@ -185,6 +194,8 @@ export default {
             searchInventorItems: ref([]),
             searchNewPlantValue: ref(""),
             searchNewPlantItems: ref([]),
+            selectedContact: null,
+            currentContactForSpecialist:[],
             newPlantsSearchOptions:[],
             showDropdown: false,
             displayableCrops:[],
@@ -203,11 +214,40 @@ export default {
     },
     created(){
         new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
+            console.log(response.data)
             this.getDisplayableCrops(response.data)
         })
 
     },
     methods:{
+        getCurrentSpecialistForCrop(crop){
+            if(crop.specialistId===0){
+                this.selectedContact={}
+            }
+            else {
+                new UserServices().getUserById(crop.specialistId).then(res=>{
+                    this.selectedContact=res.data
+                })
+            }
+        },
+        setSpecialistToProject(){
+            console.log(this.currentCrop)
+          new CropServices().setSpecialistToCrop(this.token,this.currentCrop.cropId,this.selectedContact.accountId).then(res=>{
+              console.log(res.data)
+              this.$toast.add({severity:'success', summary: 'Specialist Established', detail:'Added successfully', life: 3000});
+          })
+        },
+        getContacts(){
+            this.currentContactForSpecialist=[]
+            new ContactServices().getContactsForFarmer(this.token,sessionStorage.getItem("id")).then(response=>{
+                let rawContact=response.data
+                for (let i = 0; i < rawContact.length; i++) {
+                    new UserServices().getUserById(rawContact[i].specialistId).then(response=>{
+                        this.currentContactForSpecialist.push(response.data)
+                    })
+                }
+            })
+        },
         resetInventory(){
           this.currentInventoryResultsPlants=this.displayableCrops
             this.searchInventorValue=""
@@ -264,10 +304,12 @@ export default {
         getDisplayableCrops(rawCrop){
             this.displayableCrops=[]
             for (let i = 0; i < rawCrop.length; i++) {
+
                 let tempDisplayableCrop={}
                 new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
                     tempDisplayableCrop=response.data
                     tempDisplayableCrop.cropId=rawCrop[i].id
+                    tempDisplayableCrop.specialistId=rawCrop[i].specialistId
                     this.displayableCrops.push(tempDisplayableCrop)
                 })
                 this.currentInventoryResultsPlants=this.displayableCrops
@@ -289,6 +331,8 @@ export default {
             })
         },
         showCropDetails(crop) {
+            this.getContacts()
+            this.getCurrentSpecialistForCrop(crop)
             new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(res=>{
                 let projects=res.data
                 for (let i = 0; i < projects.length; i++) {

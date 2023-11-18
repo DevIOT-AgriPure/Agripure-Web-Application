@@ -1,9 +1,15 @@
 import axios from "axios";
 const http = axios.create({
-    baseURL:"https://nifty-jet-404014.rj.r.appspot.com/api/v1/devices",
+    baseURL:"http://localhost:8080/api/v1/devices",
     headers: { "Content-type": "application/json" },
 })
 export class DeviceServices{
+    getDeviceInfoByCropId(id){
+        return http.get("/cropId/"+id);
+    }
+    getDeviceById(id){
+        return http.get("/"+id);
+    }
     getAllDevicesByUserId(id){
         return http.get("/getDevicesByFarmerId/"+id);
     }
@@ -38,6 +44,7 @@ export class DeviceServices{
             "model": device.model,
             "category": device.category,
             "cropName": device.cropName,
+            "cropId": device.cropId,
             "farmerId": device.farmerId,
             "projectId": device.projectId
         })

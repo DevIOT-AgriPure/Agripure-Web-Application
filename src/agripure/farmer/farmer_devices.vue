@@ -63,7 +63,7 @@
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Device Settings" :style="{ width: '30vw' }">
+      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Device Settings" :style="{ width: '20rem' }">
         <div class="addplantbackground">
           <div class="crop-details">
               <div>
@@ -259,9 +259,21 @@ export default {
       buyDevice(){
           this.currentDeviceInBuy.name=this.currentDeviceName
           this.currentDeviceInBuy.cropName=this.selectedCrop.name
-          this.addDeviceDialogVisible=false
-          this.proccessingBuyDialogVisible=true
-          this.processPurchase()
+          this.currentDeviceInBuy.cropId=this.selectedCrop.cropId
+          new ProjectService().getProjectByCropId(this.currentDeviceInBuy.cropId).then(res=>{
+              new ProjectService().addDeviceProject(res.data.id).then(res=>{
+                  this.currentDeviceInBuy.projectId=res.data.id
+                  this.addDeviceDialogVisible=false
+                  this.proccessingBuyDialogVisible=true
+                  this.processPurchase()
+              })
+          }).catch(error=>{
+              this.currentDeviceInBuy.projectId=0
+              this.addDeviceDialogVisible=false
+              this.proccessingBuyDialogVisible=true
+              this.processPurchase()
+          })
+
       },
       processPurchase(){
           if(this.currentDeviceInBuy.model==='DHT22'){
@@ -300,21 +312,16 @@ export default {
           })
 
       },
-      getProjectByCropId(){
-        //logica para obtener el projecto por Id del crop
-          return 0
-      },
       addDevicefromCataloge(device){
           this.buyMode=true
 
           this.currentDeviceInBuy.model=device.model
           this.currentDeviceInBuy.category=device.category
           this.currentDeviceInBuy.farmerId=this.id
-          this.currentDeviceInBuy.projectId=this.getProjectByCropId()
+          this.currentDeviceInBuy.projectId=0
           this.currentDeviceInBuy.imageUrl=device.imageUrl
           this.currentDeviceInBuy.specifications=device.specifications
           this.currentDeviceInBuy.price=device.price
-
 
           //new DeviceServices().postDevice()
       },
