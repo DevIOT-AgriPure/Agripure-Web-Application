@@ -11,6 +11,12 @@ export class CropServices{
             "plantId": plantId
         },{ headers: {"Authorization" : `Bearer ${token}`} })
     }
+    setSpecialistToCrop(token,id,specialistId){
+        return http.put("/crops/setSpecialistToProject",{
+            "id": id,
+            "specialistId": specialistId
+        })
+    }
     getCropsByFarmerId(token,id){
         return http.get("crops/"+id,{ headers: {"Authorization" : `Bearer ${token}`} });
         

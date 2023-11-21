@@ -32,7 +32,7 @@ import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar';
 import Toast from 'primevue/toast';
 import FileUpload from 'primevue/fileupload';
-
+import Tooltip from 'primevue/tooltip';
 
 
 
@@ -43,6 +43,7 @@ const vueApp  = createApp(App)
 vueApp.use(PrimeVue);
 vueApp.use(router)
 vueApp.use(ToastService);
+vueApp.directive('tooltip', Tooltip);
 vueApp.component("pv-button",Button)
 vueApp.component("pv-avatar",Avatar)
 vueApp.component("pv-autoComplete",AutoComplete)

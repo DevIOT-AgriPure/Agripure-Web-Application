@@ -17,6 +17,7 @@ export class NotificationService{
         })
     }
     getAllNotificationByUserId(userId){
+
         return http.get("/getByToAccountId/"+userId);
     }
 

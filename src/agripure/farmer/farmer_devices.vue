@@ -39,8 +39,8 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
-                    <pv-button style="margin-right: 1rem" label="Info" severity="warning" aria-label="Information" @click="openInfoDeviceDialog(data)"/>
-                    <pv-button icon="pi pi-trash" severity="danger" rounded aria-label="Delete" @click="openDeleteDeviceDialog(data)"/>
+                  <pv-button :disabled="isWatchDisable" style="margin-right: 0.5rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
+                    <pv-button  icon="pi pi-cog" style="margin-right: 0.5rem" severity="warning" rounded aria-label="options" @click="openInfoDeviceDialog(data)"/>
                 </div>
             </template>
           </pv-column >
@@ -50,31 +50,47 @@
         <div class="addplantbackground">
           <h3 style="margin: 0rem 2rem 2rem 2rem">¿ Are you sure you want delete this device ?</h3>
           <div style="display: flex;justify-content: space-around">
-            <pv-button label="Yes" severity="success" @click="deleteDevice()"/>
             <pv-button label="No" severity="danger" @click="deleteDeviceDialogVisible=!deleteDeviceDialogVisible"/>
+              <pv-button label="Yes" severity="success" @click="deleteDevice()"/>
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Details" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Monitoring" :style="{ width: '80vw' }">
         <div class="addplantbackground">
           <div class="crop-details">
-              <h1 style="margin: 1rem ">{{currentDeviceForInfo.name}}</h1>
+            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
+            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
+          </div>
+        </div>
+      </pv-dialog>
+      <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Device Settings" :style="{ width: '20rem' }">
+        <div class="addplantbackground">
+          <div class="crop-details">
+              <div>
+                  <pv-input v-model="currentDeviceForInfoName" style="width: 100%;color: white" placeholder="Disabled" />
+              </div>
               <h4 style="margin: 1rem ">Model: {{currentDeviceForInfo.model}}</h4>
-            <h5 style="margin: 1rem ">Crop: {{currentDeviceForInfo.cropName}}</h5>
-            <h5 style="margin: 1rem " v-if="currentDeviceForInfo.projectId!==0">Project: {{currentDeviceForInfo.projectName}}</h5>
-              <div style="margin: 1rem ">
-                  <pv-tag :value="getDeviceStatus(currentDeviceForInfo.active)" :severity="getSeverity(currentDeviceForInfo.active)" />
-
+              <div style="width: 100%;display: flex;justify-content: space-around ">
+                  <div style="display: flex; align-items: center;margin-left: 1rem">
+                      <pv-inputSwitch v-model="currentDeviceForInfo.activeNotification" />
+                      <p style="margin-left: 0.5rem; margin-bottom: 0;">Send notifications</p>
+                  </div>
+                  <div style="margin: 1rem">
+                      <pv-button outlined severity="danger" label="Delete device" aria-label="Delete" @click="openDeleteDeviceDialog(currentDeviceForInfo)"/>
+                  </div>
               </div>
 
-
+              <div style="margin: 2rem 1rem 1rem 1rem;display: flex;justify-content: space-around">
+                  <pv-button icon="pi pi-times" severity="danger" label="close" aria-label="close" @click="deviceDialogVisible=false" />
+                  <pv-button icon="pi pi-save" severity="success" label="save" aria-label="save" @click="saveDeviceSettings(currentDeviceForInfo)"/>
+              </div>
           </div>
         </div>
       </pv-dialog>
         <pv-dialog v-model:visible="addDeviceDialogVisible" maximizable modal header="Add Devices" :style="{ width: '80vw' }">
             <div class="addplantbackground">
                 <div class="crop-details">
-                    <div v-for="device in devicesCataloge">
+                    <div v-if="!buyMode" v-for="device in devicesCataloge">
                         <div style="display: flex;justify-content: left; padding: 1rem">
                             <img :src="device.imageUrl" alt="" style="width: 100px; height: 100px;border-radius: 1rem; margin-right: 1.5rem">
                             <div style="display: flex; width: 100%;justify-content: space-between">
@@ -84,12 +100,75 @@
                                     <h4>S/. {{device.price}}</h4>
                                 </div>
                                 <div style="display: flex; align-items: center;">
-                                    <pv-button label="Add" />
+                                    <pv-button label="Add" @click="addDevicefromCataloge(device)"/>
                                 </div>
-
                             </div>
                         </div>
                     </div>
+                    <div v-else style="display: flex;justify-content: space-around">
+                        <div style="width: 50%;">
+                            <div style="margin: 1rem">
+                                <h1> Before buy it</h1>
+                                <h2> We need some information</h2>
+                            </div>
+                            <div style="margin: 2rem 0">
+                                <div style="margin: 1rem">
+                                    <span style="width: 100%" class="p-float-label">
+                                    <pv-input @input="buyButtonDisable" style="width: 100%" v-tooltip="'We recommend a name to differentiate it from other devices'" id="username" v-model="currentDeviceName" />
+                                    <label style="width: 100%" for="username">Device Name</label>
+                                </span>
+                                </div>
+
+                                <div style="margin: 1rem">
+                                    <pv-dropdown style="width: 100%" v-model="selectedCrop"
+                                                 @change="buyButtonDisable()" :options="cropsForFarmer"
+                                                 optionLabel="name" placeholder="Crop for your device" />
+                                </div>
+                                <div style="margin: 2rem 1rem 1rem 1rem; display: flex;justify-content: space-around">
+                                    <pv-button style="margin-right: 1rem" label="Cancel"  severity="danger" aria-label="Information" @click="cancelBuyButton()"/>
+                                    <pv-button :disabled="isBuyButtonDisable" severity="success" label="Buy" aria-label="Delete"  @click="buyDevice()"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 50%">
+                            <div style="width: 100%; display: flex;justify-content: center">
+                                <img :src="currentDeviceInBuy.imageUrl" style="width: 200px; height: 200px;border-radius: 0.5rem; " alt="">
+                            </div>
+                            <div style="width: 100%; display: flex;justify-content: center">
+                                <p class="device-specifications">{{currentDeviceInBuy.specifications}}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </pv-dialog>
+        <pv-dialog v-model:visible="proccessingBuyDialogVisible" modal header="Loading payment" :style="{ width: '30vw' }">
+            <div class="crop-details">
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 5rem"></i>
+                </div>
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <p>This process may take a few seconds.</p>
+                </div>
+            </div>
+            <stripe-checkout
+                    ref="checkoutRef"
+                    mode="payment"
+                    :pk="publishableKey"
+                    :line-items="lineItems"
+                    :success-url="successURL"
+                    :cancel-url="cancelURL"
+                    @loading="v => loading = v"
+            />
+        </pv-dialog>
+        <pv-dialog v-model:visible="isDeviceBoughtDialog"  modal header="Payment successfully processed" :style="{ width: '50vw' }">
+            <div class="crop-details">
+                <div style="display: flex;justify-content: center;margin: 2rem 0">
+                    <h2>Thank you for your patience.</h2>
+                </div>
+                <div style="display: flex;justify-content: center;margin: 2rem 0 0 0">
+                    <pv-button style="margin-right: 1rem" label="close"  severity="successful" aria-label="Close" @click="isDeviceBoughtDialog=false"/>
                 </div>
             </div>
         </pv-dialog>
@@ -101,87 +180,224 @@
 import { FilterMatchMode } from 'primevue/api';
 import {ProjectService} from "@/services/project-service";
 import {ActivitiesService} from "@/services/activities-service";
-import {SpecialistServices} from "@/services/specialists-service";
 import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
-import {UserServices} from "@/services/user-service";
 import {DeviceServices} from "@/services/device-service";
 import {DeviceCatalogeServices} from "@/services/devicesCataloge-service";
+import {StripeCheckout} from "@vue-stripe/vue-stripe";
 
 export default {
   name: "farmer_devices",
+    components: {StripeCheckout},
   data(){
     return{
-      devices:[],
-      filters: {
+        id:parseInt(sessionStorage.getItem("id").toString()),
+        devices:[],
+        filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
           cropName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         active: { value: null, matchMode: FilterMatchMode.IN },
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
-      deviceDialogVisible:false,
-      deleteDeviceDialogVisible:false,
+        publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
+        successURL:'http://localhost:5173/farmer/devices',
+        cancelURL:'http://localhost:5173/unsuccessful-pay',
+        loading: false,
+        lineItems: [
+            {
+                price: 'price_1OB0vHHe6cIQ9MTkbD9RYUzw',
+                quantity: 1,
+            },
+        ],
+        selectedCrop:null,
+        cropsForFarmer:[],
+        proccessingBuyDialogVisible:false,
+        deviceDialogVisible:false,
+        deleteDeviceDialogVisible:false,
         addDeviceDialogVisible:false,
-      currentCropForProject:{},
-      currentDeviceForDelete:{},
-      currentDeviceForInfo:{},
+        deviceValueDialogVisible:false,
+        currentCropForProject:{},
+        currentDeviceForDelete:{},
+        currentDeviceForInfo:{},
+        currentDeviceForInfoName:"",
+        currentDeviceInBuy:{},
         devicesCataloge:{},
+        currentDeviceValue:{},
+        currentDeviceName:"",
+        buyMode:false,
+        isBuyButtonDisable:true,
+        isDeviceBoughtDialog:false,
+        isWatchDisable:false,
     };
   },
   created(){
-    new DeviceServices().getAllDevicesByUserId(sessionStorage.getItem("id")).then(response=>{
-      this.devices=response.data
+      if(localStorage.getItem("deviceId")!==null){
+          this.isDeviceBoughtDialog=true
+          console.log("deviceId: "+localStorage.getItem("deviceId"))
+          localStorage.removeItem("deviceId")
+          localStorage.removeItem("deviceModel")
+      }
+    new DeviceServices().getAllDevicesByUserId(this.id).then(res=>{
+        this.devices=res.data
     })
-
+    this.getDisplayableCrops()
   },
   methods:{
-      updateActiveDevice(device){
-          if(device.active){
-              //hacer el update en el service de device
-              console.log("prendi: "+device.active)
+      cancelBuyButton(){
+          this.currentDeviceName=null
+          this.selectedCrop=null
+          this.buyMode=false
+      },
+      buyButtonDisable(){
+          if(this.currentDeviceName.length>0 && this.selectedCrop!==null){
+              this.isBuyButtonDisable=false
           }else {
-              console.log("apague: "+device.active)
+              this.isBuyButtonDisable=true
           }
       },
-      returnDisplayableSpecification(specification){
-          if (specification) {
-              return specification.replace(/\$/g, ' - ');
-          } else {
-              return '';
-          }
+      buyDevice(){
+          this.currentDeviceInBuy.name=this.currentDeviceName
+          this.currentDeviceInBuy.cropName=this.selectedCrop.name
+          this.currentDeviceInBuy.cropId=this.selectedCrop.cropId
+          new ProjectService().getProjectByCropId(this.currentDeviceInBuy.cropId).then(res=>{
+              new ProjectService().addDeviceProject(res.data.id).then(res=>{
+                  this.currentDeviceInBuy.projectId=res.data.id
+                  this.addDeviceDialogVisible=false
+                  this.proccessingBuyDialogVisible=true
+                  this.processPurchase()
+              })
+          }).catch(error=>{
+              this.currentDeviceInBuy.projectId=0
+              this.addDeviceDialogVisible=false
+              this.proccessingBuyDialogVisible=true
+              this.processPurchase()
+          })
+
       },
-      returnProjectName(id){
-        new ProjectService().getProjectById(id).then(response=>{
-            return response.data.name.toString()
-        })
+      processPurchase(){
+          if(this.currentDeviceInBuy.model==='DHT22'){
+              this.lineItems[0].price='price_1OCmbGHe6cIQ9MTkGUrgef5y'
+              new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
+                  localStorage.setItem("deviceId",res.data)
+                  localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
+                  this.$refs.checkoutRef.redirectToCheckout();
+              })
+          }
+          if(this.currentDeviceInBuy.model==='DS18B20'){
+              this.lineItems[0].price='price_1OCmcSHe6cIQ9MTkNAakzDBP'
+              new DeviceServices().postDevice(this.currentDeviceInBuy).then(res=>{
+                  localStorage.setItem("deviceId",res.data)
+                  localStorage.setItem("deviceModel",this.currentDeviceInBuy.model)
+                  this.$refs.checkoutRef.redirectToCheckout();
+              })
+          }
+
+      },
+      getDisplayableCrops(){
+          this.cropsForFarmer=[]
+          new CropServices().getCropsByFarmerId("",this.id).then(response=>{
+              let rawCrops=response.data
+                  for (let i = 0; i < rawCrops.length; i++) {
+                      new PlantServices().getPlantInfoById(rawCrops[i].plantId).then(res=>{
+                          let storableCropAndPlantInfo={}
+
+                          storableCropAndPlantInfo=res.data
+                          storableCropAndPlantInfo.cropId=rawCrops[i].id
+
+                          this.cropsForFarmer.push(storableCropAndPlantInfo)
+                      })
+                  }
+
+          })
+
+      },
+      addDevicefromCataloge(device){
+          this.buyMode=true
+
+          this.currentDeviceInBuy.model=device.model
+          this.currentDeviceInBuy.category=device.category
+          this.currentDeviceInBuy.farmerId=this.id
+          this.currentDeviceInBuy.projectId=0
+          this.currentDeviceInBuy.imageUrl=device.imageUrl
+          this.currentDeviceInBuy.specifications=device.specifications
+          this.currentDeviceInBuy.price=device.price
+
+          //new DeviceServices().postDevice()
+      },
+      getDeviceValue(data){
+          this.isWatchDisable=true
+      new DeviceServices().getDeviceValueById(data.id).then(res=>{
+        this.currentDeviceValue=res.data
+        this.deviceValueDialogVisible=true
+      })
+
+      let intervalId=setInterval(() => {
+        if (this.deviceValueDialogVisible) {
+          new DeviceServices().getDeviceValueById(data.id).then(res=>{
+            this.currentDeviceValue=res.data
+          })
+        }
+        else {
+            this.isWatchDisable=false
+          clearInterval(intervalId)
+
+        }
+      }, 2000);
+    },
+      updateActiveDevice(device){
+          new DeviceServices().setDeviceStatus(device).then(res=>{
+          })
+
       },
       addNewDevice(){
           new DeviceCatalogeServices().getAllDevices().then(response=>{
               this.devicesCataloge=response.data
+              this.buyMode=false
               this.addDeviceDialogVisible=!this.addDeviceDialogVisible
           })
       },
-    openDeleteDeviceDialog(device){
+      openDeleteDeviceDialog(device){
       this.currentDeviceForDelete=device
       this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
-    openInfoDeviceDialog(device){
-      this.currentDeviceForInfo=device
-        new ProjectService().getProjectById(device.projectId).then(response=>{
-            this.currentDeviceForInfo.projectName= response.data.name.toString()
-        })
-      this.deviceDialogVisible=!this.deviceDialogVisible
+      openInfoDeviceDialog(device){
+          this.currentDeviceForInfo={}
+          this.currentDeviceForInfo=device
+          this.currentDeviceForInfoName=""
+          this.currentDeviceForInfoName=device.name
+          if(device.projectId>0){
+              new ProjectService().getProjectById(device.projectId).then(response=>{
+                  this.currentDeviceForInfo.projectName= response.data.name.toString()
+              })
+          }
+          this.deviceDialogVisible=!this.deviceDialogVisible
     },
-    deleteDevice(){
+      deleteDevice(){
           // delete device using device service
         const index = this.devices.findIndex(device => device.id === this.currentDeviceForDelete.id);
         if (index !== -1) {
             this.devices.splice(index, 1); // Elimina el dispositivo del arreglo
         }
+        this.deviceDialogVisible=false
         this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
-    getSeverity(status) {
+      saveDeviceSettings(device){
+          device.name=this.currentDeviceForInfoName
+          new DeviceServices().updateDeviceById(device).then(res=>{
+              // Buscar el índice del dispositivo en el array basándose en su ID
+              const index = this.devices.findIndex(d => d.id === device.id);
+
+              // Verificar si se encontró el dispositivo en el array
+              if (index !== -1) {
+                  // Actualizar el dispositivo en el array
+                  this.devices[index] = { ...this.devices[index], ...device };
+              }
+              this.deviceDialogVisible=false
+          })
+
+      },
+      getSeverity(status) {
       switch (status) {
         case true:
           return 'success';
@@ -190,7 +406,7 @@ export default {
           return 'danger';
       }
     },
-    getDeviceStatus(status){
+      getDeviceStatus(status){
       switch (status) {
         case true:
           return 'On';
@@ -199,7 +415,7 @@ export default {
           return 'Off';
       }
     },
-    openActivities(id){
+      openActivities(id){
       this.activitiesDialogVisible=!this.activitiesDialogVisible
       new ActivitiesService().getActivitiesByProjectId(id).then(response=>{
         this.currentActivities=response.data
@@ -210,6 +426,15 @@ export default {
 </script>
 
 <style scoped>
+.device-specifications {
+    width: 60%;
+    display: flex;
+    margin: 1rem;
+    justify-content: center;
+    font-size: 15px;
+    word-wrap: break-word;
+    white-space: pre-line;
+}
 .background {
   background-color: #242424;
   color: white; /* Cambiar el color del texto si es necesario */
@@ -227,38 +452,11 @@ export default {
   padding: 1.5rem;
 }
 
-.chat-card {
-  display: flex;
-  align-items: center;
-  background-color: #1c1c1c; /* Color de fondo negro */
-  color: white; /* Color de texto blanco */
-  border-radius: 10px; /* Bordes redondos */
-  margin-bottom: 10px; /* Espaciado entre tarjetas */
-}
-
-.profile-image {
-  width: 50px; /* Ancho de la imagen de perfil */
-  height: 50px; /* Alto de la imagen de perfil */
-  border-radius: 50%; /* Hace que la imagen sea redonda */
-  overflow: hidden; /* Oculta cualquier parte de la imagen fuera del círculo */
-  margin-right: 10px;
-}
 
 .profile-image img {
   width: 100%; /* Ajusta la imagen de perfil al círculo */
   height: 100%;
   object-fit: cover; /* Mantiene la relación de aspecto de la imagen */
-}
-
-.chat-content {
-  flex-grow: 1;
-}
-
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
 .chat-header h3 {

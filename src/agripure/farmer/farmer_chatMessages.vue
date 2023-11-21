@@ -67,7 +67,7 @@ export default {
                 this.scrollBottom()
             })
         })
-        setInterval(() => {
+      let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
                 if(path===("/farmer/chat/"+this.id)){
@@ -76,6 +76,8 @@ export default {
                         this.rawMessages=response.data
                     })
                     console.log("ImplementarWebSocket")
+                }else{
+                  clearInterval(intervalId)
                 }
             }
 

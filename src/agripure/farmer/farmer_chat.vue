@@ -63,12 +63,14 @@ export default {
         new ContactServices().getContactsForFarmer(this.token,parseInt(sessionStorage.getItem("id").toString())).then(response=>{
             this.getDisplayableContacts(response.data)
         })
-        setInterval(() => {
+      let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
                 if(path==="/farmer/chat"){
                     // Realiza una solicitud GET al servidor para verificar nuevos mensajes
                     console.log("ImplementarWebSocket")
+                }else {
+                  clearInterval(intervalId)
                 }
             }
 

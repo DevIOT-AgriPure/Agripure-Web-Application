@@ -51,6 +51,12 @@
                     </pv-column >
                     <pv-column  header="" style="min-width: 1rem">
                         <template #body="{ data }">
+                            <pv-button :disabled="isShowDataButtonDisable" v-show="data.device" style="margin-right: 0.5rem" icon="pi pi-tablet"
+                                       severity="secondary" aria-label="Information" @click="openDeviceDialog(data)"/>
+                        </template>
+                    </pv-column >
+                    <pv-column  header="" style="min-width: 1rem">
+                        <template #body="{ data }">
                             <pv-button label="Details" severity="success" @click="showProjectDetail(data)"  />
                         </template>
                     </pv-column >
@@ -103,13 +109,18 @@
             </pv-dialog>
             <pv-dialog v-model:visible="createProjectVisible" maximizable modal header="Create a project" :style="{ width: '800px' }">
                 <div class="addplantbackground">
+                    <div v-if="this.devices > 0" style="margin: 0rem 2rem 2rem 2rem; display: flex; align-items: center;">
+                        <p style="margin-right: 0.5rem;">This crop has {{ this.devices }} monitoring</p>
+                        <pv-button :disabled="isShowDataButtonDisable" label="devices" severity="secondary"
+                                   aria-label="Information"  @click="openDeviceDialog(selectedCrop)" />
+                    </div>
                     <div v-if="selectionStep">
                         <div v-if="!stepContactSelected">
                             <div style="display:flex; justify-content: center">
                                 <h2 style="margin-bottom: 2rem">SELECT A CONTACT</h2>
                             </div>
                             <div style="display:flex; justify-content: center">
-                                <pv-dropdown style="width: 90%" v-model="selectedContact" editable :options="currentContactForSpecialist"
+                                <pv-dropdown style="width: 90%" v-model="selectedContact"  :options="currentContactForSpecialist"
                                              optionLabel="name" placeholder="Select a contact" @change="getCropForProject()"/>
                             </div>
                         </div>
@@ -119,7 +130,7 @@
                             </div>
                             <div style="display:flex; justify-content: center">
                                 <pv-dropdown style="width: 90%" :disabled="selectedContact===null" v-model="selectedCrop"
-                                             @change="this.isNextButtonDisable=false" editable :options="currentCropsForFarmer"
+                                             @change="this.isNextButtonDisable=false"  :options="currentCropsForFarmer"
                                              optionLabel="name" placeholder="Select a crop" />
                             </div>
                         </div>
@@ -128,7 +139,8 @@
                         <div style="display:flex; justify-content: center">
                             <h2 style="margin: 0rem 2rem 2rem 0">INFORMATION</h2>
                         </div>
-                      <div style="display:flex; justify-content: center; width: 100%;">
+
+                        <div style="display:flex; justify-content: center; width: 100%;">
                         <span style="margin: 1.5rem 2rem 0rem 2rem;width: 100%;display:flex; justify-content: center;" class="p-float-label">
                           <pv-input @input="validateNextButtonDisable" v-model="projectName" style="width: 100%"/>
                           <label style="width: 100%">Project name</label>
@@ -207,6 +219,40 @@
                     </div>
                 </div>
             </pv-dialog>
+            <pv-dialog v-model:visible="isDeviceDialogVisible" maximizable modal header="Devices" :style="{ width: '30rem' }">
+                <div class="addplantbackground">
+                    <div class="crop-details">
+                        <div v-if="!isDeviceShowingData">
+                            <div v-for="device in currentDevices"
+                                 :key="device.id">
+                                <div class="chat-card">
+                                    <div class="profile-image">
+                                        <i class="pi pi-tablet" style="font-size: 2.5rem"></i>
+                                    </div>
+                                    <div class="chat-content" >
+                                        <div class="chat-header">
+                                            <div style="width: 100%;">
+                                                <h3 style="margin-bottom: 0.5rem">{{ device.name }}</h3>
+                                            </div>
+                                            <div>
+                                                <pv-button :disabled="isShowDataButtonDisable" icon="pi pi-eye" severity="success" label="value" @click="showRealTimeValue(device)"  aria-label="watch"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
+                            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
+                            <div style="width: 100%;display: flex;justify-content: right">
+                              <pv-button severity="secondary" label="return" @click="stopShowingDeviceData()"  aria-label="watch"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </pv-dialog>
         </div>
     </div>
 </template>
@@ -219,12 +265,20 @@ import {PlantServices} from "@/services/plant-service";
 import {CropServices} from "@/services/crop-service";
 import {UserServices} from "@/services/user-service";
 import {ContactServices} from "@/services/contacts-service";
+import {DeviceServices} from "@/services/device-service";
+import {ChatServices} from "@/services/chat-service";
 
 export default {
     name: "farmer_projects",
     data(){
         return{
             token: sessionStorage.getItem("jwt"),
+            id: parseInt(sessionStorage.getItem("id").toString()),
+            isShowDataButtonDisable:false,
+            isDeviceShowingData:false,
+            isDeviceDialogVisible:false,
+            currentDevices:[],
+            currentDeviceValue:{},
             selectionStep:true,
             informationStep:false,
             dateStep:false,
@@ -235,6 +289,7 @@ export default {
             finishProjectDate: null,
             activityProjectDate: null,
             projects:[],
+            devices:0,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -266,7 +321,7 @@ export default {
     },
     created(){
         this.startProjectMinDate = new Date();
-        new ProjectService().getProjectsBySpecialistId(sessionStorage.getItem("id")).then(response=>{
+        new ProjectService().getProjectsBySpecialistId(this.id).then(response=>{
             this.projects=response.data
             console.log(this.projects)
 
@@ -276,6 +331,72 @@ export default {
         })
     },
     methods:{
+        showRealTimeValue(device){
+            this.isShowDataButtonDisable=true
+            let tempDevice={}
+            tempDevice.id=device.deviceId
+            tempDevice.active=false
+            new DeviceServices().getDeviceById(tempDevice.id).then(r=>{
+                console.log(r.data)
+                let shouldTurnOff=!r.data.active
+                new DeviceServices().setDeviceStatus(tempDevice).then(res=>{
+                    this.isDeviceShowingData=true
+                  this.watchData(tempDevice,shouldTurnOff)
+
+                })
+            })
+        },
+        stopShowingDeviceData(){
+            this.isDeviceShowingData=false
+        },
+        watchData(device,shouldTurnOff){
+            let intervalId=setInterval(() => {
+                if(!this.isDeviceDialogVisible){
+                    let deviceOff=device
+                    deviceOff.active=true
+                    if(shouldTurnOff){
+                        new DeviceServices().setDeviceStatus(deviceOff).then(res=>{
+                            this.isShowDataButtonDisable=false
+                            clearInterval(intervalId)
+
+                        })
+                    }else{
+                        this.isShowDataButtonDisable=false
+                        clearInterval(intervalId)
+
+                    }
+                }
+                if ( this.isDeviceShowingData) {
+                    new DeviceServices().getDeviceValueById(device.id).then(res=>{
+                        this.currentDeviceValue=res.data
+                        console.log(this.currentDeviceValue)
+                    })
+                }
+                else {
+                    let deviceOff=device
+                    deviceOff.active=true
+                    if(shouldTurnOff){
+                        new DeviceServices().setDeviceStatus(deviceOff).then(res=>{
+                            this.isShowDataButtonDisable=false
+                            clearInterval(intervalId)
+
+                        })
+                    }else{
+                        this.isShowDataButtonDisable=false
+                        clearInterval(intervalId)
+
+                    }
+                }
+            }, 2000);
+
+        },
+        openDeviceDialog(data){
+            this.isDeviceShowingData=false
+          new DeviceServices().getDeviceInfoByCropId(data.cropId).then(res=>{
+              this.isDeviceDialogVisible=true
+              this.currentDevices=res.data
+          })
+        },
         setActivitysForProject(){
             for (let i = 0; i < this.projects.length; i++) {
                 new ActivitiesService().getActivitiesByProjectId(this.token,this.projects[i].id).then(response=>{
@@ -350,13 +471,15 @@ export default {
             newProject.farmerName=this.selectedContact.name
             newProject.farmerImageUrl=this.selectedContact.imageUrl
             newProject.cropId=this.selectedCrop.cropId
+            newProject.devices=this.selectedCrop.cropId
             newProject.startDate=this.formatPeruvianDate(this.startProjectDate)
             newProject.endDate=this.formatPeruvianDate(this.finishProjectDate)
-            newProject.specialistId=parseInt(sessionStorage.getItem("id").toString())
+            newProject.specialistId=this.id
             newProject.durationDays=this.calculateDurationDay(this.formatPeruvianDate(this.startProjectDate),this.formatPeruvianDate(this.finishProjectDate))
             newProject.totalActivities=this.taskForProject.length
             newProject.activitiesDone=0
             newProject.projectStarted=this.isProjectStarted()
+            newProject.device = this.devices > 0;
             new ProjectService().createProject(newProject).then(res=>{
                 new ProjectService().getProjectsBySpecialistId(newProject.specialistId).then(response=>{
                   for (let i = 0; i < response.data.length; i++){
@@ -434,8 +557,11 @@ export default {
                     if(this.projectName !== ""&&this.projectDescription!== ""){
                         this.isNextButtonDisable=false
                     }
-                    this.selectionStep=false
-                    this.informationStep=true
+                    new DeviceServices().getDeviceInfoByCropId(this.selectedCrop.id).then(res=>{
+                        this.devices=res.data.length
+                        this.selectionStep=false
+                        this.informationStep=true
+                    })
                 }
                 else{
                     if(this.selectedContact!==null){
@@ -536,28 +662,29 @@ export default {
                 for (let i = 0; i < cropsForFarmer.length; i++) {
                     new ProjectService().getProjectByFarmerId(this.selectedContact.accountId).then(res=>{
                         let projects=res.data
-                        if(projects.length>0){
-                            for (let j = 0; j < projects.length; j++) {
-                                if(projects[j].cropId!==cropsForFarmer[i].id){
-                                    let storableCropAndPlantInfo={}
-                                    new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
-                                        storableCropAndPlantInfo=res.data
-                                        storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
-                                        this.currentCropsForFarmer.push(storableCropAndPlantInfo)
-                                        console.log(this.currentCropsForFarmer)
-                                    })
+                        if(cropsForFarmer[i].specialistId===this.id){
+                            if(projects.length>0){
+                                for (let j = 0; j < projects.length; j++) {
+                                    if(projects[j].cropId!==cropsForFarmer[i].id){
+                                        let storableCropAndPlantInfo={}
+                                        new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                            storableCropAndPlantInfo=res.data
+                                            storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                            this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                            console.log(this.currentCropsForFarmer)
+                                        })
+                                    }
                                 }
+                            }else {
+                                let storableCropAndPlantInfo={}
+                                new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
+                                    storableCropAndPlantInfo=res.data
+                                    storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
+                                    this.currentCropsForFarmer.push(storableCropAndPlantInfo)
+                                    console.log(this.currentCropsForFarmer)
+                                })
                             }
-                        }else {
-                            let storableCropAndPlantInfo={}
-                            new PlantServices().getPlantInfoById(cropsForFarmer[i].plantId).then(res=>{
-                                storableCropAndPlantInfo=res.data
-                                storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
-                                this.currentCropsForFarmer.push(storableCropAndPlantInfo)
-                                console.log(this.currentCropsForFarmer)
-                            })
                         }
-
                     })
 
                 }
@@ -586,7 +713,7 @@ export default {
             this.selectionStep=true
             this.stepContactSelected=false
             this.currentContactForSpecialist=[]
-            new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
+            new ContactServices().getContactsForSpecialist(this.id).then(response=>{
                 let rawContact=response.data
                 for (let i = 0; i < rawContact.length; i++) {
                     new UserServices().getUserById(rawContact[i].farmerId).then(response=>{
@@ -755,7 +882,6 @@ export default {
 .profile-image {
     width: 50px; /* Ancho de la imagen de perfil */
     height: 50px; /* Alto de la imagen de perfil */
-    border-radius: 50%; /* Hace que la imagen sea redonda */
     overflow: hidden; /* Oculta cualquier parte de la imagen fuera del círculo */
     margin-right: 10px;
 }
@@ -771,6 +897,7 @@ export default {
 }
 
 .chat-header {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;

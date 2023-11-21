@@ -65,11 +65,13 @@ export default {
         new ContactServices().getContactsForSpecialist(sessionStorage.getItem("id")).then(response=>{
             this.getDisplayableContacts(response.data)
         })
-        setInterval(() => {
+      let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
                 if(path===("/specialist/chat")){
                     console.log("ImplementarWebSocket")
+                }else {
+                  clearInterval(intervalId)
                 }
             }
 

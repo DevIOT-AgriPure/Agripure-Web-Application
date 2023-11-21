@@ -66,7 +66,7 @@ export default {
                 this.scrollBottom()
             })
         })
-        setInterval(() => {
+      let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
                 if(path===("/specialist/chat/"+this.id)){
@@ -75,6 +75,8 @@ export default {
                         this.rawMessages=response.data
                     })
                     console.log("ImplementarWebSocket para chat")
+                }else {
+                  clearInterval(intervalId)
                 }
             }
 

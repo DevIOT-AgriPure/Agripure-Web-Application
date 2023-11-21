@@ -7,7 +7,6 @@ import Sidebar from './components/Sidebar.vue'
         <pv-toast></pv-toast>
         <!-- Sidebar -->
         <Sidebar />
-
         <!-- Content -->
         <RouterView />
     </div>

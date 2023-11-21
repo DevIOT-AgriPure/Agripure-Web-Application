@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh;width: 100%;  display:flex; justify-content: center; align-content: center;align-items: center">
-    <div v-if="currentPath==='Types'">
+      <div v-if="currentPath==='Types'">
       <pv-card style=" border-radius: 1rem;justify-content: center;width: 50vw;">
         <template #content>
           <div style="display: flex;justify-content: center;margin: 2rem 0">
@@ -38,8 +38,6 @@
                       </template>
                   </pv-card>
               </div>
-
-
           </div>
           <div style="display: flex;justify-content: space-evenly">
             <pv-button style="border-radius: 1rem;color: white;background-color: #131313;border-color: #131313" @click="goBack('sign-in')" label="Back"/>
@@ -48,7 +46,7 @@
         </template>
       </pv-card>
     </div>
-    <div v-if="currentPath==='Plans'">
+      <div v-if="currentPath==='Plans'">
       <pv-card style=" border-radius: 1rem;justify-content: center;width: 50vw;">
         <template #content>
           <div class="content" >
@@ -71,29 +69,71 @@
                       </template>
                       <template #content>
                         <div class="content">
-                          <h2>{{plan.name}}</h2>
+                            <div style="display: flex;justify-content: center;width: 100%">
+                                <h2>{{plan.name.toUpperCase()}}</h2>
+                            </div>
+                            <div class="price">
+                                <div style="height: 100%;width: 100%">
+                                    <div style="width: 100%; display: flex">
+                                        <div style="width: 100%;display: flex;justify-content: center">
+                                            <h1>S/.{{ plan.price }}</h1>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex;justify-content: center">
+                                        <h3>MONTH</h3>
+                                    </div>
+                                </div>
+                            </div>
                           <div class="visible">
                             <template v-if="plan.name==='Premium'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">{{ plan.description }}</p>
+                                  <div class="margin-feature" >
+                                      <div class="feature-container">
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Add unlimited Crops</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Contact Specialists</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Get unlimited Projects</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Crop monitoring</p>
+                                      </div>
+                                  </div>
                               </div>
                             </template>
                             <template v-if="plan.name==='Free'">
                               <div class="usherVisible">
-                                <p style="margin-top: 15px">{{ plan.description }}</p>
+                                  <div class="margin-feature" >
+                                      <div class="feature-container">
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Add unlimited Crops</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i class="pi pi-check-circle"></i>
+                                          <p >Contact Specialists</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i style="color: #b70000" class="pi pi-times-circle"></i>
+                                          <p>Get unlimited Project</p>
+                                      </div>
+                                      <div class="feature-container" >
+                                          <i style="color: #b70000" class="pi pi-times-circle"></i>
+                                          <p >Crop monitoring</p>
+                                      </div>
+                                  </div>
                               </div>
                             </template>
                           </div>
-                          <div class="price">
-                            <p style="font-weight: bold; margin-top: 8px" v-if="plan.name!=='Free'">{{ plan.price }} S/</p>
-                            <p style="font-weight: bold; margin-top: 8px" v-if="plan.name==='Free'">‎ </p>
-                            <div style="display: table;">
-                              <p style="margin: 0;padding: 0 0 0.45rem 0.1rem ;align-items: end ;display: table-cell;vertical-align: bottom; color: darkgrey" v-if="plan.name!=='Free'">mo*</p>
-                              <p style="margin: 0;padding: 0 0 0.45rem 0.1rem ;align-items: end ;display: table-cell;vertical-align: bottom; color: darkgrey" v-if="plan.name==='Free'">‎ </p>
-                            </div>
+                          <div style="width: 100%;display: flex;justify-content: center">
+                              <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Select</pv-button>
+                              <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected(2)">Select</pv-button>
                           </div>
-                          <pv-button class="planButton" v-if="plan.name==='Free'" style="background-color: darkgreen; border-color:darkgreen ;color:white" @click="planSelected(1)">Elegir</pv-button>
-                          <pv-button class="planButton" v-if="plan.name==='Premium'" style="background-color: #ff9914;border-color: #ff9914; color:white" @click="planSelected(2)">Elegir</pv-button>
                         </div>
                       </template>
                     </pv-card >
@@ -105,7 +145,7 @@
         </template>
       </pv-card>
     </div>
-    <div v-if="currentPath==='Form'">
+      <div v-if="currentPath==='Form'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
           <template #content>
@@ -207,14 +247,14 @@
                           <div class="card" style="justify-content: center;">
                               <div class="profile">
                                   <div v-if="this.profilePictureUploaded===false">
-                                      <div v-if="loading===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                      <div v-if="loadingPhoto===false" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                                           <h1>Upload a Profile Picture</h1>
                                       </div>
-                                      <div v-if="loading===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
+                                      <div v-if="loadingPhoto===true" class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                                           <h2>Uploading a Profile Picture</h2>
                                       </div>
                                       <div>
-                                          <pv-fileUpload v-if="loading===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
+                                          <pv-fileUpload v-if="loadingPhoto===false" name="demo[]" customUpload @uploader="customBase64Uploader" :multiple="false" accept="image/*" :maxFileSize="10000000">
                                               <template #empty>
                                                   <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                                                       <i class="pi pi-cloud-upload" style="font-size: 5rem; border: 2px solid white; border-radius: 50%; padding: 25px;"></i>
@@ -222,7 +262,7 @@
                                                   </div>
                                               </template>
                                           </pv-fileUpload>
-                                          <div v-if="loading===true" style="display: flex;justify-content: center;margin: 3rem">
+                                          <div v-if="loadingPhoto===true" style="display: flex;justify-content: center;margin: 3rem">
                                               <i  class="pi pi-spin pi-spinner" style="font-size: 8rem"></i>
                                           </div>
                                       </div>
@@ -237,7 +277,8 @@
                                       <h2 style="margin: 2rem">¿Do you want to continue?</h2>
                                       <div class="buttons" >
                                           <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger" @click="deleteImage()">Reload</pv-button >
-                                          <pv-button :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
+                                          <pv-button v-if="parseInt(this.userPlanSelected)!==2" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Register</pv-button >
+                                          <pv-button v-if="parseInt(this.userPlanSelected)===2" :disabled="!esFormularioCompleto" style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="uploadPhotoNext()">Continue</pv-button >
                                       </div>
                                   </div>
                               </div>
@@ -247,29 +288,35 @@
                   </template>
               </pv-card>
           </div>
-
       </div>
-    <div v-if="currentPath==='Payment'">
+      <div v-if="currentPath==='Payment'">
       <div class="card" style="height: 98vh ">
         <pv-card style=" border-radius: 1rem;justify-content: center;">
           <template #content>
             <div class="content" style="width: 50vw">
-              <p style="margin:2rem 2rem 1rem 2rem; text-decoration-line: none;color: white; cursor: pointer " @click="goBack('ProfilePicture')"  >
-                Go back
-              </p>
-              <div class="steps" >
-              </div>
               <div class="phrase" style="margin-bottom: 1rem; display: flex; justify-content: center">
                 <h1>Payment method</h1>
               </div>
               <div style=" display: flex; justify-content: center;align-content: center">
-                <div>
-
-                </div>
+                <p>To complete the registration, complete the payment of your subscription using stripe</p>
               </div>
               <div class="footer">
                 <div class="buttons" >
-                    <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen" @click="register()">Start subscription</pv-button >
+                    <div>
+                        <stripe-checkout
+                                ref="checkoutRef"
+                                mode="payment"
+                                :pk="publishableKey"
+                                :line-items="lineItems"
+                                :success-url="successURL"
+                                :cancel-url="cancelURL"
+                                @loading="v => loading = v"
+                        />
+                    </div>
+                    <div style="display: flex;justify-content: space-around;width: 100%">
+                        <pv-button style="border-radius: 1rem;color: white;background-color: darkred;border-color: darkred" severity="danger"  @click="cancelRegister()">Cancel</pv-button>
+                        <pv-button style="border-radius: 1rem;color: white;background-color: darkgreen;border-color: darkgreen"  @click="registerAndPayment()">Pay subscription</pv-button>
+                    </div>
                 </div>
               </div>
             </div>
@@ -284,16 +331,30 @@
 import {UserServices} from "@/services/user-service";
 import {PlansServices} from "@/services/plans-service";
 import { ref, getDownloadURL, uploadBytes,deleteObject } from 'firebase/storage'
-import { storage } from '../../firebaseConfig' // Importa la configuración de Firebase Storage
-
+import { storage } from '../../firebaseConfig'
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
+import {SubscriptionService} from "@/services/subscription-service";
 export default {
     name: "sign-up-plans",
+    components: {
+        StripeCheckout,
+    },
     data(){
         return{
-            loading:false,
+            publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
+            successURL:'http://localhost:5173/successful-pay',
+            cancelURL:'http://localhost:5173/unsuccessful-pay',
+            loading: false,
+            lineItems: [
+                {
+                    price: 'price_1OB0vHHe6cIQ9MTkbD9RYUzw',
+                    quantity: 1,
+                },
+            ],
+            loadingPhoto:false,
             profilePictureUploaded:false,
-          profilePictureFile: null,
-          profilePictureURL: null,
+            profilePictureFile: null,
+            profilePictureURL: null,
             value1: 'Nuestros Planes',
             options: ['Nuestros Planes', 'Plan personalizado'],
             defaultPlan: true,
@@ -321,11 +382,10 @@ export default {
         new PlansServices().getPlans().then(res=>{
             this.plans=res.data
         })
-
     },
     methods:{
         async customBase64Uploader(event){
-            this.loading=true
+            this.loadingPhoto=true
             this.profilePictureFile = event.files[0];
             if (this.profilePictureFile) {
                 this.profilePictureFile.name
@@ -334,7 +394,7 @@ export default {
                 await uploadBytes(storageRef, this.profilePictureFile);
                 this.profilePictureURL = await getDownloadURL(storageRef);
                 this.profilePictureUploaded=true
-                this.loading=false
+                this.loadingPhoto=false
             }
             console.log('URL:', this.profilePictureURL)
         },
@@ -344,7 +404,52 @@ export default {
             this.profilePictureURL=null
         },
         uploadPhotoNext(){
-          this.currentPath="Payment"
+            this.currentPath="Payment"
+        },
+        cancelRegister(){
+            location.reload();
+        },
+        registerAndPayment(){
+            let newUser={}
+            newUser.name=this.user.name
+            newUser.email=this.user.email
+            newUser.password=this.user.password
+            newUser.description=this.user.description
+            newUser.imageUrl=this.profilePictureURL
+            newUser.location="Lima, Peru"
+            newUser.type=this.selectedUserType.toUpperCase()
+            newUser.plan=parseInt(this.userPlanSelected)
+            new UserServices().registerFarmer(newUser).then(response=>{
+                new UserServices().getUserByEmail("",newUser.email).then(res=>{
+                    let subscription={}
+                    subscription.accountId=parseInt(res.data.accountId.toString())
+                    subscription.validDate=this.getActiveDateFormated().toString()
+                    subscription.active=false
+                    console.log(subscription)
+                    new SubscriptionService().createSubscription(subscription).then(r=>{
+                        localStorage.setItem("tempUserAccount",res.data.accountId)
+                        this.$refs.checkoutRef.redirectToCheckout();
+                    })
+                })
+
+            }).catch(error=>{
+                this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
+            })
+        },
+        getActiveDateFormated() {
+            // Obtener la fecha actual
+            let fechaActual = new Date();
+
+            // Sumar un mes a la fecha
+            fechaActual.setMonth(fechaActual.getMonth() + 1);
+
+            // Obtener los componentes de la nueva fecha (día, mes, año)
+            let dia = fechaActual.getDate().toString().padStart(2, '0');
+            let mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
+            let anio = fechaActual.getFullYear();
+
+            // Formatear la fecha en el formato dd/mm/aaaa
+            return `${dia}/${mes}/${anio}`;
         },
       register(){
           let newUser={}
@@ -364,6 +469,7 @@ export default {
           if(this.selectedUserType==="farmer"){
               new UserServices().registerFarmer(newUser).then(response=>{
                   this.$router.push("/sign-in")
+                  //this.$refs.checkoutRef.redirectToCheckout();
               }).catch(error=>{
                   this.$toast.add({severity:'error', summary: 'Error', detail:'Server error', life: 3000});
               })
@@ -393,8 +499,6 @@ export default {
         if(path==="sign-in"){
           this.$router.push("/sign-in")
         }
-        console.log(this.selectedUserType)
-          console.log(path)
         if(this.selectedUserType==="specialist"&&path==="Plans"){
             this.currentPath="Types"
         }else {
@@ -408,16 +512,21 @@ export default {
         this.esFormularioCompleto = (this.user.name.length>0 && this.user.email.length >0 && this.user.password.length >0 && this.user.description.length >0);
       },
       addTemporaryUser(){
-          if(this.currentPath==="SpecialistForm"){
-              this.currentPath="ProfilePicture"
-          }
-          else {
-              if(this.selectedUserType==="specialist"){
-                  this.currentPath="SpecialistForm"
-              }else {
+          new UserServices().getUserByEmail("",this.user.email).then(res=>{
+              this.$toast.add({severity:'error', summary: 'Email registered', detail:'Email already registered', life: 3000});
+          }).catch(error=>{
+              if(this.currentPath==="SpecialistForm"){
                   this.currentPath="ProfilePicture"
               }
-          }
+              else {
+                  if(this.selectedUserType==="specialist"){
+                      this.currentPath="SpecialistForm"
+                  }else {
+                      this.currentPath="ProfilePicture"
+                  }
+              }
+          })
+
 
       },
       validarNombre(evento) {
@@ -463,10 +572,6 @@ export default {
 .form-Text{
   text-align: center;
 }
-.rw{
-  color: white;
-  text-decoration: none;
-}
 .card{
   display: flex;
   justify-content: center;
@@ -509,7 +614,28 @@ p {
     margin-bottom: 0.5rem;
 }
 .price{
+
     display: flex;
+}
+.price h1{
+    font-weight: bold;font-size: 50px
+}
+.price h3{
+    margin-top: 0.5rem;
+    color: #888888;
+    font-weight: bold;font-size: 30px
+}
+.margin-feature{
+    margin: 1rem 0 1rem 1rem
+}
+.feature-container{
+    display: flex; height: 30px; justify-content: left; align-items: center;
+}
+.feature-container i{
+    font-size: 1rem; margin-right: 5px; color: darkgreen
+}
+.feature-container p{
+    font-size: 1rem; margin: 0;
 }
 .plan-cards{
     margin-bottom: 3rem;
@@ -517,6 +643,7 @@ p {
     justify-content: space-evenly;
 }
 .planButton{
+    border-radius: 1rem;
     margin-top: .5em;
 }
 @media (max-width:1280px){
@@ -526,7 +653,6 @@ p {
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
         width: 13em;
     }
     .plan-cards{
@@ -540,8 +666,29 @@ p {
         color: black;
         margin-top: 0;
         width: 14em;
-        height: 18em;
+        height: 19em;
     }
+    .price h1{
+        font-weight: bold;font-size: 25px
+    }
+    .price h3{
+        margin-top: 0.2rem;
+        color: #888888;
+        font-weight: bold;font-size: 15px
+    }
+    .margin-feature{
+        margin: 0.5rem 0 0.5rem 0.5rem
+    }
+    .feature-container{
+        display: flex; height: 20px; justify-content: left; align-items: center;
+    }
+    .feature-container i{
+        font-size: 0.7rem; margin-right: 5px; color: darkgreen
+    }
+    .feature-container p{
+        font-size: 0.7rem; margin: 0;
+    }
+
     .content h2{
         margin-bottom: 0.5rem;
         margin-top: 0;
@@ -549,13 +696,8 @@ p {
     .content p{
         margin-top: 0;
     }
-    .until{
-        visibility: hidden;
-        height: 0;
-        width: 0;
-        margin: 0;
-    }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
 }
@@ -566,8 +708,7 @@ p {
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
-        width: 11em;
+        width: 13em;
     }
     .plan-cards{
         margin-bottom: 3rem;
@@ -582,6 +723,16 @@ p {
         width: 10em;
         height: 14em;
     }
+    .price h1{
+        font-weight: bold;font-size: 25px
+    }
+    .price h3{
+        visibility: hidden;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+        color: #888888;
+        font-weight: bold;font-size: 1px
+    }
     .content h2{
         margin-bottom: 0.5rem;
         margin-top: 0;
@@ -589,13 +740,8 @@ p {
     .content p{
         margin-top: 0;
     }
-    .until{
-        visibility: hidden;
-        height: 0;
-        width: 0;
-        margin: 0;
-    }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
     .visible{
@@ -605,14 +751,14 @@ p {
         margin: 0;
     }
 }
-@media (max-width:700px){
+@media (max-width:800px){
     .type-card{
         cursor: pointer;
         border-color: white;
         border-radius: 1rem;
         background-color: #111111;
+        margin-bottom: 1rem;
         color: black;
-        margin-top: 0;
         width: 10em;
     }
     .default{
@@ -640,17 +786,18 @@ p {
         margin-top: 0;
     }
     .planButton{
+        border-radius: 1rem;
         margin-top: 0;
     }
 }
-@media (max-width:559px){
+@media (max-width:750px){
     .type-card{
         cursor: pointer;
         border-color: white;
         border-radius: 1rem;
         background-color: #111111;
         color: black;
-        margin-top: 0;
+        margin-bottom: 1rem;
         width: 10em;
     }
     .default{

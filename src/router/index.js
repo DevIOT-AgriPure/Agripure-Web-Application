@@ -4,11 +4,11 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
-            redirect: '/sign-in',
+            path: '/sign-in',
+            redirect: '/',
         },
         {
-            path: '/sign-in',
+            path: '/',
             name: 'signIn',
             component: () => import('../agripure/security/signIn.vue')
         },
@@ -98,6 +98,21 @@ const router = createRouter({
             path: '/specialist/notifications',
             name: 'specialistNotifications',
             component: () => import('../agripure/specialist/specialist_notifications.vue')
+        },
+        {
+            path: '/specialist/notifications',
+            name: 'specialistNotifications',
+            component: () => import('../agripure/specialist/specialist_notifications.vue')
+        },
+        {
+            path: '/successful-pay',
+            name: 'successfulPay',
+            component: () => import('../agripure/security/payment/successfulPay.vue')
+        },
+        {
+            path: '/unsuccessful-pay',
+            name: 'unsuccessfulPay',
+            component: () => import('../agripure/security/payment/unsuccessfulPay.vue')
         },
     ]
 })

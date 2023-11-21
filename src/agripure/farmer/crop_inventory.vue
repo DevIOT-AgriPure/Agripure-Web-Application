@@ -155,6 +155,14 @@
                               </div>
                           </div>
                       </div>
+                      <div style="margin: 1rem 1rem 1rem 1rem;width: 100%; display: flex; justify-content: space-around; align-items: center;">
+                          <p >Project specialist:</p>
+                          <pv-dropdown :disabled="allowAddSpecialist()" style="width: 60%" v-model="selectedContact" :options="currentContactForSpecialist"
+                                       optionLabel="name" placeholder="Select a specialist" />
+                          <pv-button v-if="isSpecialistForProjectAssigned!==true" :disabled="deleteCropButtonDisable" severity="secondary" style="color: white; font-weight: bold; text-align: center;" icon="pi pi-save" @click="setSpecialistToProject()"/>
+                          <pv-button v-else :disabled="deleteCropButtonDisable" severity="danger" style="color: white; font-weight: bold; text-align: center;" icon="pi pi-times" @click="removeSpecialistToProject()"/>
+
+                      </div>
                       <div style="margin-top: 2rem; display: flex; width: 100%;justify-content: space-around">
                           <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
                               <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
@@ -175,16 +183,21 @@ import {CropServices} from "../../services/crop-service"
 import {PlantServices} from "../../services/plant-service"
 import { ref } from "vue";
 import {ProjectService} from "@/services/project-service";
+import {ContactServices} from "@/services/contacts-service";
+import {UserServices} from "@/services/user-service";
 export default {
     name: "crop_inventory",
     data(){
         return{
             token: sessionStorage.getItem("jwt"),
             userName: sessionStorage.getItem("name"),
+            planId: parseInt(sessionStorage.getItem("planId").toString()),
             searchInventorValue: ref(""),
             searchInventorItems: ref([]),
             searchNewPlantValue: ref(""),
             searchNewPlantItems: ref([]),
+            selectedContact: null,
+            currentContactForSpecialist:[],
             newPlantsSearchOptions:[],
             showDropdown: false,
             displayableCrops:[],
@@ -198,16 +211,83 @@ export default {
             currentResultsPlants:[],
             currentInventoryResultsPlants:[],
             deleteCropButtonDisable:false,
+            isSpecialistForProjectAssigned:false
 
         }
     },
     created(){
         new CropServices().getCropsByFarmerId(this.token,sessionStorage.getItem("id")).then(response=>{
+            console.log(response.data)
             this.getDisplayableCrops(response.data)
         })
 
     },
     methods:{
+        allowAddSpecialist() {
+            if(this.planId===1){
+                return this.currentInventoryResultsPlants.some(crop => crop.specialistId !== 0);
+            }
+            else{
+                return false
+            }
+        },
+        getCurrentSpecialistForCrop(crop){
+            if(crop.specialistId===0){
+                this.selectedContact=null
+                this.isSpecialistForProjectAssigned=false
+            }
+            else {
+                new UserServices().getUserById(crop.specialistId).then(res=>{
+                    this.selectedContact=res.data
+                    this.isSpecialistForProjectAssigned=true
+                })
+            }
+        },
+        setSpecialistToProject(){
+          new CropServices().setSpecialistToCrop(this.token,this.currentCrop.cropId,this.selectedContact.accountId).then(res=>{
+              const cropIdToFind = this.currentCrop.cropId;
+
+              const indexToModify = this.currentInventoryResultsPlants.findIndex(crop => crop.cropId === cropIdToFind);
+
+              if (indexToModify !== -1) {
+                  this.currentInventoryResultsPlants[indexToModify].cropId =this.selectedContact.accountId;
+              } else {
+                  console.log('Crop no encontrado en currentInventoryResultsPlants');
+              }
+              this.currentCrop.specialistId=this.selectedContact.accountId
+              this.isSpecialistForProjectAssigned=true
+              this.$toast.add({severity:'success', summary: 'Specialist Established', detail:'Added successfully', life: 3000});
+          })
+        },
+        removeSpecialistToProject(){
+            new CropServices().setSpecialistToCrop(this.token,this.currentCrop.cropId,0).then(res=>{
+                const cropIdToFind = this.currentCrop.cropId;
+
+                const indexToModify = this.currentInventoryResultsPlants.findIndex(crop => crop.cropId === cropIdToFind);
+
+                if (indexToModify !== -1) {
+                    this.currentInventoryResultsPlants[indexToModify].cropId =this.selectedContact.accountId;
+                } else {
+                    console.log('Crop no encontrado en currentInventoryResultsPlants');
+                }
+                this.selectedContact=null
+                this.currentCrop.specialistId=0
+                console.log(res.data)
+                this.isSpecialistForProjectAssigned=false
+                this.$toast.add({severity:'success', summary: 'Specialist removed', detail:'Removed successfully', life: 3000});
+            })
+        },
+        getContacts(){
+            this.currentContactForSpecialist=[]
+            new ContactServices().getContactsForFarmer(this.token,sessionStorage.getItem("id")).then(response=>{
+                let rawContact=response.data
+                for (let i = 0; i < rawContact.length; i++) {
+                    new UserServices().getUserById(rawContact[i].specialistId).then(response=>{
+                        this.currentContactForSpecialist.push(response.data)
+                    })
+                }
+            })
+        },
         resetInventory(){
           this.currentInventoryResultsPlants=this.displayableCrops
             this.searchInventorValue=""
@@ -246,28 +326,26 @@ export default {
             }
         },
         newPlantSearch(event){
-            new PlantServices().getResultsByPlantName(this.searchNewPlantValue).then(response=>{
-                this.newPlantsSearchOptions=response.data
-                let options=[]
-                if(response.data.length===0){
-                    this.currentResultsPlants=[]
-                }else {
-                    for (let i = 0; i < response.data.length; i++) {
-                        options.push(response.data[i].name)
-                    }
-                    this.searchNewPlantItems=options
-                    this.currentResultsPlants=this.newPlantsSearchOptions
-                }
-
-            })
+            // Filtra los objetos cuyo atributo "name" coincide con searchInventorValue
+            const matchingNewPlants = this.defaultResultsPlants.filter(plant =>
+                plant.name.toLowerCase().includes(this.searchNewPlantValue.toString().toLowerCase())
+            );
+            if(matchingNewPlants.length===0){
+                this.currentResultsPlants=[]
+            }else {
+                this.searchNewPlantItems = matchingNewPlants.map(plant => plant.name);
+                this.currentResultsPlants=matchingNewPlants
+            }
         },
         getDisplayableCrops(rawCrop){
             this.displayableCrops=[]
             for (let i = 0; i < rawCrop.length; i++) {
+
                 let tempDisplayableCrop={}
                 new PlantServices().getPlantInfoById(rawCrop[i].plantId).then(response=>{
                     tempDisplayableCrop=response.data
                     tempDisplayableCrop.cropId=rawCrop[i].id
+                    tempDisplayableCrop.specialistId=rawCrop[i].specialistId
                     this.displayableCrops.push(tempDisplayableCrop)
                 })
                 this.currentInventoryResultsPlants=this.displayableCrops
@@ -289,6 +367,8 @@ export default {
             })
         },
         showCropDetails(crop) {
+            this.getContacts()
+            this.getCurrentSpecialistForCrop(crop)
             new ProjectService().getProjectByFarmerId(sessionStorage.getItem("id")).then(res=>{
                 let projects=res.data
                 for (let i = 0; i < projects.length; i++) {
