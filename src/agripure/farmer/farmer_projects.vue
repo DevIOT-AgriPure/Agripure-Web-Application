@@ -3,6 +3,9 @@
         <div class="header" style="display: flex;justify-content: left;">
             <h1>Manage your projects</h1>
         </div>
+        <div style="display: flex;justify-content: left;margin: 1.5rem 3rem 0rem 3rem; color: #a9a9a9">
+            <p v-if="planId===1">You are only allowed to have 1 project</p>
+        </div>
         <div class="projects">
             <div class="card">
                 <pv-dataTable ref="dt"
@@ -119,6 +122,7 @@ export default {
     data(){
         return{
             token: sessionStorage.getItem("jwt"),
+            planId: parseInt(sessionStorage.getItem("planId").toString()),
             projects:[],
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },

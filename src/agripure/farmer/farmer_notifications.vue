@@ -2,12 +2,11 @@
   <div class="background">
     <div style="margin: 2rem 2rem 2rem 2rem" >
       <h1 style="margin: 4rem 0rem 2rem 0rem">Hello {{ userName }}!</h1>
-      <div v-if="notifications.length>0" v-for="notification in notifications"
+        <div v-if="this.notifications.length>=1" v-for="notification in notifications"
            :key="notification.id">
         <div class="chat-card">
           <div class="profile-image" @click="redirectTo(notification.notificationType)">
-            <img v-if="notification.notificationType!=='string' || notification.notificationType!=='string'" :src="notification.imageUrl" alt="Foto de perfil">
-            <img v-else src="https://media.istockphoto.com/id/1152189152/vector/red-alert-icon.jpg?s=612x612&w=0&k=20&c=Kw_-i314F4cxgn2hmakp-88-O45FSx62c6r-OzKYMw4=" alt="">
+            <img :src="notification.imageUrl" alt="Foto de perfil">
           </div>
           <div class="chat-content" >
             <div class="chat-header">
@@ -34,7 +33,6 @@
 
 
 <script>
-import {FilterMatchMode} from "primevue/api";
 import {NotificationService} from "@/services/notification-service";
 import {useRoute} from "vue-router";
 
@@ -45,18 +43,18 @@ export default {
         route: null,
       userName: sessionStorage.getItem("name"),
       token: sessionStorage.getItem("jwt"),
-      notifications:null,
+      notifications:[],
     };
   },
   created(){
-      this.route = useRoute(); // Obtener la ruta actual
-    new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
-      this.notifications=response.data
-      console.log(response.data)
-        const fecha = new Date(); // Obtiene la fecha y hora actual
-        //this.getFormatDay(fecha)
+      new NotificationService().getAllNotificationByUserId(sessionStorage.getItem("id")).then(response=>{
+          this.notifications=response.data
+          console.log(response.data)
+          const fecha = new Date(); // Obtiene la fecha y hora actual
+          //this.getFormatDay(fecha)
 
-    })
+      })
+      this.route = useRoute(); // Obtener la ruta actual
     let intervalId=setInterval(() => {
           if (this.route) {
               const path = this.route.path;
