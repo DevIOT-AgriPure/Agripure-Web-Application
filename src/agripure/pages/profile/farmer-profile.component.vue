@@ -54,8 +54,8 @@
                     <div class="action-buttons">
                         <div class="acb" style="">
                             <pv-button icon="pi pi-pencil" label="Edit profile" @click="showEditProfileDialog()" text rounded aria-label="update" />
-                            <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
-                            <pv-button icon="pi pi-sign-out" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
+                            <pv-button icon="pi pi-times" severity="danger" label="Delete profile" text rounded aria-label="Filter" @click="deleteProfileDialogVisible=true" />
+                            <pv-button icon="pi pi-sign-out" severity="secondary" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
                         </div>
                     </div>
                 </div>
@@ -165,6 +165,15 @@
                 </div>
             </div>
         </pv-dialog>
+        <pv-dialog v-model:visible="deleteProfileDialogVisible"  modal header="Delete profile" :style="{ width: '30vw' }">
+            <div class="addplantbackground">
+                <h3 style="margin: 0rem 2rem 2rem 2rem">¿ Are you sure you want delete your profile ?</h3>
+                <div style="display: flex;justify-content: space-around">
+                    <pv-button label="No" severity="danger" @click="deleteProfileDialogVisible=false"/>
+                    <pv-button label="Yes" severity="success" @click="deleteProfile()"/>
+                </div>
+            </div>
+        </pv-dialog>
 
     </div>
 </template>
@@ -186,6 +195,7 @@ export default {
             profilePictureFile: null,
             profilePictureURL: null,
             esFormularioCompleto:false,
+            deleteProfileDialogVisible:false,
             editProfileDialogVisible:false,
             updatePlanDialogVisible:false,
             updateProfileDialogVisible:false,
@@ -199,8 +209,8 @@ export default {
             planId:parseInt(sessionStorage.getItem("planId").toString()),
             plan: {},
             publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
-            successURL:'http://localhost:5173/successful-pay',
-            cancelURL:'http://localhost:5173/unsuccessful-pay',
+            successURL:'https://agripure.netlify.app/successful-pay',
+            cancelURL:'https://agripure.netlify.app/unsuccessful-pay',
             loadingP: false,
             lineItems: [
                 {
@@ -219,6 +229,11 @@ export default {
         })
     },
     methods:{
+        deleteProfile(){
+            new UserServices().deleteProfile(this.id).then(res=>{
+                this.logOut()
+            })
+        },
         planSelected(planId){
             let farmer={}
             farmer.accountId=parseInt(sessionStorage.getItem("id").toString())
@@ -348,7 +363,7 @@ export default {
             sessionStorage.removeItem("type")
             sessionStorage.removeItem("planId")
 
-            this.$router.push("/sign-in")
+            this.$router.push("/")
         }
     }
 }

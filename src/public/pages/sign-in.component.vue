@@ -22,13 +22,10 @@
                     </div>
                     <div class="footer"  >
                         <div class="Text" style="font-weight: lighter; font-size: 0.9rem; margin-bottom: 3rem">
-                            <router-link to="/forgot-password" class="rw">
-                                ¿Forgot your password?
-                            </router-link>
                         </div>
                         <div class="buttons">
                             <router-link to="/sign-up" class="rw" ><pv-button style="background-color: #337e21;border-color: #337e21;color: white" label="Register"/></router-link>
-                            <pv-button @click="sign" style="background-color: #337e21;border-color: #337e21;color: white" label="Login"></pv-button>
+                            <pv-button @click="signIn" style="background-color: #337e21;border-color: #337e21;color: white" label="Login"></pv-button>
                         </div>
                     </div>
                 </template>
@@ -61,7 +58,7 @@ export default {
                     sessionStorage.setItem("type",resp.data.type.toString().toLowerCase())
                     sessionStorage.setItem("planId",resp.data.planId)
                     if(resp.data.type==="FARMER"){
-                        this.$router.push("/farmer/cropInventory")
+                        this.$router.push("/farmer/crops")
                     }else {
                         this.$router.push("/specialist/farmers")
                     }

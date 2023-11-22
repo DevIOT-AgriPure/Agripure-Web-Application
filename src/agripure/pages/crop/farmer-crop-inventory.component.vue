@@ -164,11 +164,11 @@
 
                       </div>
                       <div style="margin-top: 2rem; display: flex; width: 100%;justify-content: space-around">
-                          <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
-                              <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">To return</div>
-                          </pv-button>
                           <pv-button :disabled="deleteCropButtonDisable" severity="danger" style="width: 10rem; color: white; font-weight: bold;" @click="deleteCrop">
                               <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%">Delete plant</div>
+                          </pv-button>
+                          <pv-button severity="secondary" style="color: white; font-weight: bold; text-align: center;" @click="cropDetailsVisible=!cropDetailsVisible">
+                              <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">Close</div>
                           </pv-button>
                       </div>
                   </div>

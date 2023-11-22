@@ -124,7 +124,7 @@
                   <div style="display: flex; justify-content: center; align-items: center; font-weight: bold; height: 100%;">cancel</div>
                 </pv-button>
                 <pv-button style="width: 15rem; color: white; font-weight: bold;" :disabled="isAddContactDisable" @click="sendRequestToSpecialist">
-                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%" >Send request</div>
+                  <div style="display: flex; justify-content: center; align-items: center; height: 100%;width: 100%" >Add specialist</div>
                 </pv-button>
               </div>
             </div>

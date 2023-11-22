@@ -51,8 +51,8 @@
                     <div class="action-buttons">
                         <div class="acb" style="">
                             <pv-button icon="pi pi-pencil" label="Edit profile" @click="showEditProfileDialog()" text rounded aria-label="update" />
-                            <pv-button icon="pi pi-times" label="Delete profile" text rounded aria-label="Filter" />
-                            <pv-button icon="pi pi-sign-out" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
+                            <pv-button icon="pi pi-times" severity="danger" label="Delete profile" text rounded aria-label="Filter" @click="deleteProfileDialogVisible=true"/>
+                            <pv-button icon="pi pi-sign-out" severity="secondary" label="Sign Out" text rounded aria-label="Filter" @click="logOut()"/>
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,15 @@
                 </div>
             </div>
         </pv-dialog>
-
+        <pv-dialog v-model:visible="deleteProfileDialogVisible"  modal header="Delete profile" :style="{ width: '30vw' }">
+            <div class="addplantbackground">
+                <h3 style="margin: 0rem 2rem 2rem 2rem">¿ Are you sure you want delete your profile ?</h3>
+                <div style="display: flex;justify-content: space-around">
+                    <pv-button label="No" severity="danger" @click="deleteProfileDialogVisible=false"/>
+                    <pv-button label="Yes" severity="success" @click="deleteProfile()"/>
+                </div>
+            </div>
+        </pv-dialog>
     </div>
 </template>
 <script >
@@ -144,6 +152,7 @@ import {SpecialistServices} from "@/agripure/services/specialists-api.service";
 export default {
     data(){
         return{
+            id:parseInt(sessionStorage.getItem("id").toString()),
             plans:[],
             loading:false,
             profilePictureFile: null,
@@ -151,6 +160,7 @@ export default {
             esFormularioCompleto:false,
             editProfileDialogVisible:false,
             updatePlanDialogVisible:false,
+            deleteProfileDialogVisible:false,
             updateProfileDialogVisible:false,
             userName:sessionStorage.getItem("name"),
             userDescription:sessionStorage.getItem("description"),
@@ -172,6 +182,11 @@ export default {
         })
     },
     methods:{
+        deleteProfile(){
+            new UserServices().deleteProfile(this.id).then(res=>{
+                this.logOut()
+            })
+        },
         async customBase64Uploader(event){
             this.loading=true
             this.profilePictureFile = event.files[0];

@@ -39,7 +39,7 @@
           <pv-column  header="" style="min-width: 1rem">
             <template #body="{ data }">
                 <div style="display: flex;justify-content: space-evenly">
-                  <pv-button :disabled="isWatchDisable" style="margin-right: 0.5rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
+                  <pv-button :disabled="isWatchDisable || !data.active" style="margin-right: 0.5rem" icon="pi pi-eye" label="Watch" severity="secondary" aria-label="Information" @click="getDeviceValue(data)"/>
                     <pv-button  icon="pi pi-cog" style="margin-right: 0.5rem" severity="warning" rounded aria-label="options" @click="openInfoDeviceDialog(data)"/>
                 </div>
             </template>
@@ -55,12 +55,84 @@
           </div>
         </div>
       </pv-dialog>
-      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Monitoring" :style="{ width: '80vw' }">
+      <pv-dialog v-model:visible="deviceValueDialogVisible" maximizable modal header="Monitoring" :style="{ width: '40rem' }">
         <div class="addplantbackground">
-          <div class="crop-details">
-            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
-            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
+            <div style="display: flex;justify-items: center;align-items: center">
+                <i class="pi pi-circle-fill" style="color: green;font-size: 0.7rem;margin-right: 0.5rem" ></i>
+                <h3>{{currentDevice.cropName}} - {{currentDevice.model}}</h3>
+            </div>
+            <div v-if="currentDevice.model==='DHT22'" class="crop-details">
+              <div style="display: flex; margin-top: 1rem; justify-content: space-around">
+                  <div v-if="isTemperatureOutOfRange()===false">
+                      <div style="display: flex;justify-items: center;align-items: center">
+                          <h2 style="margin: 1rem ; font-size: 5rem">{{ formatNumber(currentDeviceValue.planTemperature) }}</h2>
+                          <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem">ºC</p>
+                      </div>
+                      <div style="display: flex;justify-content: center;width: 100%">
+                          <p>TEMPERATURE</p>
+                      </div>
+                  </div>
+                  <div v-if="isTemperatureOutOfRange()===true">
+                      <div style="display: flex;justify-items: center;align-items: center">
+                          <h2 style="margin: 1rem ; font-size: 5rem;color: #ff4b4b">{{ formatNumber(currentDeviceValue.planTemperature) }}</h2>
+                          <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem;color: #ff4b4b">ºC</p>
+                      </div>
+                      <div style="display: flex;justify-content: center;width: 100%;color: #ff4b4b">
+                          <div>
+                              <p>TEMPERATURE</p>
+                              <p>OUT OF RANGE</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div v-if="isHumidityOutOfRange()===false">
+                      <div style="display: flex;justify-items: center;align-items: center">
+                          <h2 style="margin: 1rem ; font-size: 5rem">{{ formatNumber(currentDeviceValue.planHumidity) }}</h2>
+                          <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem"> %</p>
+                      </div>
+                      <div style="display: flex;justify-content: center;width: 100%">
+                          <p>HUMIDITY</p>
+                      </div>
+                  </div>
+                  <div v-if="isHumidityOutOfRange()===true">
+                      <div style="display: flex;justify-items: center;align-items: center">
+                          <h2 style="margin: 1rem ; font-size: 5rem;color: #ff4b4b">{{ formatNumber(currentDeviceValue.planHumidity) }}</h2>
+                          <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem;color: #ff4b4b"> %</p>
+                      </div>
+                      <div style="display: flex;justify-content: center;width: 100%;color: #ff4b4b">
+                          <div>
+                              <p>TEMPERATURE</p>
+                              <p>OUT OF RANGE</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
+            <div v-if="currentDevice.model==='DS18B20'" class="crop-details">
+                <div style="display: flex; margin-top: 1rem; justify-content: space-around">
+                    <div v-if="isTemperatureOutOfRange()===false">
+                        <div style="display: flex;justify-items: center;align-items: center">
+                            <h2 style="margin: 1rem ; font-size: 5rem">{{ formatNumber(currentDeviceValue.planTemperature) }}</h2>
+                            <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem">ºC</p>
+                        </div>
+                        <div style="display: flex;justify-content: center;width: 100%">
+                            <p>TEMPERATURE</p>
+                        </div>
+                    </div>
+                    <div v-if="isTemperatureOutOfRange()===true">
+                        <div style="display: flex;justify-items: center;align-items: center">
+                            <h2 style="margin: 1rem ; font-size: 5rem;color: #ff4b4b">{{ formatNumber(currentDeviceValue.planTemperature) }}</h2>
+                            <p style="margin: 1rem 0rem 1rem 0rem ; font-size: 4rem;color: #ff4b4b">ºC</p>
+                        </div>
+                        <div style="display: flex;justify-content: center;width: 100%;color: #ff4b4b">
+                            <div>
+                                <p>TEMPERATURE</p>
+                                <p>OUT OF RANGE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </pv-dialog>
       <pv-dialog v-model:visible="deviceDialogVisible" maximizable modal header="Device Settings" :style="{ width: '20rem' }">
@@ -201,8 +273,8 @@ export default {
         verified: { value: null, matchMode: FilterMatchMode.EQUALS }
       },
         publishableKey:'pk_test_51OAzYZHe6cIQ9MTkeu2FPZCcR1olGo1LeCLLkUNdmVvEXBGmIv2Tw3jFWWhqzCDZ6agSJYrMsQhBwCOdEeeMs3zf007fpn6u8x',
-        successURL:'http://localhost:5173/farmer/devices',
-        cancelURL:'http://localhost:5173/unsuccessful-pay',
+        successURL:'https://agripure.netlify.app/farmer/devices',
+        cancelURL:'https://agripure.netlify.app/unsuccessful-pay',
         loading: false,
         lineItems: [
             {
@@ -229,6 +301,8 @@ export default {
         isBuyButtonDisable:true,
         isDeviceBoughtDialog:false,
         isWatchDisable:false,
+        currentDevice:null,
+        currentCropRanges:null
     };
   },
   created(){
@@ -244,6 +318,31 @@ export default {
     this.getDisplayableCrops()
   },
   methods:{
+      isTemperatureOutOfRange(){
+          let minRange=this.currentCropRanges.minHumidity
+          let maxRange=this.currentCropRanges.maxHumidity
+          if(this.currentDeviceValue.planTemperature>=maxRange || this.currentDeviceValue.planTemperature<=minRange ){
+              return true
+          }else {
+              return false
+          }
+      },
+      isHumidityOutOfRange(){
+          let minRange=this.currentCropRanges.minHumidity
+          let maxRange=this.currentCropRanges.maxHumidity
+          if(this.currentDeviceValue.planHumidity>=maxRange || this.currentDeviceValue.planHumidity<=minRange ){
+              return true
+          }else {
+              return false
+          }
+      },
+      formatNumber(number) {
+          // Redondear el número a una decimal y convertirlo a una cadena
+          const formated = number.toFixed(1);
+
+          // Convertir la cadena a un número
+          return parseFloat(formated);
+      },
       cancelBuyButton(){
           this.currentDeviceName=null
           this.selectedCrop=null
@@ -301,10 +400,9 @@ export default {
                   for (let i = 0; i < rawCrops.length; i++) {
                       new PlantServices().getPlantInfoById(rawCrops[i].plantId).then(res=>{
                           let storableCropAndPlantInfo={}
-
                           storableCropAndPlantInfo=res.data
                           storableCropAndPlantInfo.cropId=rawCrops[i].id
-
+                          console.log(storableCropAndPlantInfo)
                           this.cropsForFarmer.push(storableCropAndPlantInfo)
                       })
                   }
@@ -326,9 +424,14 @@ export default {
           //new DeviceServices().postDevice()
       },
       getDeviceValue(data){
+          console.log(data)
+          this.currentDevice=data
+          this.currentCropRanges=this.cropsForFarmer.find(crop => crop.cropId === this.currentDevice.cropId);
           this.isWatchDisable=true
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data
+          //this.currentDeviceValue.planTemperature=20.33333
+          //this.currentDeviceValue.planHumidity=70.33333
         this.deviceValueDialogVisible=true
       })
 
@@ -408,15 +511,6 @@ export default {
 
         case false:
           return 'danger';
-      }
-    },
-      getDeviceStatus(status){
-      switch (status) {
-        case true:
-          return 'On';
-
-        case false:
-          return 'Off';
       }
     },
       openActivities(id){

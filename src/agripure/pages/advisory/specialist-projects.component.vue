@@ -233,6 +233,7 @@
                                         <div class="chat-header">
                                             <div style="width: 100%;">
                                                 <h3 style="margin-bottom: 0.5rem">{{ device.name }}</h3>
+                                                <p>{{device.category}}</p>
                                             </div>
                                             <div>
                                                 <pv-button :disabled="isShowDataButtonDisable" icon="pi pi-eye" severity="success" label="value" @click="showRealTimeValue(device)"  aria-label="watch"/>
@@ -243,8 +244,13 @@
                             </div>
                         </div>
                         <div v-else>
-                            <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
-                            <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
+                            <div v-if="currentDeviceInShowingData.model==='DHT22'">
+                                <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
+                                <h2 style="margin: 1rem ">Humedity: {{currentDeviceValue.planHumidity}} %</h2>
+                            </div>
+                            <div v-if="currentDeviceInShowingData.model==='DS18B20'">
+                                <h2 style="margin: 1rem ">Temperature: {{currentDeviceValue.planTemperature}} C</h2>
+                            </div>
                             <div style="width: 100%;display: flex;justify-content: right">
                               <pv-button severity="secondary" label="return" @click="stopShowingDeviceData()"  aria-label="watch"/>
                             </div>
@@ -316,7 +322,8 @@ export default {
             taskForProject:[],
             isNextButtonDisable:true,
             isAddTaskButtonDisable:true,
-            isCreateProjectButtonDisable:true
+            isCreateProjectButtonDisable:true,
+            currentDeviceInShowingData:null
         };
     },
     created(){
@@ -330,6 +337,8 @@ export default {
     },
     methods:{
         showRealTimeValue(device){
+            this.currentDeviceInShowingData=device
+            console.log(this.currentDeviceInShowingData)
             this.isShowDataButtonDisable=true
             let tempDevice={}
             tempDevice.id=device.deviceId
@@ -366,6 +375,7 @@ export default {
                 if ( this.isDeviceShowingData) {
                     new DeviceServices().getDeviceValueById(device.id).then(res=>{
                         this.currentDeviceValue=res.data
+                        console.log(this.currentDeviceValue)
                     })
                 }
                 else {
@@ -391,6 +401,15 @@ export default {
           new DeviceServices().getDeviceInfoByCropId(data.cropId).then(res=>{
               this.isDeviceDialogVisible=true
               this.currentDevices=res.data
+                  for (let i = 0; i < this.currentDevices.length; i++) {
+                      new DeviceServices().getDeviceById(this.currentDevices[i].deviceId).then(r=>{
+                          this.currentDevices[i].model=r.data.model
+                          this.currentDevices[i].category=r.data.category
+                      })
+                  }
+
+
+              console.log(this.currentDevices)
           })
         },
         setActivitysForProject(){

@@ -6,5 +6,8 @@ export class PlantServices{
     getAllPlants(){
         return http.get("plant");
     }
+    getPlantRangesById(id){
+        return http.get("/ranges/"+id)
+    }
 
 }

@@ -1,6 +1,10 @@
 import http from "@/shared/services/http-common";
 
 export class UserServices{
+
+    deleteProfile(accountId){
+        return http.delete("profiles/deleteProfile/"+accountId)
+    }
     updateSpecialist(specialist){
         return http.put("profiles/updateSpecialist",{
             "accountId": specialist.accountId,
