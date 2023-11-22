@@ -40,8 +40,8 @@
 
 <script>
 import {ref} from "vue";
-import {ContactServices} from "../services/contacts-api.service"
-import {UserServices} from "../services/user-api.service"
+import {ContactServices} from "../../services/contacts-api.service"
+import {UserServices} from "../../services/user-api.service"
 import {ChatServices} from "@/agripure/services/chat-api.service";
 import {useRoute} from "vue-router";
 

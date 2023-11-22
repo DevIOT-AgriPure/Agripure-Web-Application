@@ -85,8 +85,8 @@
 
 <script>
 import { ref } from "vue";
-import {ContactServices} from "../services/contacts-api.service"
-import {UserServices} from "../services/user-api.service"
+import {ContactServices} from "../../services/contacts-api.service"
+import {UserServices} from "../../services/user-api.service"
 import {ProjectApiService} from "@/agripure/services/project-api.service";
 
 export default {

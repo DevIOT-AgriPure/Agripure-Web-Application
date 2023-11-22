@@ -179,8 +179,8 @@
 </template>
 
 <script>
-import {CropServices} from "../services/crop-api.service"
-import {PlantServices} from "../services/plant-api.service"
+import {CropServices} from "../../services/crop-api.service"
+import {PlantServices} from "../../services/plant-api.service"
 import { ref } from "vue";
 import {ProjectApiService} from "@/agripure/services/project-api.service";
 import {ContactServices} from "@/agripure/services/contacts-api.service";

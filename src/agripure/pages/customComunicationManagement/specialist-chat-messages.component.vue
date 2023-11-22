@@ -34,13 +34,13 @@
 </template>
 
 <script>
-import {UserServices} from "../services/user-api.service"
+import {UserServices} from "../../services/user-api.service"
 import {ChatServices} from "@/agripure/services/chat-api.service";
 import {ContactServices} from "@/agripure/services/contacts-api.service";
 import {useRoute} from "vue-router";
 
 export default {
-    name: "farmer_chatMessages",
+    name: "specialist_chatMessages",
     props: ['id'], // Declara que esperas recibir el parámetro 'id' como prop
     data() {
         return {
@@ -61,7 +61,7 @@ export default {
         })
         new ContactServices().getContactById(this.id).then(response=>{
             this.chatStarted =response.data.isChatStarted
-            new UserServices().getUserById(response.data.specialistId).then(response=>{
+            new UserServices().getUserById(response.data.farmerId).then(response=>{
                 this.displayableContactInfo=response.data
                 this.scrollBottom()
             })
@@ -69,11 +69,12 @@ export default {
       let intervalId=setInterval(() => {
             if (this.route) {
                 const path = this.route.path;
-                if(path===("/farmer/chats/"+this.id)){
+                if(path===("/specialist/chats/"+this.id)){
                     new ChatServices().getChatByContactId(this.id).then(response=>{
                         this.rawMessages=response.data
                     })
-                }else{
+                    console.log("ImplementarWebSocket para chat")
+                }else {
                   clearInterval(intervalId)
                 }
             }
@@ -81,9 +82,9 @@ export default {
         }, 5000);
     },
     methods:{
-      goback(){
-          this.$router.push("/farmer/chats")
-      },
+        goback(){
+            this.$router.push("/specialist/chats")
+        },
         formatTimeWithAmPm(date) {
             const hours = date.getHours();
             const minutes = date.getMinutes();
@@ -93,17 +94,18 @@ export default {
             return `${formattedHours}:${formattedMinutes} ${amPm}`;
         },
         checkSendButtonDisable(){
-          if(this.message!==""){
-              this.isSendButtonDisable=false
-          }else {
-              this.isSendButtonDisable=true
-          }
+            if(this.message!==""){
+                this.isSendButtonDisable=false
+            }else {
+                this.isSendButtonDisable=true
+            }
         },
         sendMessage(){
             let newMessage={}
             newMessage.contactId=this.id
             newMessage.authorId=parseInt(sessionStorage.getItem("id").toString())
             newMessage.message=this.message
+            newMessage.order=this.rawMessages.length+1
             newMessage.hour=this.formatTimeWithAmPm(new Date())
             if(this.chatStarted===false){
                 new ContactServices().startChatContact(this.id).then(res=>{
@@ -112,12 +114,10 @@ export default {
             }
             new ChatServices().sendMessage(newMessage).then(res=>{
                 this.rawMessages.push(newMessage)
+                //Enviar el mensaje en el service
                 this.message=""
                 setTimeout(this.scrollBottom,100)
             })
-
-            //Enviar el mensaje en el service
-
 
 
         },
