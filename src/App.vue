@@ -1,5 +1,5 @@
 <script setup>
-import Sidebar from './components/Sidebar.vue'
+import Sidebar from './agripure/components/sidebar.component.vue'
 </script>
 
 <template>
