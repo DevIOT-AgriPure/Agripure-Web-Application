@@ -1,14 +1,10 @@
-import axios from "axios";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/plant",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
 export class PlantServices{
     getPlantInfoById(id){
-        return http.get("/"+id);
+        return http.get("/plant/"+id);
     }
     getAllPlants(){
-        return http.get("");
+        return http.get("plant");
     }
 
 }

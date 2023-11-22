@@ -362,13 +362,17 @@ export default {
       this.deleteDeviceDialogVisible=!this.deleteDeviceDialogVisible
     },
       openInfoDeviceDialog(device){
+          console.log(device)
           this.currentDeviceForInfo={}
           this.currentDeviceForInfo=device
           this.currentDeviceForInfoName=""
           this.currentDeviceForInfoName=device.name
           if(device.projectId>0){
               new ProjectService().getProjectById(device.projectId).then(response=>{
+
                   this.currentDeviceForInfo.projectName= response.data.name.toString()
+              }).then(errer=>{
+                  console.log(errer.data)
               })
           }
           this.deviceDialogVisible=!this.deviceDialogVisible

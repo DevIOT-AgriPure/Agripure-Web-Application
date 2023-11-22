@@ -1,11 +1,8 @@
-import axios from "axios";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/notifications",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
+
 export class NotificationService{
     sendNotification(notification){
-        return http.post("",{
+        return http.post("notifications",{
             "message": notification.message,
             "imageUrl": notification.imageUrl,
             "notificationType": notification.notificationType,
@@ -18,11 +15,11 @@ export class NotificationService{
     }
     getAllNotificationByUserId(userId){
 
-        return http.get("/getByToAccountId/"+userId);
+        return http.get("notifications/getByToAccountId/"+userId);
     }
 
     deleteNotification(id){
-        return http.delete("/deleteNotificationById/"+id)
+        return http.delete("notifications/deleteNotificationById/"+id)
     }
 
 }

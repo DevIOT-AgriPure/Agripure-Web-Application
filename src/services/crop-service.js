@@ -1,9 +1,4 @@
-import axios from "axios";
-import {PlantServices} from "@/services/plant-service";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
 export class CropServices{
     addCrop(token,farmerId,plantId){
         return http.post("crops",{

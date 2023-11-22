@@ -1,29 +1,28 @@
-import axios from "axios";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/devices",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
 export class DeviceServices{
     getDeviceInfoByCropId(id){
-        return http.get("/cropId/"+id);
+        return http.get("devices/cropId/"+id);
+    }
+    getFullDeviceInfoByCropId(id){
+        return http.get("devices/device/cropId/"+id);
     }
     getDeviceById(id){
-        return http.get("/"+id);
+        return http.get("devices/"+id);
     }
     getAllDevicesByUserId(id){
-        return http.get("/getDevicesByFarmerId/"+id);
+        return http.get("devices/getDevicesByFarmerId/"+id);
     }
     getDeviceValueById(id){
-        return http.get("/temperaturehumidity/"+id);
+        return http.get("devices/temperaturehumidity/"+id);
     }
     setDeviceStatus(device){
-        return http.post("/status",{
+        return http.post("devices/status",{
             "deviceId": device.id,
             "newStatus": !device.active
         })
     }
     updateDeviceById(device){
-        return http.put("/updateDeviceById",{
+        return http.put("devices/updateDeviceById",{
             "id": device.id,
             "name": device.name,
             "cropName": device.cropName,
@@ -32,14 +31,8 @@ export class DeviceServices{
             "activeNotification": device.activeNotification
         })
     }
-    setDeviceNotification(device){
-        return http.post("/notification",{
-            "deviceId": device.id,
-            "newStatus": !device.activeNotification
-        })
-    }
     postDevice(device){
-        return http.post("",{
+        return http.post("devices",{
             "name": device.name,
             "model": device.model,
             "category": device.category,

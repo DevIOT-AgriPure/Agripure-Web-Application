@@ -1,17 +1,13 @@
-import axios from "axios";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/activities",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
 export class ActivitiesService{
     setActivityCompleted(id){
-        return http.put("/completeActivity/"+id);
+        return http.put("activities/completeActivity/"+id);
     }
     getActivitiesByProjectId(token,id){
-        return http.get("/activityByProjectId/"+id,);
+        return http.get("activities/activityByProjectId/"+id,);
     }
     addActivity(activity){
-        return http.post("",{
+        return http.post("activities",{
             "projectId": activity.projectId,
             "title": activity.title,
             "description": activity.description,

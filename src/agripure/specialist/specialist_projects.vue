@@ -109,8 +109,8 @@
             </pv-dialog>
             <pv-dialog v-model:visible="createProjectVisible" maximizable modal header="Create a project" :style="{ width: '800px' }">
                 <div class="addplantbackground">
-                    <div v-if="this.devices > 0" style="margin: 0rem 2rem 2rem 2rem; display: flex; align-items: center;">
-                        <p style="margin-right: 0.5rem;">This crop has {{ this.devices }} monitoring</p>
+                    <div v-if="this.devices.length > 0" style="margin: 0rem 2rem 2rem 2rem; display: flex; align-items: center;">
+                        <p style="margin-right: 0.5rem;">This crop has {{ this.devices.length }} monitoring</p>
                         <pv-button :disabled="isShowDataButtonDisable" label="devices" severity="secondary"
                                    aria-label="Information"  @click="openDeviceDialog(selectedCrop)" />
                     </div>
@@ -323,8 +323,6 @@ export default {
         this.startProjectMinDate = new Date();
         new ProjectService().getProjectsBySpecialistId(this.id).then(response=>{
             this.projects=response.data
-            console.log(this.projects)
-
             this.setFarmerDataToProject()
             this.setDurationDayToProject()
             this.setActivitysForProject()
@@ -337,7 +335,6 @@ export default {
             tempDevice.id=device.deviceId
             tempDevice.active=false
             new DeviceServices().getDeviceById(tempDevice.id).then(r=>{
-                console.log(r.data)
                 let shouldTurnOff=!r.data.active
                 new DeviceServices().setDeviceStatus(tempDevice).then(res=>{
                     this.isDeviceShowingData=true
@@ -369,7 +366,6 @@ export default {
                 if ( this.isDeviceShowingData) {
                     new DeviceServices().getDeviceValueById(device.id).then(res=>{
                         this.currentDeviceValue=res.data
-                        console.log(this.currentDeviceValue)
                     })
                 }
                 else {
@@ -471,7 +467,6 @@ export default {
             newProject.farmerName=this.selectedContact.name
             newProject.farmerImageUrl=this.selectedContact.imageUrl
             newProject.cropId=this.selectedCrop.cropId
-            newProject.devices=this.selectedCrop.cropId
             newProject.startDate=this.formatPeruvianDate(this.startProjectDate)
             newProject.endDate=this.formatPeruvianDate(this.finishProjectDate)
             newProject.specialistId=this.id
@@ -479,7 +474,8 @@ export default {
             newProject.totalActivities=this.taskForProject.length
             newProject.activitiesDone=0
             newProject.projectStarted=this.isProjectStarted()
-            newProject.device = this.devices > 0;
+            newProject.device = this.devices.length > 0;
+            console.log(newProject)
             new ProjectService().createProject(newProject).then(res=>{
                 new ProjectService().getProjectsBySpecialistId(newProject.specialistId).then(response=>{
                   for (let i = 0; i < response.data.length; i++){
@@ -488,6 +484,7 @@ export default {
                           this.projects.push(newProject)
                           //add task as activities
                           this.createStorableTaskForProject()
+                          this.updateProjectIdInDevices(newProject.cropId,response.data[i].id)
                           this.createProjectVisible=false
                           this.taskStep=false
                           this.selectionStep=true
@@ -498,14 +495,22 @@ export default {
 
             })
         },
+        updateProjectIdInDevices(cropId,projectId){
+            new DeviceServices().getFullDeviceInfoByCropId(cropId).then(res=>{
+                let deviceList=res.data
+                for (let i = 0; i < deviceList.length; i++) {
+                    let tempDevice=deviceList[i]
+                    tempDevice.projectId=projectId
+                    console.log(tempDevice)
+                    new DeviceServices().updateDeviceById(tempDevice).then(r=>{
+
+                    })
+                }
+
+            })
+        },
         createStorableTaskForProject(){
-            console.log("projects")
-            console.log(this.projects)
-            console.log("projectId")
-            console.log(this.projects[this.projects.length-1].id)
             let tempStorableTaskList=[]
-            console.log("taskForProject")
-            console.log(this.taskForProject)
             for (let i = 0; i < this.taskForProject.length; i++) {
                 let tempStorableTask={}
                 tempStorableTask.id=i+1
@@ -519,12 +524,8 @@ export default {
             this.uploadTaskAsActivities(tempStorableTaskList)
         },
         uploadTaskAsActivities(tempStorableTaskList){
-            console.log("uploadTaskAsActivities")
-            console.log(tempStorableTaskList)
             for (let i = 0; i < tempStorableTaskList.length; i++) {
-                console.log(tempStorableTaskList[i])
                 new ActivitiesService().addActivity(tempStorableTaskList[i]).then(res=>{
-                    console.log("subi task")
                 })
             }
 
@@ -557,8 +558,9 @@ export default {
                     if(this.projectName !== ""&&this.projectDescription!== ""){
                         this.isNextButtonDisable=false
                     }
-                    new DeviceServices().getDeviceInfoByCropId(this.selectedCrop.id).then(res=>{
-                        this.devices=res.data.length
+                    new DeviceServices().getDeviceInfoByCropId(this.selectedCrop.cropId).then(res=>{
+                        this.devices=res.data
+                        console.log(this.devices.length)
                         this.selectionStep=false
                         this.informationStep=true
                     })
@@ -624,11 +626,8 @@ export default {
             newTask.description=this.taskDescription
             newTask.date=this.activityProjectDate
             if(this.isTaskUnique(newTask)){
-                console.log("newTask  added")
-                console.log(this.taskForProject)
                 this.taskForProject.push(newTask)
             }else {
-                console.log("tarea repetida")
                 this.$toast.add({severity:'error', summary: 'Repeated task ', detail:'You have entered a repeated task on the same day', life: 3000});
             }
             this.taskName=""
@@ -671,7 +670,6 @@ export default {
                                             storableCropAndPlantInfo=res.data
                                             storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
                                             this.currentCropsForFarmer.push(storableCropAndPlantInfo)
-                                            console.log(this.currentCropsForFarmer)
                                         })
                                     }
                                 }
@@ -681,7 +679,6 @@ export default {
                                     storableCropAndPlantInfo=res.data
                                     storableCropAndPlantInfo.cropId=cropsForFarmer[i].id
                                     this.currentCropsForFarmer.push(storableCropAndPlantInfo)
-                                    console.log(this.currentCropsForFarmer)
                                 })
                             }
                         }
@@ -691,6 +688,7 @@ export default {
             })
         },
         cleanProjectData(){
+            this.devices=[]
             this.selectedContact=null
             this.selectedCrop=null
             this.projectName=""
@@ -756,7 +754,6 @@ export default {
             }
         },
         openActivities(project){
-            console.log(project)
             this.activitiesDialogVisible=!this.activitiesDialogVisible
             new ActivitiesService().getActivitiesByProjectId(this.token,project.id).then(response=>{
                 this.currentActivities=response.data

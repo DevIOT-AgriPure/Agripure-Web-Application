@@ -1,11 +1,7 @@
-import axios from "axios";
-const http = axios.create({
-    baseURL:"http://localhost:8080/api/v1/messages",
-    headers: { "Content-type": "application/json" },
-})
+import http from "@/shared/services/http-common";
 export class ChatServices{
     sendMessage(message){
-        return http.post("",{
+        return http.post("messages",{
             "contactId": message.contactId,
             "authorId": message.authorId,
             "message": message.message,
@@ -13,7 +9,7 @@ export class ChatServices{
         })
     }
     getChatByContactId(id){
-        return http.get("/"+id);
+        return http.get("messages/"+id);
     }
 
 }
