@@ -430,6 +430,7 @@ export default {
           this.isWatchDisable=true
       new DeviceServices().getDeviceValueById(data.id).then(res=>{
         this.currentDeviceValue=res.data
+        //this.currentDeviceValue.planMinTemperature
           //this.currentDeviceValue.planTemperature=20.33333
           //this.currentDeviceValue.planHumidity=70.33333
         this.deviceValueDialogVisible=true
