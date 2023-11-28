@@ -1,37 +1,57 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import Sidebar from './agripure/components/sidebar.component.vue'
 </script>
 
 <template>
-  <RouterView />
+    <div class="app">
+        <pv-toast></pv-toast>
+        <!-- Sidebar -->
+        <Sidebar />
+        <!-- Content -->
+        <RouterView />
+    </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style lang="scss">
+:root {
+    --primary: #f5f5f5;
+    --primary-alt: #22c55e;
+    --grey: #64748b;
+    --dark: #242424;
+    --dark-alt: #282828;
+    --light: #181818;
+    --sidebar-width: 300px;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Fira sans', sans-serif;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+body {
+    background: var(--light);
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+button {
+    cursor: pointer;
+    appearance: none;
+    border: none;
+    outline: none;
+    background: none;
+}
 
-  header .wrapper {
+.app {
     display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+
+    main {
+        flex: 1 1 0;
+        padding: 2rem;
+
+        @media (max-width: 1024px) {
+            padding-left: 6rem;
+        }
+    }
 }
 </style>
